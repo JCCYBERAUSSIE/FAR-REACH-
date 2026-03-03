@@ -8,7 +8,8 @@
 <meta name="theme-color" content="#04060e">
 <title>FAR REACH — One Planet Was Never Enough</title>
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Far%20Reach%22,%22short_name%22:%22Far%20Reach%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%2304060e%22,%22theme_color%22:%22%2340d8ff%22,%22description%22:%22A%20hex-based%20strategy%20game%20from%20castle%20to%20the%20stars%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20fill%3D'%2304060e'/%3E%3Ctext%20x%3D'256'%20y%3D'340'%20text-anchor%3D'middle'%20font-size%3D'300'%3E%F0%9F%8C%8C%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]}">
-<style>@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;1,300&display=swap');:root{--bg:#04060e;--panel:rgba(4,8,20,0.96);--bord:rgba(60,140,255,0.3);--gold:#f0c040;--gold-lt:#ffe080;--cyan:#40d8ff;--red:#ff4444;--green:#40ff80;--parchment:#d8e8f8;--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);--safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px)}*{box-sizing:border-box;margin:0;padding:0}html{height:100%;height:-webkit-fill-available}body{background:var(--bg);font-family:'Exo 2',sans-serif;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;color:var(--parchment);padding-left:var(--safe-l);padding-right:var(--safe-r)}#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s infinite}@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}#hdr{position:relative;z-index:10;background:linear-gradient(180deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-bottom:1px solid var(--bord);padding:6px 14px;padding-top:calc(6px+var(--safe-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 24px rgba(0,0,0,0.9),0 0 40px rgba(0,30,80,0.3)}#logo{display:none}.hstats{display:flex;align-items:stretch;gap:0;flex:1;justify-content:center;}.hs{display:flex;align-items:center;gap:6px;padding:4px 14px;border-left:1px solid rgba(60,140,255,0.12);font-size:9px}.hs:first-child{border-left:none}.hs-icon{font-size:14px;line-height:1;flex-shrink:0}.hs-block{display:flex;flex-direction:column;line-height:1}.hs-v{font-family:'Orbitron',monospace;color:var(--cyan);font-size:14px;font-weight:700;min-width:20px;line-height:1.1}.hs-l{color:rgba(216,232,248,0.32);font-size:7px;text-transform:uppercase;letter-spacing:1px;margin-top:1px}#tbadge{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--cyan);border:1px solid var(--bord);padding:3px 8px;background:rgba(64,216,255,0.04);border-radius:2px}#era-badge{font-size:8px;color:var(--gold);letter-spacing:1px;border:1px solid rgba(240,192,64,0.22);padding:3px 8px;background:rgba(240,192,64,0.04);border-radius:2px;display:inline-block;}#music-btn,#planet-btn{background:none;border:1px solid var(--bord);color:var(--cyan);font-size:13px;padding:4px 8px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-left:3px;min-width:32px;min-height:32px}#music-btn:hover,#planet-btn:hover{background:rgba(64,216,255,0.1);border-color:var(--cyan)}#wrap{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;min-height:0}#cvs-wrap{flex:1;position:relative;overflow:hidden}canvas{position:absolute;top:0;left:0;cursor:crosshair;touch-action:none}#side{width:260px;min-width:200px;max-width:420px;background:var(--panel);border-left:1px solid var(--bord);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative;resize:horizontal;}#side-drag{position:absolute;left:0;top:0;bottom:0;width:5px;cursor:ew-resize;background:transparent;z-index:20;transition:background 0.2s;}#side-drag:hover{background:rgba(64,216,255,0.18);}.ss{border-bottom:1px solid rgba(60,140,255,0.1);padding:8px 10px}.st{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:3px;color:var(--cyan);margin-bottom:5px}#sel-panel{flex:1;overflow-y:auto;padding:9px;scrollbar-width:thin;scrollbar-color:var(--bord) transparent}.igrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.ic{background:rgba(64,216,255,0.04);border:1px solid rgba(64,216,255,0.1);padding:5px 6px;border-radius:3px}.icl{font-size:7px;color:rgba(216,232,248,0.3);letter-spacing:1px;text-transform:uppercase}.icv{font-family:'Orbitron',monospace;font-size:12px;color:var(--cyan)}.hpw{margin:5px 0}.hpb{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden}.hpf{height:100%;border-radius:3px;transition:width 0.3s}.abtn{width:100%;margin-top:4px;padding:6px 8px;background:rgba(64,216,255,0.03);border:1px solid rgba(64,216,255,0.15);color:var(--parchment);font-family:'Exo 2',sans-serif;font-size:10px;cursor:pointer;text-align:left;transition:all 0.12s;border-radius:3px;min-height:36px}.abtn:hover:not(:disabled){background:rgba(64,216,255,0.1);border-color:var(--cyan);color:var(--cyan)}.abtn:disabled{opacity:0.2;cursor:not-allowed}.abtn.hi{border-color:var(--gold);color:var(--gold-lt);background:rgba(240,192,64,0.05)}.trow{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:9px}.tpip{width:7px;height:7px;border-radius:50%;border:1px solid rgba(64,216,255,0.2);flex-shrink:0}.tpip.done{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 5px rgba(64,216,255,0.5)}.tpip.avail{border-color:var(--gold)}.era-hdr{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;color:var(--gold);padding:5px 0 2px;opacity:0.65}#ftr{position:relative;z-index:10;background:linear-gradient(0deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-top:1px solid var(--bord);padding:7px 14px;padding-bottom:calc(7px+var(--safe-bot));display:flex;align-items:center;gap:10px;flex-shrink:0}#fullscreen-btn{position:fixed;bottom:14px;left:14px;z-index:400;background:rgba(4,8,20,0.85);border:1px solid rgba(64,216,255,0.3);color:var(--cyan);width:38px;height:38px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:all 0.2s;}#fullscreen-btn:hover{background:rgba(64,216,255,0.12);border-color:var(--cyan);box-shadow:0 0 12px rgba(64,216,255,0.3);}#endbtn{padding:10px 20px;background:linear-gradient(135deg,rgba(0,30,80,0.8),rgba(0,50,120,0.6));border:1px solid rgba(64,216,255,0.5);color:var(--cyan);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;min-height:44px;box-shadow:0 0 12px rgba(64,216,255,0.1) inset}#endbtn:hover{box-shadow:0 0 20px rgba(64,216,255,0.35);border-color:var(--cyan)}#endbtn:active{transform:scale(0.97)}#msgbar{flex:1;font-size:9px;color:rgba(216,232,248,0.35);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fdmg{position:absolute;font-family:'Orbitron',monospace;font-weight:700;pointer-events:none;z-index:300;text-shadow:0 1px 8px rgba(0,0,0,0.9);animation:fdmg-anim 1.1s ease-out forwards}@keyframes fdmg-anim{0%{opacity:1;transform:translateY(0) scale(1.2)}80%{opacity:1}100%{opacity:0;transform:translateY(-42px) scale(0.7)}}.retro-burst{position:absolute;pointer-events:none;z-index:350}@keyframes burst-ring{0%{transform:translate(-50%,-50%) scale(0);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}@keyframes burst-star{0%{transform:translate(-50%,-50%) scale(0) rotate(0deg);opacity:1}60%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.4) rotate(180deg);opacity:0}}@keyframes retro-flash{0%{opacity:0.9}50%{opacity:0.2}100%{opacity:0}}@keyframes pixel-explode{0%{transform:translate(-50%,-50%) scale(0);opacity:1}40%{transform:translate(-50%,-50%) scale(1.1);opacity:1}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}@keyframes level-up-badge{0%{transform:translateX(-50%) translateY(10px) scale(0.5);opacity:0}20%{transform:translateX(-50%) translateY(0) scale(1.15);opacity:1}80%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(-20px) scale(0.8);opacity:0}}@keyframes era-fanfare{0%{transform:translateX(-50%) scale(0.2);opacity:0}25%{transform:translateX(-50%) scale(1.1);opacity:1}75%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) scale(1.05);opacity:0}}@keyframes comet-fly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--cx),var(--cy)) scale(0);opacity:0}}@keyframes scanline{0%{top:-4px}100%{top:100%}}
+<style>@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;1,300&display=swap');:root{--bg:#04060e;--panel:rgba(4,8,20,0.96);--bord:rgba(60,140,255,0.3);--gold:#f0c040;--gold-lt:#ffe080;--cyan:#40d8ff;--red:#ff4444;--green:#40ff80;--parchment:#d8e8f8;--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);--safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px)}*{box-sizing:border-box;margin:0;padding:0}html{height:100%;height:-webkit-fill-available}body{background:var(--bg);font-family:'Exo 2',sans-serif;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;color:var(--parchment);padding-left:var(--safe-l);padding-right:var(--safe-r)}#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s infinite}@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}#hdr{position:relative;z-index:10;background:linear-gradient(180deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-bottom:1px solid var(--bord);padding:6px 14px;padding-top:calc(6px+var(--safe-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 24px rgba(0,0,0,0.9),0 0 40px rgba(0,30,80,0.3)}#logo{display:none}.hstats{display:flex;align-items:stretch;gap:0;flex:1;justify-content:center;}.hs{display:flex;align-items:center;gap:6px;padding:4px 14px;border-left:1px solid rgba(60,140,255,0.12);font-size:9px}.hs:first-child{border-left:none}.hs-icon{font-size:14px;line-height:1;flex-shrink:0}.hs-block{display:flex;flex-direction:column;line-height:1}.hs-v{font-family:'Orbitron',monospace;color:var(--cyan);font-size:14px;font-weight:700;min-width:20px;line-height:1.1}.hs-l{color:rgba(216,232,248,0.32);font-size:7px;text-transform:uppercase;letter-spacing:1px;margin-top:1px}#campaign-badge{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1px;color:var(--gold);border:1px solid rgba(240,192,64,0.2);padding:2px 7px;background:rgba(240,192,64,0.04);border-radius:2px;}
+#tbadge{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--cyan);border:1px solid var(--bord);padding:3px 8px;background:rgba(64,216,255,0.04);border-radius:2px}#era-badge{font-size:8px;color:var(--gold);letter-spacing:1px;border:1px solid rgba(240,192,64,0.22);padding:3px 8px;background:rgba(240,192,64,0.04);border-radius:2px;display:inline-block;}#music-btn,#planet-btn{background:none;border:1px solid var(--bord);color:var(--cyan);font-size:13px;padding:4px 8px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-left:3px;min-width:32px;min-height:32px}#music-btn:hover,#planet-btn:hover{background:rgba(64,216,255,0.1);border-color:var(--cyan)}#wrap{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;min-height:0}#cvs-wrap{flex:1;position:relative;overflow:hidden}canvas{position:absolute;top:0;left:0;cursor:crosshair;touch-action:none}#side{width:260px;min-width:200px;max-width:420px;background:var(--panel);border-left:1px solid var(--bord);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative;resize:horizontal;}#side-drag{position:absolute;left:0;top:0;bottom:0;width:5px;cursor:ew-resize;background:transparent;z-index:20;transition:background 0.2s;}#side-drag:hover{background:rgba(64,216,255,0.18);}.ss{border-bottom:1px solid rgba(60,140,255,0.1);padding:8px 10px}.st{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:3px;color:var(--cyan);margin-bottom:5px}#sel-panel{flex:1;overflow-y:auto;padding:9px;scrollbar-width:thin;scrollbar-color:var(--bord) transparent}.igrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.ic{background:rgba(64,216,255,0.04);border:1px solid rgba(64,216,255,0.1);padding:5px 6px;border-radius:3px}.icl{font-size:7px;color:rgba(216,232,248,0.3);letter-spacing:1px;text-transform:uppercase}.icv{font-family:'Orbitron',monospace;font-size:12px;color:var(--cyan)}.hpw{margin:5px 0}.hpb{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden}.hpf{height:100%;border-radius:3px;transition:width 0.3s}.abtn{width:100%;margin-top:4px;padding:6px 8px;background:rgba(64,216,255,0.03);border:1px solid rgba(64,216,255,0.15);color:var(--parchment);font-family:'Exo 2',sans-serif;font-size:10px;cursor:pointer;text-align:left;transition:all 0.12s;border-radius:3px;min-height:36px}.abtn:hover:not(:disabled){background:rgba(64,216,255,0.1);border-color:var(--cyan);color:var(--cyan)}.abtn:disabled{opacity:0.2;cursor:not-allowed}.abtn.hi{border-color:var(--gold);color:var(--gold-lt);background:rgba(240,192,64,0.05)}.trow{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:9px}.tpip{width:7px;height:7px;border-radius:50%;border:1px solid rgba(64,216,255,0.2);flex-shrink:0}.tpip.done{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 5px rgba(64,216,255,0.5)}.tpip.avail{border-color:var(--gold)}.era-hdr{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;color:var(--gold);padding:5px 0 2px;opacity:0.65}#ftr{position:relative;z-index:10;background:linear-gradient(0deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-top:1px solid var(--bord);padding:7px 14px;padding-bottom:calc(7px+var(--safe-bot));display:flex;align-items:center;gap:10px;flex-shrink:0}#fullscreen-btn{position:fixed;bottom:14px;left:14px;z-index:400;background:rgba(4,8,20,0.85);border:1px solid rgba(64,216,255,0.3);color:var(--cyan);width:38px;height:38px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:all 0.2s;}#fullscreen-btn:hover{background:rgba(64,216,255,0.12);border-color:var(--cyan);box-shadow:0 0 12px rgba(64,216,255,0.3);}#endbtn{padding:10px 20px;background:linear-gradient(135deg,rgba(0,30,80,0.8),rgba(0,50,120,0.6));border:1px solid rgba(64,216,255,0.5);color:var(--cyan);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;min-height:44px;box-shadow:0 0 12px rgba(64,216,255,0.1) inset}#endbtn:hover{box-shadow:0 0 20px rgba(64,216,255,0.35);border-color:var(--cyan)}#endbtn:active{transform:scale(0.97)}#msgbar{flex:1;font-size:9px;color:rgba(216,232,248,0.35);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fdmg{position:absolute;font-family:'Orbitron',monospace;font-weight:700;pointer-events:none;z-index:300;text-shadow:0 1px 8px rgba(0,0,0,0.9);animation:fdmg-anim 1.1s ease-out forwards}@keyframes fdmg-anim{0%{opacity:1;transform:translateY(0) scale(1.2)}80%{opacity:1}100%{opacity:0;transform:translateY(-42px) scale(0.7)}}.retro-burst{position:absolute;pointer-events:none;z-index:350}@keyframes burst-ring{0%{transform:translate(-50%,-50%) scale(0);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}@keyframes burst-star{0%{transform:translate(-50%,-50%) scale(0) rotate(0deg);opacity:1}60%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.4) rotate(180deg);opacity:0}}@keyframes retro-flash{0%{opacity:0.9}50%{opacity:0.2}100%{opacity:0}}@keyframes pixel-explode{0%{transform:translate(-50%,-50%) scale(0);opacity:1}40%{transform:translate(-50%,-50%) scale(1.1);opacity:1}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}@keyframes level-up-badge{0%{transform:translateX(-50%) translateY(10px) scale(0.5);opacity:0}20%{transform:translateX(-50%) translateY(0) scale(1.15);opacity:1}80%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(-20px) scale(0.8);opacity:0}}@keyframes era-fanfare{0%{transform:translateX(-50%) scale(0.2);opacity:0}25%{transform:translateX(-50%) scale(1.1);opacity:1}75%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) scale(1.05);opacity:0}}@keyframes comet-fly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--cx),var(--cy)) scale(0);opacity:0}}@keyframes scanline{0%{top:-4px}100%{top:100%}}
 @keyframes hero-pulse{0%,100%{text-shadow:0 0 60px rgba(64,216,255,0.8),0 0 120px rgba(64,216,255,0.3),0 4px 0 rgba(0,0,0,0.9)}50%{text-shadow:0 0 80px rgba(64,216,255,1),0 0 160px rgba(64,216,255,0.45),0 4px 0 rgba(0,0,0,0.9)}}
 @keyframes line-breathe{0%,100%{opacity:0.6;width:min(220px,60%)}50%{opacity:1;width:min(300px,80%)}}
 @keyframes tagline-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -278,7 +279,7 @@ canvas{touch-action:none}
   </div>
   <!-- RIGHT: turn + controls -->
   <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
-    <div id="tbadge">TURN 1</div>
+    <div id="campaign-badge" style="display:none;font-family:Orbitron,monospace;font-size:7px;padding:2px 7px;border-radius:2px;background:rgba(240,192,64,0.07);border:1px solid rgba(240,192,64,0.25);color:var(--gold);letter-spacing:1px;"></div><div id="tbadge">TURN 1</div>
     <button id="music-btn" onclick="toggleMusic()" title="Toggle Music">🎵</button>
     <button id="planet-btn" onclick="showPlanetOverview()" title="Planet Map">🌌</button>
     <button id="diplo-btn" onclick="showDiploScreen()" title="Diplomacy" style="background:none;border:1px solid var(--bord);color:rgba(216,232,248,0.6);font-size:13px;padding:4px 10px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-left:3px;min-width:36px;min-height:32px;">🕊️</button>
@@ -403,26 +404,199 @@ g.gain.setValueAtTime(vol,ac.currentTime+delay);
 g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);
 o.start(ac.currentTime+delay);o.stop(ac.currentTime+delay+dur+0.05);
 }
+// ── Richer synthesis building blocks ─────────────────────────────────
+function playNoise(dur,vol,delay=0,lpFreq=2000,hpFreq=40){
+  const ac=getAC();if(!ac)return;
+  const buf=ac.createBuffer(1,ac.sampleRate*dur,ac.sampleRate);
+  const data=buf.getChannelData(0);
+  for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1);
+  const src=ac.createBufferSource();src.buffer=buf;
+  const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=lpFreq;
+  const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=hpFreq;
+  const g=ac.createGain();
+  src.connect(hp);hp.connect(lp);lp.connect(g);g.connect(ac.destination);
+  g.gain.setValueAtTime(vol,ac.currentTime+delay);
+  g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);
+  src.start(ac.currentTime+delay);src.stop(ac.currentTime+delay+dur+0.05);
+}
+function playChord(freqs,type,dur,vol,delay=0,attack=0.01){
+  const ac=getAC();if(!ac)return;
+  freqs.forEach((f,i)=>{
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);
+    o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(0.001,ac.currentTime+delay);
+    g.gain.linearRampToValueAtTime(vol*(0.7+0.3*(freqs.length-i)/freqs.length),ac.currentTime+delay+attack);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);
+    o.start(ac.currentTime+delay);o.stop(ac.currentTime+delay+dur+0.1);
+  });
+}
+function playImpact(vol=0.3,delay=0){
+  // Punchy impact: noise burst + low thud
+  playNoise(0.06,vol*0.6,delay,300,20);
+  playTone(80,'sine',0.18,vol*0.8,delay,30);
+  playTone(160,'sine',0.08,vol*0.4,delay,60);
+}
+function playReverb(freq,type,dur,vol,delay=0,roomSize=0.4){
+  // Simulate reverb via decaying echoes
+  const ac=getAC();if(!ac)return;
+  [0,roomSize*0.3,roomSize*0.6,roomSize*0.9].forEach((d,i)=>{
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);
+    o.type=type;o.frequency.value=freq*(1-i*0.002);
+    const v=vol*Math.pow(0.5,i);
+    g.gain.setValueAtTime(v,ac.currentTime+delay+d);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+d+dur*(1+i*0.4));
+    o.start(ac.currentTime+delay+d);o.stop(ac.currentTime+delay+d+dur*(1+i*0.4)+0.1);
+  });
+}
 const SFX={
-move(){playTone(280,'sine',0.1,0.04);playTone(380,'sine',0.08,0.03,0.07);},
-attack(){playTone(140,'sawtooth',0.07,0.08);playTone(70,'square',0.12,0.09,0.04,45);},
-laser(){playTone(800,'sawtooth',0.05,0.07);playTone(400,'sawtooth',0.07,0.06,0.03,180);playTone(1100,'sine',0.03,0.04,0.06);},
-build(){playTone(440,'sine',0.08,0.05);playTone(554,'sine',0.1,0.05,0.09);playTone(660,'sine',0.12,0.04,0.19);},
-research(){[0,0.1,0.2,0.32].forEach((d,i)=>playTone(440*Math.pow(1.25,i),'sine',0.12,0.05,d));},
-capture(){playTone(330,'sine',0.07,0.08);playTone(440,'sine',0.09,0.07,0.09);playTone(660,'sine',0.15,0.07,0.22);},
-launch(){[0,0.12,0.26,0.42,0.58].forEach((d,i)=>playTone(100*Math.pow(1.18,i),'sawtooth',0.18,0.07,d));},
-event(){playTone(110,'square',0.14,0.08);playTone(138,'square',0.1,0.06,0.12);},
-victory(){[523,659,784,880,1047].forEach((f,i)=>playTone(f,'sine',0.28,0.08,i*0.16));},
-defeat(){playTone(220,'sawtooth',0.28,0.08);playTone(185,'sawtooth',0.28,0.07,0.24);playTone(155,'sawtooth',0.35,0.06,0.5);},
-wrath(){[0,0.08,0.18,0.3,0.45].forEach((d,i)=>playTone(60*Math.pow(1.3,i),'sawtooth',0.22,0.1,d));},
-diplo(){playTone(660,'sine',0.14,0.07);playTone(880,'sine',0.12,0.06,0.15);playTone(1100,'sine',0.08,0.04,0.28);},
-peace(){[440,554,660].forEach((f,i)=>playTone(f,'sine',0.22,0.07,i*0.06));},
-war(){playTone(120,'sawtooth',0.06,0.18);playTone(180,'square',0.08,0.16,0.03);playTone(90,'sawtooth',0.1,0.14,0.08,55);},
-wonder(){[262,330,392,523,659,784].forEach((f,i)=>playTone(f,'sine',0.18,0.12,i*0.11));setTimeout(()=>[523,659,784,1047].forEach((f,i)=>playTone(f,'triangle',0.14,0.08,i*0.08)),700);},
-fortify(){playTone(220,'square',0.06,0.14);playTone(180,'sawtooth',0.08,0.12,0.04);playTone(260,'sine',0.1,0.06,0.1);},
-unitLost(){playTone(220,'sawtooth',0.09,0.12);playTone(165,'sawtooth',0.11,0.1,0.12,110);},
-cityLost(){[330,277,220,185,147].forEach((f,i)=>playTone(f,'sawtooth',0.14,0.1,i*0.14));},
-era(){[262,330,392,330,523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.16,0.1,i*0.09));setTimeout(()=>playTone(1047,'sine',0.25,0.08),750);}
+// ── Movement: soft whoosh ─────────────────────────────────────────────
+move(){
+  playNoise(0.08,0.04,0,600,200);
+  playTone(380,'sine',0.07,0.03,0.02,320);
+},
+// ── Attack: impact punch with metallic ring ───────────────────────────
+attack(){
+  playImpact(0.22);
+  playTone(180,'sawtooth',0.12,0.06,0.02,60);
+  playNoise(0.04,0.15,0,800,400);
+},
+// ── Laser: sci-fi zap with high whine ────────────────────────────────
+laser(){
+  playTone(1200,'sawtooth',0.06,0.06,0,300);
+  playTone(600,'sawtooth',0.08,0.07,0.02,150);
+  playNoise(0.05,0.08,0,4000,1000);
+  playTone(2400,'sine',0.04,0.03,0.03,800);
+},
+// ── Build: satisfying construction clunk ─────────────────────────────
+build(){
+  playNoise(0.06,0.12,0,400,60);
+  playTone(220,'sine',0.14,0.08,0.05);
+  playTone(440,'sine',0.1,0.07,0.14);
+  playTone(660,'sine',0.08,0.06,0.24);
+},
+// ── Research: shimmering discovery ────────────────────────────────────
+research(){
+  playNoise(0.12,0.05,0,3000,500);
+  [0,0.08,0.18,0.3].forEach((d,i)=>{
+    playReverb(440*Math.pow(1.25,i),'sine',0.2,0.1,d,0.15);
+  });
+},
+// ── Capture: triumphant fanfare ────────────────────────────────────────
+capture(){
+  playNoise(0.04,0.1,0,300,40);
+  playChord([330,415,494],'sine',0.3,0.08,0.04,0.06);
+  playTone(660,'sine',0.22,0.12,0.18);
+  playTone(880,'sine',0.16,0.1,0.32);
+},
+// ── Launch: rocket ignition roar ─────────────────────────────────────
+launch(){
+  playNoise(0.8,0.2,0,800,30);
+  [0,0.15,0.32,0.52,0.74].forEach((d,i)=>playTone(80*Math.pow(1.2,i),'sawtooth',0.2,0.14,d));
+  playTone(200,'sawtooth',0.6,0.08,0.1,400);
+},
+// ── Event: ominous low rumble ─────────────────────────────────────────
+event(){
+  playNoise(0.2,0.1,0,300,20);
+  playTone(110,'square',0.18,0.1);
+  playTone(138,'square',0.14,0.07,0.14);
+  playTone(82,'sine',0.3,0.08,0.05);
+},
+// ── Victory: full orchestral swell ───────────────────────────────────
+victory(){
+  // Bass foundation
+  playChord([130,165,196],'sine',1.2,0.1,0,0.08);
+  // Mid chord
+  playChord([262,330,392,494],'sine',1.0,0.1,0.2,0.1);
+  // High fanfare
+  [523,659,784,988,1047].forEach((f,i)=>playReverb(f,'sine',0.5,0.12,0.4+i*0.12,0.3));
+  // Noise shimmer
+  playNoise(0.3,0.06,0.4,6000,2000);
+  playNoise(0.3,0.06,1.0,8000,3000);
+},
+// ── Defeat: collapsing minor descent ─────────────────────────────────
+defeat(){
+  playNoise(0.15,0.15,0,500,20);
+  playChord([220,261,311],'sawtooth',0.6,0.08,0.05,0.04);
+  [330,277,220,185,147,110].forEach((f,i)=>playTone(f,'sawtooth',0.25,0.1,i*0.22));
+  playNoise(0.4,0.06,0.4,200,20);
+},
+// ── Wrath: Leviathan awakens ─────────────────────────────────────────
+wrath(){
+  playNoise(0.5,0.2,0,400,10);
+  [0,0.06,0.14,0.24,0.38].forEach((d,i)=>playTone(55*Math.pow(1.35,i),'sawtooth',0.25,0.15,d));
+  playChord([55,73,82],'square',0.6,0.08,0.1,0.05);
+},
+// ── Diplo: diplomatic chime ───────────────────────────────────────────
+diplo(){
+  playNoise(0.05,0.04,0,4000,1000);
+  playReverb(660,'sine',0.3,0.1,0,0.25);
+  playReverb(880,'sine',0.25,0.09,0.18,0.2);
+  playTone(1100,'sine',0.12,0.06,0.34);
+},
+// ── Peace: warm resolution ────────────────────────────────────────────
+peace(){
+  playChord([440,554,660],'sine',0.4,0.1,0,0.08);
+  playNoise(0.1,0.03,0.1,3000,800);
+  playTone(880,'sine',0.2,0.07,0.22);
+},
+// ── War: brutal declaration ───────────────────────────────────────────
+war(){
+  playNoise(0.12,0.2,0,600,20);
+  playImpact(0.2,0.04);
+  playChord([110,138,165],'sawtooth',0.4,0.1,0.06,0.03);
+  playTone(90,'sawtooth',0.5,0.12,0.1,40);
+},
+// ── Wonder: epic reveal ───────────────────────────────────────────────
+wonder(){
+  // Rising bass
+  playChord([131,165,196],'sine',1.4,0.1,0,0.1);
+  // Main chord swell
+  playChord([262,330,392,523],'sine',1.2,0.12,0.2,0.12);
+  // Reverberant high melody
+  [523,659,784,1047,1319].forEach((f,i)=>playReverb(f,'sine',0.6,0.12,0.4+i*0.14,0.4));
+  // Shimmer
+  playNoise(0.4,0.05,0.5,8000,2000);
+  playNoise(0.4,0.05,1.0,10000,4000);
+  // Final high tone
+  setTimeout(()=>playChord([784,988,1175],'sine',0.5,0.1,0,0.06),1100);
+},
+// ── Fortify: stone clunk ──────────────────────────────────────────────
+fortify(){
+  playNoise(0.08,0.15,0,500,50);
+  playTone(180,'square',0.14,0.1,0.02);
+  playTone(260,'sine',0.1,0.06,0.1);
+},
+// ── Unit lost: short mournful drop ───────────────────────────────────
+unitLost(){
+  playNoise(0.06,0.1,0,600,100);
+  playTone(330,'sawtooth',0.15,0.1,0.02,180);
+  playTone(220,'sawtooth',0.18,0.1,0.14,130);
+},
+// ── City lost: dramatic collapse ─────────────────────────────────────
+cityLost(){
+  playImpact(0.25);
+  playNoise(0.3,0.15,0.04,800,20);
+  [330,277,220,185,147].forEach((f,i)=>playTone(f,'sawtooth',0.22,0.12,i*0.16));
+  playTone(110,'sine',0.4,0.1,0.3);
+},
+// ── Era advance: epoch-defining moment ───────────────────────────────
+era(){
+  // Noise burst
+  playNoise(0.2,0.12,0,1000,30);
+  // Rising bass
+  playChord([131,165,196],'sine',1.6,0.1,0.05,0.12);
+  // Ascending fanfare
+  [262,330,392,330,523,659,784,1047].forEach((f,i)=>playReverb(f,'sine',0.3,0.12,i*0.1,0.25));
+  // Triumphant swell at peak
+  setTimeout(()=>{
+    playChord([523,659,784,1047],'sine',0.8,0.14,0,0.08);
+    playNoise(0.3,0.06,0.1,6000,1000);
+  },850);
+  // Final bell tone
+  setTimeout(()=>playReverb(1047,'sine',0.5,0.2,0,0.5),1400);
+}
 }
 const MUSIC=(function(){
 let ac=null,playing=false,mode='explore',mg=null,_t=null,planet='earth';
@@ -1070,7 +1244,7 @@ const TILE_RESOURCES={
 [T.R_MOUN]: {icon:'💎',label:'Rare Earth',       bonus:'+3💎/turn',  incomeBonus:3},
 };
 const CV=document.getElementById('C'),ctx=CV.getContext('2d');
-const HS=40,GW=18,GH=14,TC_S=HS*2+4;
+const HS=40;let GW=18,GH=14;const TC_S=HS*2+4;
 const ri=n=>Math.floor(Math.random()*n);
 function hxy(q,r){return{x:HS*1.5*q,y:HS*(Math.sqrt(3)*0.5*q+Math.sqrt(3)*r)};}
 function pHex(px,py){const q=(2/3*px)/HS,r=(-1/3*px+Math.sqrt(3)/3*py)/HS;return rHex(q,r);}
@@ -1087,8 +1261,8 @@ const c=tc.getContext('2d'),mx=TC_S/2,my=TC_S/2;
 hPath(c,mx,my,HS);c.save();c.clip();
 
 if(fog==='hidden'){
-// True black shroud — no terrain art whatsoever
-c.fillStyle='#04060c';c.fillRect(0,0,TC_S,TC_S);
+// Rich dark shroud with subtle depth
+const _sh=c.createRadialGradient(mx,my,2,mx,my,TC_S*0.65);_sh.addColorStop(0,'#070e1e');_sh.addColorStop(1,'#020408');c.fillStyle=_sh;c.fillRect(0,0,TC_S,TC_S);
 } else {
 drawTile(c,mx,my,HS,type);
 // Ambient occlusion edge darkening
@@ -1104,9 +1278,8 @@ light.addColorStop(0.5,'rgba(255,248,220,0.01)');
 light.addColorStop(1,'rgba(0,0,0,0.09)');
 c.fillStyle=light;c.fillRect(0,0,TC_S,TC_S);
 if(fog==='fog'){
-// Explored-but-dark: heavy dark overlay with slight blue-grey tint
-// This simulates the Civ "greyed-out explored" look
-c.fillStyle='rgba(8,12,28,0.74)';c.fillRect(0,0,TC_S,TC_S);
+// Explored-but-dark: gradient overlay for depth
+const _sf=c.createLinearGradient(0,0,TC_S,TC_S);_sf.addColorStop(0,'rgba(12,18,42,0.72)');_sf.addColorStop(1,'rgba(4,8,20,0.80)');c.fillStyle=_sf;c.fillRect(0,0,TC_S,TC_S);
 }
 // Resource badge on visible tiles only
 if(fog==='visible'&&TILE_RESOURCES[type]){
@@ -1926,6 +2099,10 @@ const cached=_getCachedUnit(unit.type,unit.owner,hpLevel,!!unit.moved);
 if(cached){
 const pad=14,dim=(sz+pad)*2;
 c2.drawImage(cached,sx-dim/2,sy+HS*0.05-dim/2);
+// Subtle resting ambient glow — makes units feel present on the map
+{const ag=c2.createRadialGradient(sx,sy+HS*0.05,sz*0.5,sx,sy+HS*0.05,sz*1.8);
+ag.addColorStop(0,fac.color+'28');ag.addColorStop(1,'transparent');
+c2.fillStyle=ag;c2.beginPath();c2.arc(sx,sy+HS*0.05,sz*1.8,0,Math.PI*2);c2.fill();}
 if(isLeviathan){
 const ux=sx,uy=sy+HS*0.05;
 const wg=c2.createRadialGradient(ux,uy,0,ux,uy,sz*2.2);
@@ -2129,6 +2306,10 @@ return'MEDIEVAL';
 function initGame(factionId,aiSetup,planet){
 planet=planet||'EARTH';
 playerFaction=FACTIONS[factionId];
+// Apply commander map size
+const _ms=getActiveMapSize();GW=_ms.w;GH=_ms.h;
+// Apply commander faction skins
+applyCommanderSkins();
 SEED=Math.random()*9999;
 Object.keys(tileCache).forEach(k=>delete tileCache[k]);
 clearUnitCache();clearCityCache();
@@ -2204,6 +2385,14 @@ const bg=ctx.createLinearGradient(0,0,CV.width,CV.height);
 bg.addColorStop(0,'#0c1528');bg.addColorStop(0.4,'#0a1220');bg.addColorStop(1,'#060e18');
 ctx.fillStyle=bg;ctx.fillRect(0,0,CV.width,CV.height);
 }
+// Subtle star-field background — only visible at map edges / fog of war
+{const sRng=(n,s=SEED||42)=>{let h=Math.sin(n*127.1+s*311.7)*43758.5;return h-Math.floor(h);};
+ctx.save();ctx.globalAlpha=0.35;ctx.fillStyle='#fff';
+for(let i=0;i<60;i++){
+  const sx2=sRng(i*3)*CV.width,sy2=sRng(i*3+1)*CV.height,sr=0.6+sRng(i*3+2)*1.2;
+  ctx.beginPath();ctx.arc(sx2,sy2,sr,0,Math.PI*2);ctx.fill();
+}
+ctx.restore();}
 ctx.save();
 ctx.translate(cvW/2,cvH/2);ctx.scale(z,z);ctx.translate(-cvW/2,-cvH/2);
 const mc=hxy(GW/2,GH/2),ox=cvW/2+G.cam.x-mc.x,oy=cvH/2+G.cam.y-mc.y;
@@ -2212,8 +2401,28 @@ const{x,y}=hxy(q,r);const sx=x+ox,sy=y+oy;
 if(sx<-TC_S||sx>cvW+TC_S||sy<-TC_S||sy>cvH+TC_S)continue;
 const fog=G.fog[q][r],tile=G.grid[q][r];
 ctx.drawImage(getTile(tile.terrain,fog),sx-TC_S/2,sy-TC_S/2,TC_S,TC_S);
+// Fog border glow — fuzzy edge between explored/unexplored
+if(fog==='fog'){
+  hPath(ctx,sx,sy,HS);
+  const fg2=ctx.createRadialGradient(sx,sy,HS*0.3,sx,sy,HS*1.1);
+  fg2.addColorStop(0,'rgba(20,40,80,0.0)');
+  fg2.addColorStop(1,'rgba(10,20,50,0.35)');
+  ctx.fillStyle=fg2;ctx.fill();
+}
 if(fog==='hidden')continue;
 if(fog==='visible')drawAnimOverlay(ctx,sx,sy,tile.terrain,t+q*0.3+r*0.2);
+// Subtle hex border — gives the grid structure without being harsh
+if(fog!=='hidden'){
+  hPath(ctx,sx,sy,HS);
+  ctx.strokeStyle='rgba(0,0,0,0.22)';
+  ctx.lineWidth=0.9;
+  ctx.stroke();
+  // Inner bevel highlight — top-left edge catches light
+  hPath(ctx,sx,sy,HS-1);
+  ctx.strokeStyle='rgba(255,255,255,0.04)';
+  ctx.lineWidth=0.7;
+  ctx.stroke();
+}
 const key=`${q},${r}`;
 const isSel=G.sel&&G.sel.q===q&&G.sel.r===r;
 const isMov=G.mRange&&G.mRange.has(key);
@@ -2280,6 +2489,10 @@ ctx.fillText(label,dest.x,dest.y-14);
 }
 ctx.restore();
 });
+// Map edge vignette
+{const vg=ctx.createRadialGradient(cvW/2,cvH/2,Math.min(cvW,cvH)*0.28,cvW/2,cvH/2,Math.max(cvW,cvH)*0.72);
+vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,0.5)');
+ctx.fillStyle=vg;ctx.fillRect(0,0,cvW,cvH);}
 drawFogEdge(ox,oy);
 if(G.wrath!==null&&playerFaction&&playerFaction.id==='BENEVOLENT'){drawWrathMeter();}
 if(window.innerWidth<=640){drawMobileHUDStrip();}
@@ -3879,6 +4092,11 @@ if(tc&&tc.owner==='player'){tc.owner=myId;tc.hp=Math.floor(tc.maxHp/2);notify('�
 G.units=G.units.filter(u=>u.hp>0);
 }
 function checkEnd(){
+// Campaign: enforce turn limit
+if(G.campaignMission&&G.turn>G.turnLimit){
+endScreen(false,'You ran out of turns. Try again — you have '+G.turnLimit+' turns to complete this mission.',[]);
+return;
+}
 const _ap=G.unlockedPlanets?[...G.unlockedPlanets]:['EARTH'];
 const _sp=G.planet;
 let allAiC=[],allAiU=[],allPC=[],allPU=[],exLost=false,exMsg='';
@@ -3936,7 +4154,12 @@ function renderTechs(){
 renderMobTechs();
 const el=document.getElementById('techlist');if(!el)return;
 let html='';
-ERA_ORDER.forEach(era=>{
+// Campaign gate: only show techs for current era if fullTech not unlocked
+const campaignFeatures=G&&G.campaignFeatures;
+const showEras=campaignFeatures&&!campaignFeatures.fullTech
+  ?ERA_ORDER.slice(0,Math.max(1,ERA_ORDER.indexOf(G.era||'MEDIEVAL')+2))
+  :ERA_ORDER;
+showEras.forEach(era=>{
 const eraTs=TECHS.filter(t=>t.era===era);
 html+=`<div class="era-hdr">${ERA_NAMES[era]}</div>`;
 eraTs.forEach(t=>{
@@ -4670,6 +4893,16 @@ const mtb=document.getElementById('mob-turn-badge');if(mtb)mtb.textContent='T'+G
 const eb=document.getElementById('endbtn');
 if(eb)eb.classList.toggle('ready',G.phase==='player');
 renderTechs();
+// Campaign mission badge
+const cmBadge=document.getElementById('campaign-badge');
+if(cmBadge){
+  if(G&&G.campaignMission){
+    cmBadge.style.display='inline-block';
+    cmBadge.textContent='M'+G.campaignMission.id+'/8';
+  } else {
+    cmBadge.style.display='none';
+  }
+}
 }
 let _nt2;
 function notify(msg,type){
@@ -4807,6 +5040,11 @@ return lb.map((e,i)=>`<div class="lb-row">
   </div>`).join('');
 }
 function endScreen(won, reason, newAchievements){
+// Campaign mission complete handler
+if(won&&isCampaignMission()){
+showCampaignMissionComplete(G.campaignMission,reason,newAchievements);
+return;
+}
 const elapsed=Math.floor((Date.now()-G.startTime)/60000);
 const rivals=(G.aiPlayers||[]).map(a=>FACTIONS[a.factionId].icon+' '+FACTIONS[a.factionId].name).join(', ')||'The AI';
 if(won)SFX.victory();else SFX.defeat();
@@ -4892,6 +5130,13 @@ function showEndResults(won, reason, newAchievements){
 if(document.getElementById('end-tab-content'))return;
 const elapsed=Math.floor((Date.now()-G.startTime)/60000);
 const rivals=(G.aiPlayers||[]).map(a=>FACTIONS[a.factionId].icon+' '+FACTIONS[a.factionId].name).join(', ')||'The AI';
+// Award Commander XP
+const _cmdResult=awardCommanderXP(won,{
+  turns:G.turn,unitsKilled:G.unitsKilled||0,
+  wondersBuilt:(G.wonders?G.wonders.size:0),
+  techsResearched:G.techs?G.techs.size:0,
+  isDaily:isDailyChallenge,isCampaign:!!(G&&G.campaignMission),
+});
 const newAchHtml=(newAchievements||[]).length?`
     <div style="margin:0 0 14px;padding:10px 12px;border:1px solid ${_GLD}0.25);border-radius:6px;background:${_GLD}0.04);">
       <div style="${_F};font-size:7px;letter-spacing:3px;color:var(--gold);margin-bottom:8px;text-align:center;">🏆 ACHIEVEMENTS UNLOCKED</div>
@@ -4901,7 +5146,48 @@ const newAchHtml=(newAchievements||[]).length?`
 <div style="font-size:8px;color:${_RPC}0.45);margin-top:2px">${a.desc}</div></div>
 </div>`).join('')}
     </div>`:'';
+// Commander XP panel
+const _cmdXpRows=[
+  ['Game '+(won?'Victory':'Defeat'), won?'+'+CMD_XP.win:'+'+CMD_XP.loss],
+  ['Turns survived (×2)', '+'+(G.turn*2)],
+  G.unitsKilled>0?['Units defeated (×3)', '+'+(G.unitsKilled*3)]:null,
+  G.wonders&&G.wonders.size>0?['Wonders built (×15)', '+'+(G.wonders.size*15)]:null,
+  isDailyChallenge?['Daily challenge bonus', '+'+CMD_XP.dailyBonus]:null,
+  G.campaignMission?['Campaign mission bonus', '+'+CMD_XP.campaignBonus]:null,
+].filter(Boolean);
+const _oldCmd=loadCommander();
+const _pct=cmdProgress(_oldCmd.xp-_cmdResult.xpGained);
+const _newPct=cmdProgress(_oldCmd.xp);
+const _cmdUnlockHtml=_cmdResult.unlocks.map(u=>u.type==='skin'
+  ?`<div style="padding:6px 10px;background:${u.skin.color}15;border:1px solid ${u.skin.color}40;border-radius:4px;font-size:8px;color:${u.skin.light};">🎨 Unlocked: ${FACTIONS[u.faction].icon} ${u.skin.name} skin</div>`
+  :`<div style="padding:6px 10px;background:rgba(64,216,255,0.08);border:1px solid rgba(64,216,255,0.25);border-radius:4px;font-size:8px;color:var(--cyan);">🗺 Unlocked map size: ${u.mapSize.name}</div>`
+).join('');
 document.getElementById('ov-content').innerHTML=`
+    <!-- Commander card -->
+    <div style="width:100%;max-width:480px;margin:0 auto 10px;padding:10px 14px;border:1px solid rgba(64,216,255,0.2);border-radius:8px;background:rgba(4,8,24,0.6);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="text-align:center;flex-shrink:0;">
+          <div style="${_F};font-size:18px;font-weight:900;color:var(--cyan);line-height:1;">${_cmdResult.cmd.level}</div>
+          <div style="font-size:6px;letter-spacing:1px;color:rgba(64,216,255,0.4);">LEVEL</div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="${_F};font-size:9px;letter-spacing:2px;color:var(--cyan);">${cmdTitle(_cmdResult.cmd.level).toUpperCase()}</div>
+          <div style="margin-top:5px;height:5px;background:rgba(64,216,255,0.1);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${Math.round(cmdProgress(_cmdResult.cmd.xp)*100)}%;background:linear-gradient(90deg,rgba(64,216,255,0.6),var(--cyan));border-radius:3px;transition:width 1.2s ease;"></div>
+          </div>
+          <div style="font-size:7px;color:rgba(64,216,255,0.35);margin-top:3px;">${cmdXpToNext(_cmdResult.cmd.xp)} XP to next level</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;color:${won?'#40ff80':'rgba(216,232,248,0.4)'};">+${_cmdResult.xpGained} XP</div>
+          ${_cmdResult.levelUp?`<div style="${_F};font-size:7px;color:var(--gold);animation:hero-pulse 1s ease-in-out 3;">▲ LEVEL UP!</div>`:''}
+        </div>
+      </div>
+      <!-- XP breakdown -->
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        ${_cmdXpRows.map(([label,val])=>`<div style="font-size:7px;color:rgba(216,232,248,0.35);background:rgba(64,216,255,0.04);padding:2px 7px;border-radius:10px;">${label} <span style="color:rgba(64,216,255,0.6);">${val}</span></div>`).join('')}
+      </div>
+      ${_cmdUnlockHtml?`<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;">${_cmdUnlockHtml}</div>`:''}
+    </div>
     <h1 style="font-size:${won?34:28}px;color:${won?'var(--gold)':'var(--red)'};margin-bottom:6px">${won?'✨ VICTORY':'💀 DEFEAT'}</h1>
     <div class="ov-sub" style="color:${won?'var(--gold-lt)':'var(--red)'};margin-bottom:10px">${won?'HUMANITY ASCENDS':'EMPIRE FALLEN'}</div>
     <p class="ov-desc" style="margin-bottom:4px">${reason||''}</p>
@@ -5091,22 +5377,47 @@ document.getElementById('ov-content').innerHTML=`
     </div>
 
     <!-- Primary action buttons -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:min(340px,90%);">
-      <button class="sbtn" id="launch-btn" disabled onclick="showOpponentSetup()" style="width:100%;font-size:clamp(9px,1.3vw,11px);letter-spacing:3px;padding:13px 24px;min-height:48px;">▶ CHOOSE OPPONENTS</button>
-      <div style="display:flex;gap:8px;width:100%;">
-        <button class="sbtn gbtn" id="quick-btn" disabled onclick="quickStart()" style="flex:1;font-size:clamp(8px,1.1vw,10px);letter-spacing:2px;min-height:40px;">🎲 QUICK START</button>
-        <button onclick="showScenariosScreen()" style="flex:1;padding:9px 8px;${_F};font-size:clamp(7px,1vw,9px);letter-spacing:1px;border:1px solid ${_CYN}0.18);background:${_CYN}0.04);color:${_CYN}0.65);cursor:pointer;border-radius:3px;min-height:40px;">⚔️ SCENARIOS</button>
-        <button onclick="showAchievementsScreen()" style="flex:1;padding:9px 8px;${_F};font-size:clamp(7px,1vw,9px);letter-spacing:1px;border:1px solid ${_GLD}0.18);background:${_GLD}0.04);color:${_GLD}0.6);cursor:pointer;border-radius:3px;min-height:40px;">🎖 MEDALS</button>
-      </div>
-      <!-- Daily challenge pill -->
-      <button onclick="launchDailyChallenge()" style="width:100%;padding:8px 12px;${_F};font-size:clamp(7px,1vw,9px);letter-spacing:1.5px;border:1px solid ${dailyDone?'rgba(64,255,128,0.45)':_GLD+'0.4)'};background:${dailyDone?'rgba(64,255,128,0.06)':_GLD+'0.05)'};color:${dailyDone?'#40ff80':'var(--gold)'};cursor:pointer;border-radius:5px;min-height:36px;">
-        ${dailyDone?'✓ DAILY COMPLETE':'📅 DAILY CHALLENGE'} · ${getDailyDateStr()}${streak>1?` · 🔥 ${streak}-day streak`:''}
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:min(360px,92%);">
+      <!-- CAMPAIGN — hero button -->
+      <button onclick="showCampaignScreen()" style="width:100%;padding:14px 20px;${_F};font-size:clamp(10px,1.4vw,12px);letter-spacing:3px;border:2px solid ${_CYN}0.5);background:linear-gradient(135deg,${_CYN}0.08),${_CYN}0.04));color:var(--cyan);cursor:pointer;border-radius:6px;min-height:52px;box-shadow:0 0 24px ${_CYN}0.1);transition:all 0.2s;">
+        ⚔ CAMPAIGN
+        <span style="display:block;font-family:'Exo 2',sans-serif;font-size:clamp(7px,1vw,9px);letter-spacing:1px;color:${_CYN}0.5);font-weight:300;margin-top:3px;">Learn the game · 8 missions · Recommended</span>
       </button>
+      <!-- SKIRMISH + DAILY row -->
+      <div style="display:flex;gap:8px;width:100%;">
+        <button id="launch-btn" onclick="showSkirmishMenu()" style="flex:1;padding:11px 8px;${_F};font-size:clamp(8px,1.1vw,10px);letter-spacing:2px;border:1px solid ${_CYN}0.2);background:${_CYN}0.04);color:${_CYN}0.7);cursor:pointer;border-radius:5px;min-height:44px;position:relative;">
+          🗺 SKIRMISH
+          ${getCampaignUnlocks().skirmish?'':' <span style="position:absolute;top:3px;right:5px;font-size:7px;color:rgba(240,192,64,0.5);">NEW</span>'}
+        </button>
+        <button onclick="launchDailyChallenge()" style="flex:1;padding:11px 8px;${_F};font-size:clamp(8px,1.1vw,10px);letter-spacing:2px;border:1px solid ${dailyDone?'rgba(64,255,128,0.35)':_GLD+'0.3)'};background:${dailyDone?'rgba(64,255,128,0.04)':_GLD+'0.04)'};color:${dailyDone?'#40ff80':'var(--gold)'};cursor:pointer;border-radius:5px;min-height:44px;">
+          ${dailyDone?'✓ DAILY':'📅 DAILY'}
+          ${streak>1?`<span style="display:block;font-size:7px;margin-top:2px;opacity:0.6;">🔥 ${streak}-day streak</span>`:''}
+        </button>
+        <button onclick="showAchievementsScreen()" style="padding:11px 10px;${_F};font-size:clamp(8px,1.1vw,10px);letter-spacing:1px;border:1px solid ${_GLD}0.15);background:${_GLD}0.03);color:${_GLD}0.5);cursor:pointer;border-radius:5px;min-height:44px;">🎖</button>
+      </div>
     </div>
   </div>
 
-  <!-- ── FACTION STRIP — compact icon row at bottom ── -->
-  <div style="flex-shrink:0;border-top:1px solid ${_CYN}0.1);background:linear-gradient(0deg,rgba(2,4,16,0.97),rgba(4,8,24,0.9));padding:clamp(10px,1.8vh,18px) clamp(12px,2vw,28px) clamp(10px,1.8vh,18px);">
+  <!-- ── BOTTOM STRIP: Commander card + faction picker ── -->
+  <div style="flex-shrink:0;border-top:1px solid ${_CYN}0.1);background:linear-gradient(0deg,rgba(2,4,16,0.97),rgba(4,8,24,0.9));padding:clamp(8px,1.5vh,14px) clamp(12px,2vw,28px) clamp(10px,1.8vh,18px);">
+    <!-- Commander card -->
+    ${(()=>{const _cmd=loadCommander();const _lv=_cmd.level||1;const _pct=Math.round(cmdProgress(_cmd.xp||0)*100);return`
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid ${_CYN}0.15);border-radius:7px;background:${_CYN}0.03);margin-bottom:clamp(8px,1.5vh,14px);">
+      <div style="text-align:center;flex-shrink:0;min-width:36px;">
+        <div style="${_F};font-size:20px;font-weight:900;color:var(--cyan);line-height:1;">${_lv}</div>
+        <div style="font-size:6px;letter-spacing:1px;color:${_CYN}0.4);">LVL</div>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
+          <span style="${_F};font-size:9px;letter-spacing:2px;color:var(--cyan);">${cmdTitle(_lv).toUpperCase()}</span>
+          <span style="font-size:7px;color:${_CYN}0.35);">· ${_cmd.totalGames||0} games · ${_cmd.totalWins||0} wins</span>
+        </div>
+        <div style="height:4px;background:${_CYN}0.08);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${_pct}%;background:linear-gradient(90deg,${_CYN}0.5),var(--cyan));border-radius:2px;"></div>
+        </div>
+      </div>
+      <button onclick="showCommanderScreen()" style="flex-shrink:0;padding:5px 10px;${_F};font-size:7px;letter-spacing:1px;border:1px solid ${_CYN}0.2);background:${_CYN}0.04);color:${_CYN}0.6);cursor:pointer;border-radius:3px;min-height:30px;">⚙ CUSTOMISE</button>
+    </div>`;})()}
     <div style="${_F};font-size:7px;letter-spacing:3px;color:${_RPC}0.25);text-align:center;margin-bottom:clamp(8px,1.5vh,14px);">CHOOSE YOUR FACTION</div>
     <div style="display:flex;gap:clamp(6px,1.5vw,14px);justify-content:center;flex-wrap:wrap;">
       ${Object.values(FACTIONS).map(f=>`
@@ -5149,8 +5460,7 @@ Object.values(FACTIONS).forEach(f=>{
   },{passive:false});
 });
 
-const lb2=document.getElementById('launch-btn'),qb=document.getElementById('quick-btn');
-if(lb2)lb2.disabled=false;if(qb)qb.disabled=false;
+// buttons are always enabled now
 }
 
 
@@ -5331,6 +5641,437 @@ return`<div class="ai-slot-card" style="display:flex;align-items:stretch;gap:0;b
 window.randomiseAI=randomiseAI;
 function setAIFac(i,fid){if(window._aiSlots)window._aiSlots[i].factionId=fid;renderAISlots();};
 function setAIPers(i,p){if(window._aiSlots)window._aiSlots[i].personality=p;};
+
+
+// ── COMMANDER PROGRESSION ───────────────────────────────────────────
+const CMD_KEY='farreach_commander';
+const CMD_TITLES=[
+  'Recruit','Scout','Soldier','Veteran','Warlord',
+  'Tactician','Admiral','Sovereign','Architect','Legend',
+  'Immortal','Overlord','Dominator','Conqueror','Commander',
+];
+const CMD_XP_PER_LEVEL=300;
+const CMD_MAX_LEVEL=50;
+
+const CMD_FACTION_SKINS={
+  APEX:[
+    {id:'default',name:'Default',color:'#1a8aff',light:'#80c8ff'},
+    {id:'void',name:'Void',color:'#6040ff',light:'#a090ff'},
+    {id:'solar',name:'Solar',color:'#ff8c00',light:'#ffcc60'},
+    {id:'stealth',name:'Stealth',color:'#2a3a4a',light:'#8ab0c8'},
+  ],
+  COLLECTIVE:[
+    {id:'default',name:'Default',color:'#cc2020',light:'#ff7070'},
+    {id:'crimson',name:'Crimson',color:'#8b0000',light:'#ff4444'},
+    {id:'gold',name:'Gold',color:'#b8860b',light:'#ffd700'},
+    {id:'iron',name:'Iron',color:'#607080',light:'#a0b8c8'},
+  ],
+  GREYS:[
+    {id:'default',name:'Default',color:'#50d0a0',light:'#90ffcc'},
+    {id:'neon',name:'Neon',color:'#00ff88',light:'#88ffcc'},
+    {id:'ice',name:'Ice',color:'#80d0ff',light:'#c0f0ff'},
+    {id:'shadow',name:'Shadow',color:'#304858',light:'#80a8c0'},
+  ],
+  BENEVOLENT:[
+    {id:'default',name:'Default',color:'#2060c0',light:'#80b8ff'},
+    {id:'deep',name:'Deep Sea',color:'#003880',light:'#4080ff'},
+    {id:'tidal',name:'Tidal',color:'#00a8c8',light:'#60e8ff'},
+    {id:'abyss',name:'Abyss',color:'#101830',light:'#4060a0'},
+  ],
+};
+
+const CMD_MAP_SIZES=[
+  {id:'small',name:'Small',w:18,h:14,unlockLevel:1,desc:'Classic — fast games, 30–60 min'},
+  {id:'standard',name:'Standard+',w:24,h:18,unlockLevel:5,desc:'More room to expand, 45–90 min'},
+  {id:'large',name:'Large',w:30,h:22,unlockLevel:15,desc:'Epic scale, 60–120 min'},
+  {id:'massive',name:'Massive',w:38,h:28,unlockLevel:25,desc:'Marathon battles, 90–180 min'},
+];
+
+// XP rewards
+const CMD_XP={
+  win:100, loss:20, turnSurvived:2, unitKilled:3,
+  wonderBuilt:15, techResearched:1,
+  dailyBonus:50, campaignBonus:75,
+};
+
+function loadCommander(){
+  try{
+    const s=localStorage.getItem(CMD_KEY);
+    if(s)return JSON.parse(s);
+  }catch(e){}
+  return{xp:0,level:1,totalGames:0,totalWins:0,
+    unlockedSkins:{APEX:['default'],COLLECTIVE:['default'],GREYS:['default'],BENEVOLENT:['default']},
+    activeSkins:{APEX:'default',COLLECTIVE:'default',GREYS:'default',BENEVOLENT:'default'},
+    activeMapSize:'small',
+  };
+}
+function saveCommander(data){
+  try{localStorage.setItem(CMD_KEY,JSON.stringify(data));}catch(e){}
+}
+function cmdLevel(xp){return Math.min(CMD_MAX_LEVEL,Math.floor(xp/CMD_XP_PER_LEVEL)+1);}
+function cmdTitle(level){
+  const idx=Math.min(CMD_TITLES.length-1,Math.floor((level-1)/Math.ceil(CMD_MAX_LEVEL/CMD_TITLES.length)));
+  return CMD_TITLES[idx];
+}
+function cmdXpToNext(xp){return CMD_XP_PER_LEVEL-(xp%CMD_XP_PER_LEVEL);}
+function cmdProgress(xp){return (xp%CMD_XP_PER_LEVEL)/CMD_XP_PER_LEVEL;}
+
+function getUnlockedSkins(factionId, level){
+  const all=CMD_FACTION_SKINS[factionId]||[];
+  // Unlock 1 skin per 10 levels
+  return all.filter((_,i)=>i===0||level>=i*10);
+}
+function getUnlockedMapSizes(level){
+  return CMD_MAP_SIZES.filter(m=>m.unlockLevel<=level);
+}
+
+// Award XP after a game — returns {xpGained, newLevel, oldLevel, unlocks:[]}
+function awardCommanderXP(won, gameData){
+  const cmd=loadCommander();
+  const oldLevel=cmd.level||1;
+  let xp=0;
+  xp+=won?CMD_XP.win:CMD_XP.loss;
+  xp+=(gameData.turns||0)*CMD_XP.turnSurvived;
+  xp+=(gameData.unitsKilled||0)*CMD_XP.unitKilled;
+  xp+=(gameData.wondersBuilt||0)*CMD_XP.wonderBuilt;
+  xp+=(gameData.techsResearched||0)*CMD_XP.techResearched;
+  if(gameData.isDaily)xp+=CMD_XP.dailyBonus;
+  if(gameData.isCampaign)xp+=CMD_XP.campaignBonus;
+  cmd.xp=(cmd.xp||0)+xp;
+  cmd.level=cmdLevel(cmd.xp);
+  cmd.totalGames=(cmd.totalGames||0)+1;
+  if(won)cmd.totalWins=(cmd.totalWins||0)+1;
+  // Detect new unlocks
+  const unlocks=[];
+  // Skins
+  Object.keys(CMD_FACTION_SKINS).forEach(fid=>{
+    const prev=getUnlockedSkins(fid,oldLevel).length;
+    const now=getUnlockedSkins(fid,cmd.level).length;
+    if(now>prev){
+      const newSkin=CMD_FACTION_SKINS[fid][now-1];
+      if(!cmd.unlockedSkins[fid])cmd.unlockedSkins[fid]=['default'];
+      if(!cmd.unlockedSkins[fid].includes(newSkin.id))cmd.unlockedSkins[fid].push(newSkin.id);
+      unlocks.push({type:'skin',faction:fid,skin:newSkin});
+    }
+  });
+  // Map sizes
+  const prevMaps=getUnlockedMapSizes(oldLevel).length;
+  const nowMaps=getUnlockedMapSizes(cmd.level).length;
+  if(nowMaps>prevMaps){
+    const newMap=CMD_MAP_SIZES[nowMaps-1];
+    unlocks.push({type:'map',mapSize:newMap});
+  }
+  saveCommander(cmd);
+  return{xpGained:xp,newLevel:cmd.level,oldLevel,levelUp:cmd.level>oldLevel,unlocks,cmd};
+}
+
+// Apply active faction skin to FACTIONS
+function applyCommanderSkins(){
+  const cmd=loadCommander();
+  Object.keys(FACTIONS).forEach(fid=>{
+    const skinId=cmd.activeSkins&&cmd.activeSkins[fid]||'default';
+    const skins=CMD_FACTION_SKINS[fid];
+    if(!skins)return;
+    const skin=skins.find(s=>s.id===skinId)||skins[0];
+    FACTIONS[fid].color=skin.color;
+    FACTIONS[fid].light=skin.light;
+  });
+}
+
+// Get current map size dims
+function getActiveMapSize(){
+  const cmd=loadCommander();
+  const sz=CMD_MAP_SIZES.find(m=>m.id===(cmd.activeMapSize||'small'))||CMD_MAP_SIZES[0];
+  return{w:sz.w,h:sz.h};
+}
+
+// ── CAMPAIGN SYSTEM ─────────────────────────────────────────────────
+const CAMPAIGN_KEY='farreach_campaign';
+const CAMPAIGN_MISSIONS=[
+{id:1,title:'First Contact',
+ desc:'A rival empire has been spotted nearby. Learn the basics of movement and combat — capture their HQ to win.',
+ planet:'EARTH',turns:30,aiCount:1,aiDiff:'EASY',
+ features:{tech:false,building:false,diplo:false,multiplanet:false,wonders:false,fullTech:false},
+ winCondition:'domination',
+ tip:'Tap a unit to select it, then tap a highlighted tile to move. Move adjacent to an enemy city to attack it.',
+ unlocks:'Building cities and earning credits',
+ reward:'Buildings & Economy'},
+{id:2,title:'Growing Pains',
+ desc:'You have more territory to manage now. Learn how cities grow, generate income, and produce units.',
+ planet:'EARTH',turns:40,aiCount:1,aiDiff:'EASY',
+ features:{tech:false,building:true,diplo:false,multiplanet:false,wonders:false,fullTech:false},
+ winCondition:'domination',
+ tip:'Build units at your cities each turn. Level up cities by letting their population grow.',
+ unlocks:'Technology research',
+ reward:'Tech Tree'},
+{id:3,title:'Age of Invention',
+ desc:'A new era dawns. Research technologies to unlock powerful units and abilities.',
+ planet:'EARTH',turns:50,aiCount:1,aiDiff:'EASY',
+ features:{tech:true,building:true,diplo:false,multiplanet:false,wonders:false,fullTech:false},
+ winCondition:'domination',
+ tip:'Spend credits in the Tech tab to research upgrades. Unlock new unit types to get an edge.',
+ unlocks:'Wonders of the World',
+ reward:'Wonders'},
+{id:4,title:'Monuments to Power',
+ desc:'Two rivals now stand against you. Build a Wonder to tip the balance in your favour.',
+ planet:'EARTH',turns:60,aiCount:2,aiDiff:'NORMAL',
+ features:{tech:true,building:true,diplo:false,multiplanet:false,wonders:true,fullTech:false},
+ winCondition:'domination',
+ tip:'Wonders can only be built once — race your rivals to claim the most powerful ones first.',
+ unlocks:'Diplomacy',
+ reward:'Diplomacy'},
+{id:5,title:'The Art of War and Peace',
+ desc:'Three rival empires surround you. Not every problem can be solved by force — learn to negotiate.',
+ planet:'EARTH',turns:70,aiCount:2,aiDiff:'NORMAL',
+ features:{tech:true,building:true,diplo:true,multiplanet:false,wonders:true,fullTech:false},
+ winCondition:'domination',
+ tip:'Use the Diplo tab to negotiate ceasefires when outnumbered, then pick your rivals off one at a time.',
+ unlocks:'Multi-planet expansion',
+ reward:'Moon & Mars'},
+{id:6,title:'Beyond the Sky',
+ desc:'Earth is no longer enough. Establish colonies on the Moon to secure your empires future.',
+ planet:'EARTH',turns:80,aiCount:2,aiDiff:'NORMAL',
+ features:{tech:true,building:true,diplo:true,multiplanet:true,wonders:true,fullTech:false},
+ winCondition:'domination',
+ tip:'Research Moonbase tech then use the Planet Map button to travel. Your tech carries over between planets.',
+ unlocks:'Full technology tree',
+ reward:'Full Tech Tree'},
+{id:7,title:'Arms Race',
+ desc:'A hardened rival empire has emerged. The full technology tree is now at your disposal — use it wisely.',
+ planet:'EARTH',turns:90,aiCount:2,aiDiff:'HARD',
+ features:{tech:true,building:true,diplo:true,multiplanet:true,wonders:true,fullTech:true},
+ winCondition:'domination',
+ tip:'On Hard difficulty the AI coordinates siege attacks and uses ICBMs. Fortify your HQ and keep defenders nearby.',
+ unlocks:'Skirmish mode — full free play',
+ reward:'Full Skirmish'},
+{id:8,title:'The Final Frontier',
+ desc:'The ultimate challenge. Three rivals, maximum stakes. Launch your Exodus Ship through the Black Hole to win.',
+ planet:'EARTH',turns:120,aiCount:3,aiDiff:'HARD',
+ features:{tech:true,building:true,diplo:true,multiplanet:true,wonders:true,fullTech:true},
+ winCondition:'any',
+ tip:'Any victory condition counts — domination, exodus, colonisation, or score. Choose your path.',
+ unlocks:'Elon Mode difficulty',
+ reward:'Elon Mode'},
+];
+
+function loadCampaign(){
+  try{const s=localStorage.getItem(CAMPAIGN_KEY);return s?JSON.parse(s):{completed:[],current:0};}
+  catch(e){return{completed:[],current:0};}
+}
+function saveCampaign(data){
+  try{localStorage.setItem(CAMPAIGN_KEY,JSON.stringify(data));}catch(e){}
+}
+function getCampaignUnlocks(){
+  const data=loadCampaign();
+  const n=data.completed.length;
+  return{
+    building:n>=1,
+    tech:n>=2,
+    wonders:n>=3,
+    diplo:n>=4,
+    multiplanet:n>=5,
+    fullTech:n>=6,
+    skirmish:n>=7,  // soft unlock
+    elonMode:n>=8,
+  };
+}
+function isCampaignMission(){return !!(G&&G.campaignMission);}
+
+
+function showCampaignMissionComplete(mission, reason, newAchievements){
+// Mark mission complete
+const data=loadCampaign();
+if(!data.completed.includes(mission.id))data.completed.push(mission.id);
+data.current=Math.min(mission.id, CAMPAIGN_MISSIONS.length-1);
+saveCampaign(data);
+SFX.victory();MUSIC.stop();
+const isLast=mission.id===CAMPAIGN_MISSIONS.length;
+const nextMission=CAMPAIGN_MISSIONS[mission.id]; // 0-indexed, so mission.id = next index
+showOv();
+document.getElementById('ov-content').innerHTML=`
+<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;position:relative;">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(64,216,255,0.06),transparent 70%);pointer-events:none;"></div>
+  <!-- Mission badge -->
+  <div style="font-size:48px;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(240,192,64,0.6));">✨</div>
+  <div style="font-family:Orbitron,monospace;font-size:10px;letter-spacing:4px;color:rgba(64,216,255,0.5);margin-bottom:6px;">MISSION ${mission.id} COMPLETE</div>
+  <div style="font-family:Orbitron,monospace;font-size:clamp(18px,4vw,28px);font-weight:900;color:var(--gold);letter-spacing:2px;margin-bottom:6px;text-align:center;">${mission.title.toUpperCase()}</div>
+  <div style="font-size:10px;color:rgba(216,232,248,0.45);margin-bottom:24px;text-align:center;">${reason||'Victory secured.'}</div>
+  <!-- Unlock reveal -->
+  <div style="border:1px solid rgba(240,192,64,0.35);border-radius:8px;background:rgba(240,192,64,0.06);padding:16px 24px;margin-bottom:24px;text-align:center;max-width:340px;">
+    <div style="font-family:Orbitron,monospace;font-size:7px;letter-spacing:3px;color:rgba(240,192,64,0.5);margin-bottom:8px;">🔓 UNLOCKED</div>
+    <div style="font-family:Orbitron,monospace;font-size:13px;color:var(--gold);letter-spacing:1px;">${mission.reward}</div>
+    ${mission.unlocks?`<div style="font-size:8px;color:rgba(216,232,248,0.38);margin-top:6px;line-height:1.5;">${mission.unlocks}</div>`:''}
+  </div>
+  <!-- Progress pip row -->
+  <div style="display:flex;gap:8px;margin-bottom:28px;">
+    ${CAMPAIGN_MISSIONS.map((_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<mission.id?'var(--cyan)':i===mission.id?'var(--gold)':'rgba(60,140,255,0.15)'};box-shadow:${i<mission.id?'0 0 8px rgba(64,216,255,0.5)':i===mission.id?'0 0 8px rgba(240,192,64,0.5)':'none'};transition:all 0.4s;animation:${i===mission.id-1?'hero-pulse 2s ease-in-out 3':'none'};"></div>`).join('')}
+  </div>
+  <!-- CTAs -->
+  <div style="display:flex;flex-direction:column;gap:10px;width:min(300px,90%);">
+    ${!isLast&&nextMission?`<button class="sbtn gbtn" onclick="showCampaignScreen()" style="font-size:10px;letter-spacing:2px;min-height:48px;">→ MISSION ${nextMission.id}: ${nextMission.title.toUpperCase()}</button>`:''}
+    ${isLast?`<button class="sbtn gbtn" onclick="showPickScreen()" style="font-size:10px;letter-spacing:2px;min-height:48px;">🚀 PLAY FREE SKIRMISH</button>`:''}
+    <button class="sbtn" onclick="showPickScreen()" style="font-size:9px;letter-spacing:2px;min-height:40px;">← Main Menu</button>
+  </div>
+</div>`;
+}
+
+
+function showCampaignScreen(){
+pickedFaction=pickedFaction||Object.keys(FACTIONS)[0];
+const data=loadCampaign();
+const completed=new Set(data.completed);
+const nextId=completed.size+1;
+showOv();
+document.getElementById('ov-content').innerHTML=`
+<div style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;padding:16px 20px;box-sizing:border-box;">
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:14px;">
+    <div>
+      <div style="font-family:Orbitron,monospace;font-size:10px;letter-spacing:4px;color:var(--cyan);">⚔ CAMPAIGN</div>
+      <div style="font-size:8px;color:rgba(216,232,248,0.3);margin-top:3px;">Learn the game one system at a time</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div style="font-family:Orbitron,monospace;font-size:9px;color:var(--gold);">${completed.size}/${CAMPAIGN_MISSIONS.length}</div>
+      <div style="display:flex;gap:4px;">${CAMPAIGN_MISSIONS.map((_,i)=>`<div style="width:8px;height:8px;border-radius:50%;background:${completed.has(i+1)?'var(--cyan)':'rgba(60,140,255,0.15)'};"></div>`).join('')}</div>
+    </div>
+  </div>
+  <!-- Faction strip -->
+  <div style="flex-shrink:0;margin-bottom:14px;">
+    <div style="font-family:Orbitron,monospace;font-size:7px;letter-spacing:2px;color:rgba(216,232,248,0.2);margin-bottom:8px;">YOUR FACTION</div>
+    <div style="display:flex;gap:8px;">
+      ${Object.values(FACTIONS).map(f=>`
+        <div id="cfc-${f.id}" onclick="pickedFaction='${f.id}';document.querySelectorAll('[id^=cfc-]').forEach(el=>el.style.borderColor='');this.style.borderColor='${f.color}';this.style.background='${f.color}15';" 
+          style="display:flex;align-items:center;gap:7px;padding:8px 12px;border:1.5px solid ${f.id===pickedFaction?f.color+'99':'rgba(60,140,255,0.12)'};border-radius:6px;background:${f.id===pickedFaction?f.color+'10':'transparent'};cursor:pointer;transition:all 0.15s;flex:1;min-width:0;">
+          <span style="font-size:18px;flex-shrink:0;">${f.icon}</span>
+          <div style="min-width:0;">
+            <div style="font-family:Orbitron,monospace;font-size:7px;color:${f.light};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.name}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>
+  <!-- Mission list -->
+  <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:rgba(64,216,255,0.15) transparent;padding-right:4px;">
+    ${CAMPAIGN_MISSIONS.map((m,i)=>{
+      const done=completed.has(m.id);
+      const isNext=m.id===nextId;
+      const locked=!done&&!isNext;
+      const bdr=done?'rgba(64,216,255,0.25)':isNext?'rgba(240,192,64,0.35)':'rgba(60,140,255,0.08)';
+      const bg=done?'rgba(64,216,255,0.04)':isNext?'rgba(240,192,64,0.05)':'rgba(2,4,16,0.3)';
+      return`<div style="border:1px solid ${bdr};border-radius:8px;background:${bg};padding:12px 14px;display:flex;align-items:center;gap:12px;opacity:${locked?0.4:1};">
+        <div style="font-family:Orbitron,monospace;font-size:${done?'16px':'14px'};color:${done?'var(--cyan)':isNext?'var(--gold)':'rgba(216,232,248,0.25)'};flex-shrink:0;width:28px;text-align:center;">${done?'✓':isNext?'▶':m.id}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:Orbitron,monospace;font-size:9px;color:${done?'rgba(216,232,248,0.6)':isNext?'var(--gold)':'rgba(216,232,248,0.25)'};letter-spacing:1px;margin-bottom:3px;">${m.title}</div>
+          <div style="font-size:8px;color:rgba(216,232,248,0.32);line-height:1.4;">${m.desc}</div>
+          ${!done&&!locked?`<div style="font-size:7px;color:rgba(64,216,255,0.4);margin-top:4px;">🔓 Unlocks: ${m.reward}</div>`:''}
+        </div>
+        ${!locked?`<button onclick="launchCampaignMission(${i})" style="flex-shrink:0;padding:8px 14px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:1px;border:1px solid ${done?'rgba(64,216,255,0.3)':'rgba(240,192,64,0.45)'};background:${done?'rgba(64,216,255,0.06)':'rgba(240,192,64,0.08)'};color:${done?'var(--cyan)':'var(--gold)'};cursor:pointer;border-radius:4px;min-height:36px;">${done?'Replay':'Play'}</button>`:'<div style="flex-shrink:0;width:52px;text-align:center;font-size:16px;">🔒</div>'}
+      </div>`;
+    }).join('')}
+  </div>
+  <!-- Footer -->
+  <div style="flex-shrink:0;margin-top:12px;">
+    <button onclick="showPickScreen()" style="width:100%;padding:10px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;border:1px solid rgba(60,140,255,0.18);background:transparent;color:rgba(216,232,248,0.3);cursor:pointer;border-radius:4px;min-height:40px;">← Back to Menu</button>
+  </div>
+</div>`;
+}
+
+
+function showSkirmishMenu(){
+const unlocks=getCampaignUnlocks();
+const data=loadCampaign();
+const missionsComplete=data.completed.length;
+showOv();
+document.getElementById('ov-content').innerHTML=`
+<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;gap:14px;">
+  <div style="font-family:Orbitron,monospace;font-size:10px;letter-spacing:4px;color:var(--cyan);">🗺 SKIRMISH</div>
+  <div style="font-size:9px;color:rgba(216,232,248,0.38);text-align:center;max-width:320px;line-height:1.6;">Free play. Choose your opponents, difficulty, and planet. No restrictions.</div>
+  ${missionsComplete<3?`
+  <!-- Soft gate nudge -->
+  <div style="border:1px solid rgba(240,192,64,0.25);border-radius:8px;background:rgba(240,192,64,0.04);padding:12px 16px;max-width:340px;text-align:center;">
+    <div style="font-family:Orbitron,monospace;font-size:7px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;">💡 RECOMMENDATION</div>
+    <div style="font-size:8px;color:rgba(216,232,248,0.4);line-height:1.5;margin-bottom:10px;">You've completed ${missionsComplete} of 8 Campaign missions. The Campaign teaches the game step by step — most players enjoy it more if they start there.</div>
+    <button onclick="showCampaignScreen()" style="width:100%;padding:8px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:1px;border:1px solid rgba(240,192,64,0.35);background:rgba(240,192,64,0.07);color:var(--gold);cursor:pointer;border-radius:4px;min-height:36px;">⚔ Take me to Campaign instead</button>
+  </div>`:``}
+  <!-- Skirmish options -->
+  <div style="display:flex;flex-direction:column;gap:8px;width:min(320px,90%);">
+    <button onclick="hideOv();showOpponentSetup()" style="width:100%;padding:13px;font-family:Orbitron,monospace;font-size:10px;letter-spacing:2px;border:1px solid rgba(64,216,255,0.3);background:rgba(64,216,255,0.06);color:var(--cyan);cursor:pointer;border-radius:5px;min-height:48px;">Choose Opponents →</button>
+    <button onclick="hideOv();quickStart()" style="width:100%;padding:11px;font-family:Orbitron,monospace;font-size:9px;letter-spacing:2px;border:1px solid rgba(64,216,255,0.15);background:rgba(64,216,255,0.03);color:rgba(64,216,255,0.6);cursor:pointer;border-radius:5px;min-height:44px;">🎲 Quick Start</button>
+    <button onclick="showScenariosScreen()" style="width:100%;padding:11px;font-family:Orbitron,monospace;font-size:9px;letter-spacing:2px;border:1px solid rgba(64,216,255,0.12);background:transparent;color:rgba(64,216,255,0.45);cursor:pointer;border-radius:5px;min-height:40px;">⚔️ Scenarios</button>
+  </div>
+  <button onclick="showPickScreen()" style="padding:8px 20px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;border:1px solid rgba(60,140,255,0.12);background:transparent;color:rgba(216,232,248,0.25);cursor:pointer;border-radius:3px;min-height:36px;">← Back</button>
+</div>`;
+}
+
+
+function showCommanderScreen(){
+const cmd=loadCommander();
+const level=cmd.level||1;
+showOv();
+function renderCommanderScreen(){
+const cmd2=loadCommander();
+document.getElementById('ov-content').innerHTML=`
+<div style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;padding:16px 20px;box-sizing:border-box;">
+  <!-- Header -->
+  <div style="flex-shrink:0;margin-bottom:14px;">
+    <div style="font-family:Orbitron,monospace;font-size:10px;letter-spacing:4px;color:var(--cyan);">⚙ COMMANDER</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+      <div style="font-family:Orbitron,monospace;font-size:28px;font-weight:900;color:var(--cyan);">${cmd2.level||1}</div>
+      <div>
+        <div style="font-family:Orbitron,monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;">${cmdTitle(cmd2.level||1).toUpperCase()}</div>
+        <div style="font-size:8px;color:rgba(64,216,255,0.35);margin-top:2px;">${cmd2.totalGames||0} games · ${cmd2.totalWins||0} victories · ${cmd2.xp||0} total XP</div>
+        <div style="height:5px;background:rgba(64,216,255,0.1);border-radius:3px;overflow:hidden;margin-top:5px;width:180px;">
+          <div style="height:100%;width:${Math.round(cmdProgress(cmd2.xp||0)*100)}%;background:linear-gradient(90deg,rgba(64,216,255,0.5),var(--cyan));border-radius:3px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Scrollable content -->
+  <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;scrollbar-width:thin;scrollbar-color:rgba(64,216,255,0.15) transparent;padding-right:4px;">
+    <!-- MAP SIZES -->
+    <div>
+      <div style="font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;color:rgba(64,216,255,0.5);margin-bottom:8px;">🗺 MAP SIZE</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${CMD_MAP_SIZES.map(m=>{
+          const unlocked=(cmd2.level||1)>=m.unlockLevel;
+          const active=cmd2.activeMapSize===m.id;
+          return`<div onclick="${unlocked?`"setMapSize('${m.id}')"`:''}" style="flex:1;min-width:80px;padding:10px 12px;border:${active?'2px':'1px'} solid ${active?'var(--cyan)':unlocked?'rgba(64,216,255,0.2)':'rgba(60,140,255,0.08)'};border-radius:6px;background:${active?'rgba(64,216,255,0.08)':'transparent'};cursor:${unlocked?'pointer':'not-allowed'};opacity:${unlocked?1:0.4};text-align:center;" ${unlocked?`onclick="setMapSize('${m.id}');renderCommanderScreen()"`:''}> 
+            <div style="font-family:Orbitron,monospace;font-size:8px;color:${active?'var(--cyan)':'rgba(216,232,248,0.5)'};">${m.name}</div>
+            <div style="font-size:7px;color:rgba(216,232,248,0.3);margin-top:3px;">${m.w}×${m.h}</div>
+            ${!unlocked?`<div style="font-size:6px;color:rgba(240,192,64,0.4);margin-top:3px;">Lv ${m.unlockLevel}</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <!-- FACTION SKINS -->
+    ${Object.keys(CMD_FACTION_SKINS).map(fid=>{
+      const fac=FACTIONS[fid];
+      const skins=CMD_FACTION_SKINS[fid];
+      const unlockedIds=cmd2.unlockedSkins&&cmd2.unlockedSkins[fid]||['default'];
+      const activeId=cmd2.activeSkins&&cmd2.activeSkins[fid]||'default';
+      return`<div>
+        <div style="font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;color:rgba(64,216,255,0.5);margin-bottom:8px;">${fac.icon} ${fac.name.toUpperCase()} SKIN</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${skins.map((skin,i)=>{
+            const unlocked=unlockedIds.includes(skin.id);
+            const active=activeId===skin.id;
+            const unlockLevel=i*10;
+            return`<div onclick="${unlocked?`setSkin('${fid}','${skin.id}')`:''}; renderCommanderScreen()" style="flex:1;min-width:70px;padding:8px 10px;border:${active?'2px':'1px'} solid ${active?skin.color:unlocked?skin.color+'44':'rgba(60,140,255,0.1)'};border-radius:6px;background:${active?skin.color+'18':unlocked?skin.color+'08':'transparent'};cursor:${unlocked?'pointer':'not-allowed'};opacity:${unlocked?1:0.4};text-align:center;" ${unlocked?`onclick="setSkin('${fid}','${skin.id}');renderCommanderScreen()"`:''}> 
+              <div style="width:24px;height:24px;border-radius:50%;background:${skin.color};margin:0 auto 5px;box-shadow:0 0 8px ${skin.color}66;"></div>
+              <div style="font-family:Orbitron,monospace;font-size:7px;color:${unlocked?skin.light:'rgba(216,232,248,0.25)'};">${skin.name}</div>
+              ${!unlocked?`<div style="font-size:6px;color:rgba(240,192,64,0.4);margin-top:2px;">Lv ${unlockLevel||1}</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  <button onclick="showPickScreen()" style="flex-shrink:0;margin-top:12px;width:100%;padding:10px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;border:1px solid rgba(60,140,255,0.18);background:transparent;color:rgba(216,232,248,0.3);cursor:pointer;border-radius:4px;min-height:40px;">← Back to Menu</button>
+</div>`;}
+renderCommanderScreen();
+}
+function setMapSize(id){const cmd=loadCommander();cmd.activeMapSize=id;saveCommander(cmd);}
+function setSkin(factionId,skinId){const cmd=loadCommander();if(!cmd.activeSkins)cmd.activeSkins={};cmd.activeSkins[factionId]=skinId;saveCommander(cmd);applyCommanderSkins();}
+
 function launchGame(){
 if(!pickedFaction)return;
 const aiSetup=(window._aiSlots||[]).slice(0,setupAICount);
@@ -5338,6 +6079,54 @@ hideOv();
 initGame(pickedFaction,aiSetup,'EARTH');
 updateHUD();renderTechs();
 setMsg('The '+FACTIONS[pickedFaction].name+' awakens. Your journey to the stars begins on Earth.');
+}
+function launchCampaignMission(missionIdx){
+if(!pickedFaction){notify('Pick a faction first','warn');return;}
+const m=CAMPAIGN_MISSIONS[missionIdx];
+if(!m)return;
+// Build minimal AI setup
+const aiPersonalities=['TACTICIAN','RUSHER','BUILDER'];
+const aiSetup=Array.from({length:m.aiCount},(_,i)=>({
+factionId:Object.keys(FACTIONS).filter(f=>f!==pickedFaction)[i%3],
+personality:aiPersonalities[i%3],
+}));
+// Set difficulty
+const prevDiff=globalDifficulty;
+globalDifficulty=m.aiDiff;
+hideOv();
+initGame(pickedFaction,aiSetup,m.planet);
+// Apply campaign flags to G
+G.campaignMission=m;
+G.campaignFeatures=m.features;
+G.turnLimit=m.turns;
+globalDifficulty=m.aiDiff;
+// Apply feature gates
+applyCampaignGates(m.features);
+updateHUD();renderTechs();
+// Show tip
+setTimeout(()=>notify('💡 '+m.tip),800);
+setMsg(m.title+' — '+m.desc);
+}
+function applyCampaignGates(features){
+// Sidebar tabs — hide/show based on features
+const diploTab=document.querySelector('.stab[data-tab="diplo"]');
+const wondersTab=document.querySelector('.stab[data-tab="wonders"]');
+const techTab=document.querySelector('.stab[data-tab="tech"]');
+if(diploTab)diploTab.style.display=features.diplo?'':'none';
+if(wondersTab)wondersTab.style.display=features.wonders?'':'none';
+if(techTab)techTab.style.display=features.tech?'':'none';
+// Mobile FABs
+const diploFab=document.getElementById('mob-diplo-btn');
+const wondersFab=document.getElementById('mob-wonders-btn');
+const techFab=document.getElementById('mob-tech-btn');
+if(diploFab)diploFab.style.display=features.diplo&&window.innerWidth<=640?'flex':'none';
+if(wondersFab)wondersFab.style.display=features.wonders&&window.innerWidth<=640?'flex':'none';
+if(techFab)techFab.style.display=features.tech&&window.innerWidth<=640?'flex':'none';
+// Header buttons
+const diploBtn=document.getElementById('diplo-btn');
+const planetBtn=document.getElementById('planet-btn');
+if(diploBtn)diploBtn.style.display=features.diplo?'':'none';
+if(planetBtn)planetBtn.style.display=features.multiplanet?'':'none';
 }
 const SAVE_KEY='farreach_save';
 function openGameMenu(){
@@ -5660,8 +6449,20 @@ document.querySelectorAll('.stab').forEach(b=>b.classList.toggle('active',b.data
 document.querySelectorAll('.stab-pane').forEach(p=>p.style.display='none');
 const pane=document.getElementById('stab-'+tab);
 if(pane)pane.style.display='flex',pane.style.flexDirection='column';
-if(tab==='tech')renderTechs();
-if(tab==='diplo')renderDiploPanel();
+if(tab==='tech'){
+  const cf=G&&G.campaignFeatures;
+  if(cf&&!cf.tech){
+    const el=document.getElementById('stab-tech');
+    if(el)el.innerHTML='<div style="padding:20px 14px;text-align:center;color:rgba(216,232,248,0.25);font-size:8px;line-height:1.7;">🔒 Technology research<br>unlocks in Mission 3.</div>';
+  } else renderTechs();
+}
+if(tab==='diplo'){
+  const cf=G&&G.campaignFeatures;
+  if(cf&&!cf.diplo){
+    const el=document.getElementById('stab-diplo');
+    if(el)el.innerHTML='<div style="padding:20px 14px;text-align:center;color:rgba(216,232,248,0.25);font-size:8px;line-height:1.7;">🔒 Diplomacy<br>unlocks in Mission 5.</div>';
+  } else renderDiploPanel();
+}
 if(tab==='wonders')renderWondersPanel();
 }
 function renderWondersPanel(){
