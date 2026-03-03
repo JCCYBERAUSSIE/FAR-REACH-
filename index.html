@@ -106,7 +106,15 @@ canvas{touch-action:none}
 .cnt-btn{min-height:48px;font-size:10px;}
 .sbtn{min-height:50px;}
 .evt-btn{min-height:52px;font-size:11px;padding:14px;}
+/* ── Event modal overlay ── */
+#evt-modal{display:none;position:fixed;inset:0;z-index:800;align-items:center;justify-content:center;}
+#evt-modal.open{display:flex;}
+#evt-bg{position:absolute;inset:0;background:rgba(2,4,16,0.82);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+#evt-panel{position:relative;z-index:1;background:linear-gradient(135deg,rgba(4,8,24,0.98),rgba(8,16,40,0.98));border:1px solid rgba(240,192,64,0.35);border-radius:12px;padding:22px 20px;max-width:min(380px,90vw);width:100%;box-shadow:0 0 40px rgba(240,192,64,0.12),0 8px 32px rgba(0,0,0,0.6);text-align:center;}
 
+/* ── Mobile fullscreen simulation ── */
+body.mob-fullscreen{position:fixed;inset:0;overflow:hidden;}
+body.mob-fullscreen #game-wrap,body.mob-fullscreen #CV,body.mob-fullscreen canvas{width:100vw!important;height:100dvh!important;}
 /* ── Notifications ── */
 #notif{font-size:10px;max-width:94%;padding:9px 16px;}
 
@@ -380,16 +388,18 @@ canvas{touch-action:none}
     <div id="mob-sel-panel"></div>
   </div>
 </div>
-<!-- Event choice modal -->
+<!-- Event choice modal — full overlay, hidden by default -->
 <div id="evt-modal">
-  <div id="evt-bg"></div>
+  <div id="evt-bg" onclick=""></div>
   <div id="evt-panel">
-    <div class="evt-icon" id="evt-icon">🌋</div>
-    <div class="evt-name" id="evt-name">EVENT</div>
-    <div class="evt-desc" id="evt-desc"></div>
-    <div id="evt-choices"></div>
+    <div id="evt-icon" style="font-size:36px;margin-bottom:8px;">🌋</div>
+    <div id="evt-name" style="font-family:Orbitron,monospace;font-size:11px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">EVENT</div>
+    <div id="evt-desc" style="font-size:9px;color:rgba(216,232,248,0.6);line-height:1.6;margin-bottom:14px;"></div>
+    <div id="evt-choices" style="display:flex;flex-direction:column;gap:8px;width:100%;"></div>
   </div>
 </div>
+<!-- Event notification badge — shown after event resolved -->
+<div id="evt-badge" style="display:none;position:fixed;top:52px;right:8px;z-index:450;cursor:pointer;background:rgba(4,8,24,0.92);border:1px solid rgba(240,192,64,0.4);border-radius:6px;padding:5px 8px;font-size:16px;backdrop-filter:blur(4px);" onclick="showLastEvent()" title="Last event"></div>
 <script>const _F='font-family:Orbitron,monospace',_B1='border:1px solid ',_RPC='rgba(216,232,248,',_CYN='rgba(64,216,255,',_GLD='rgba(240,192,64,';
 (function(){const s=document.getElementById('stars');for(let i=0;i<120;i++){const d=document.createElement('div');d.className='star';const sz=Math.random()*2+0.5;d.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*4}s;opacity:${Math.random()*0.5+0.1}`;s.appendChild(d);}})();
 let AC=null;
@@ -600,147 +610,203 @@ era(){
 }
 const MUSIC=(function(){
 let ac=null,playing=false,mode='explore',mg=null,_t=null,planet='earth';
-let bar=0,section=0,sectionLen=8,phrase=0;
-const SCALES={
-earth_explore:  [65,73,78,87,98,110,131,147],
-earth_combat:   [55,62,65,73,82,87,98,110],
-moon_explore:   [82,92,98,110,123,131,147,164],
-moon_combat:    [73,82,87,98,110,117,131,146],
-mars_explore:   [58,65,69,78,87,92,104,116],
-mars_combat:    [55,58,65,73,78,82,92,98],
-space:          [73,82,98,110,131,147,164,196],
+let bar=0,beat=0;
+
+function gAC(){
+  if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
+  if(ac.state==='suspended')ac.resume();
+  return ac;
 }
-const SECTION_PATTERNS=[0,1,2,1,3,2,0,5,1,4,2,3];
-function gAC(){if(!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}return ac;}
-function mko(freq,type,vol,t,dur,detune=0,filter=null){
-const a=gAC();if(!a||!mg)return;
-const o=a.createOscillator(),g=a.createGain();
-let chain=g;
-if(filter){const f=a.createBiquadFilter();f.type=filter.type||'lowpass';f.frequency.value=filter.freq||800;f.Q.value=filter.q||1;o.connect(f);f.connect(g);}
-else o.connect(g);
-g.connect(mg);
-o.type=type;o.frequency.setValueAtTime(freq,t);
-if(detune)o.detune.value=detune;
-g.gain.setValueAtTime(0,t);
-g.gain.linearRampToValueAtTime(vol,t+0.04);
-g.gain.setValueAtTime(vol,t+dur*0.7);
-g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-o.start(t);o.stop(t+dur+0.1);
+
+// Master gain with soft limiter
+function getMG(){
+  if(!mg){
+    const a=gAC();if(!a)return null;
+    mg=a.createGain();
+    mg.gain.value=0;
+    mg.connect(a.destination);
+  }
+  return mg;
 }
-function noise(vol,t,dur){
-const a=gAC();if(!a||!mg)return;
-const buf=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate);
-const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
-const src=a.createBufferSource(),g=a.createGain(),f=a.createBiquadFilter();
-f.type='bandpass';f.frequency.value=120+Math.random()*80;f.Q.value=0.8;
-src.buffer=buf;src.connect(f);f.connect(g);g.connect(mg);
-g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.01);
-g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-src.start(t);src.stop(t+dur+0.05);
+
+// Smooth tone with attack/decay envelope
+function tone(freq,dur,vol,start,type='sine',detune=0){
+  const a=gAC();const m=getMG();if(!a||!m)return;
+  const o=a.createOscillator();
+  const g=a.createGain();
+  o.type=type;
+  o.frequency.value=freq;
+  if(detune)o.detune.value=detune;
+  o.connect(g);g.connect(m);
+  const atk=Math.min(0.08,dur*0.1);
+  const rel=Math.min(0.4,dur*0.3);
+  g.gain.setValueAtTime(0,start);
+  g.gain.linearRampToValueAtTime(vol,start+atk);
+  g.gain.setValueAtTime(vol,start+dur-rel);
+  g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.start(start);o.stop(start+dur+0.05);
 }
-function getScale(){return SCALES[`${planet}_${mode}`]||SCALES.earth_explore;}
+
+// Soft pad — layered detuned oscillators for warmth
+function pad(freq,dur,vol,start){
+  const a=gAC();const m=getMG();if(!a||!m)return;
+  [-6,0,6].forEach((dt,i)=>{
+    const o=a.createOscillator();const g=a.createGain();
+    o.type='sine';o.frequency.value=freq;o.detune.value=dt;
+    const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=800+i*100;lp.Q.value=0.5;
+    o.connect(lp);lp.connect(g);g.connect(m);
+    const atk=dur*0.25;const rel=dur*0.4;
+    g.gain.setValueAtTime(0,start+i*0.02);
+    g.gain.linearRampToValueAtTime(vol*0.33,start+i*0.02+atk);
+    g.gain.setValueAtTime(vol*0.33,start+dur-rel);
+    g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+    o.start(start+i*0.02);o.stop(start+dur+0.1);
+  });
+}
+
+// Soft high shimmer
+function shimmer(freq,dur,vol,start){
+  tone(freq*2,dur,vol*0.4,start,'sine',8);
+  tone(freq*4,dur*0.6,vol*0.15,start+0.1,'sine',-5);
+}
+
+// Soft noise breath
+function breath(dur,vol,start,cutoff=1200){
+  const a=gAC();const m=getMG();if(!a||!m)return;
+  const buf=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.3;
+  const src=a.createBufferSource();src.buffer=buf;
+  const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=cutoff;
+  const g=a.createGain();
+  src.connect(lp);lp.connect(g);g.connect(m);
+  g.gain.setValueAtTime(0,start);
+  g.gain.linearRampToValueAtTime(vol,start+dur*0.3);
+  g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  src.start(start);src.stop(start+dur+0.1);
+}
+
+// ── Chord/scale definitions ───────────────────────────────────────
+// All in Hz, root around 110–220 for warmth
+const CHORDS={
+  earth_explore:[
+    [110,138,165,220],  // Am
+    [98,123,147,196],   // G
+    [123,155,185,246],  // Bm
+    [110,138,185,220],  // Am7
+  ],
+  earth_combat:[
+    [110,131,165,220],  // Am(b3)
+    [92,110,138,185],   // F#m
+    [82,98,131,165],    // Em
+    [110,138,165,247],  // Am + tension
+  ],
+  moon_explore:[
+    [130,164,195,260],  // C major — bright, open
+    [146,184,220,293],  // D
+    [116,146,174,232],  // Bb
+    [130,164,220,260],  // Cmaj7
+  ],
+  moon_combat:[
+    [116,138,174,232],  // Bb minor
+    [103,130,155,206],  // Ab
+    [130,155,195,260],  // Cm
+    [116,146,174,247],  // Bb+
+  ],
+  mars_explore:[
+    [87,110,131,174],   // F minor — dusty, low
+    [98,123,147,196],   // G
+    [82,98,123,165],    // Em
+    [87,110,155,174],   // Fm7
+  ],
+  mars_combat:[
+    [73,87,110,146],    // Dm
+    [82,98,123,164],    // Em
+    [87,104,131,174],   // Fm
+    [73,92,110,146],    // Dm+
+  ],
+};
+
+function getChords(){
+  const key=planet+'_'+mode;
+  return CHORDS[key]||CHORDS.earth_explore;
+}
+
+let _chordIdx=0;
+let _nextBar=0;
+const BAR=3.2; // seconds per bar — slow and spacious
+
 function scheduleBar(t,bn){
-const sc=getScale();
-const st=SECTION_PATTERNS[(Math.floor(bn/sectionLen)+section)%SECTION_PATTERNS.length];
-const bl=0.22;
-const beats=8;
-const root=sc[0];
-mko(root*0.5,'sine',0.06,t,bl*beats*0.95);
-if(mode==='combat'||st===3||st===5){
-mko(root*0.5,'square',0.025,t,bl*beats*0.95);
+  const chords=getChords();
+  _chordIdx=(_chordIdx+(bn%3===0?1:0))%chords.length;
+  const ch=chords[_chordIdx];
+  const isCombat=mode==='combat';
+  const barVol=isCombat?0.28:0.22;
+
+  if(isCombat){
+    // Combat: staccato low bass pulse on beat 1 and 3
+    tone(ch[0]*0.5,0.18,0.14,t,'square');
+    tone(ch[0]*0.5,0.14,0.10,t+BAR*0.5,'square');
+    // Mid tension chord, short
+    ch.slice(1,3).forEach((f,i)=>{
+      tone(f,0.3,0.07,t+i*0.04,'sawtooth');
+      tone(f,0.25,0.05,t+BAR*0.5+i*0.04,'sawtooth');
+    });
+    // High nervous shimmer every 2 bars
+    if(bn%2===0)shimmer(ch[2],0.4,0.04,t+BAR*0.25);
+    breath(BAR*0.4,0.025,t,600);
+  } else {
+    // Explore: long warm pad chords
+    pad(ch[0],BAR*0.85,barVol,t);
+    // Upper harmony — held long
+    ch.slice(1).forEach((f,i)=>{
+      pad(f,BAR*(0.7-i*0.05),barVol*(0.5-i*0.08),t+i*0.06);
+    });
+    // Gentle high melody note every 2 bars
+    if(bn%2===0){
+      const melNote=ch[bn%2===0?2:3]*2;
+      tone(melNote,0.6,0.04,t+BAR*0.6,'sine');
+      shimmer(ch[2],0.5,0.025,t+BAR*0.65);
+    }
+    // Very subtle breath texture
+    breath(BAR*0.9,0.012,t,900);
+  }
 }
-if(st===0){
-const chordDegrees=[0,2,4,6];
-chordDegrees.forEach((d,i)=>{
-const note=sc[d%sc.length];
-const slight=note*(1+0.005*i);
-mko(slight,'sine',0.028+i*0.005,t+i*0.04,bl*beats*0.9);
-mko(note*2,'triangle',0.012,t+i*0.06,bl*beats*0.8);
-});
-if(bn%4===0)mko(sc[6]*2,'sine',0.018,t+bl*2,bl*4);
-} else if(st===1){
-const arpNotes=[sc[0],sc[2],sc[4],sc[6],sc[4],sc[2],sc[3],sc[1]];
-arpNotes.forEach((n,i)=>{
-mko(n,'square',0.022,t+i*bl,bl*0.75,0,{type:'lowpass',freq:900+i*40,q:1.5});
-if(mode==='combat')mko(n*2,'sawtooth',0.008,t+i*bl,bl*0.5);
-});
-mko(sc[0],'sine',0.035,t,bl*beats*0.9);
-mko(sc[4],'sine',0.025,t,bl*beats*0.9);
-} else if(st===2){
-for(let i=0;i<beats;i++){
-const bassNote=i%4===0?sc[0]:i%4===2?sc[3]:sc[1];
-mko(bassNote*0.5,'square',0.04,t+i*bl,bl*0.55,0,{type:'lowpass',freq:300,q:2});
-}
-const motif=[0,2,4,6,5,3,2,0];
-motif.forEach((d,i)=>{
-if(Math.sin(bn*7.3+i)*0.5+0.5>0.35){
-mko(sc[d%sc.length]*(i%3===0?1:2),'triangle',0.02,t+i*bl,bl*0.8);
-}
-});
-if(mode==='explore'){
-const lead=[sc[4]*2,sc[6]*2,sc[5]*2,sc[4]*2];
-lead.forEach((n,i)=>mko(n,'sine',0.015,t+i*bl*2,bl*1.8));
-}
-} else if(st===3){
-const ostinato=[sc[0],sc[1],sc[0],sc[7]];
-for(let rep=0;rep<2;rep++){
-ostinato.forEach((n,i)=>{
-mko(n*0.5,'sawtooth',0.035,t+rep*bl*4+i*bl,bl*0.65,0,{type:'lowpass',freq:500,q:3});
-mko(n,'square',0.015,t+rep*bl*4+i*bl+0.01,bl*0.5);
-});
-}
-for(let i=0;i<beats;i+=2){
-mko(sc[7]*2,'sawtooth',0.012,t+i*bl,bl*0.3);
-mko(sc[6]*2,'sawtooth',0.010,t+i*bl+0.11,bl*0.3);
-}
-noise(0.018,t,bl*beats*0.9);
-} else if(st===4){
-mko(sc[0]*0.5,'sine',0.04,t,bl*beats);
-mko(sc[4]*0.5,'sine',0.025,t+bl,bl*(beats-1));
-mko(sc[2],'sine',0.018,t+bl*3,bl*(beats-3));
-if(bn%8===0)mko(sc[6]*4,'sine',0.012,t+bl*5,bl*2.5);
-} else if(st===5){
-const escalate=[sc[0],sc[1],sc[2],sc[3],sc[4],sc[5],sc[6],sc[7]];
-escalate.forEach((n,i)=>{
-mko(n,'square',0.02+i*0.003,t+i*bl,bl*(beats-i)*0.12+bl*0.4,0,{type:'lowpass',freq:400+i*80,q:2});
-mko(n*2,'triangle',0.012+i*0.002,t+i*bl+0.05,bl*0.6);
-});
-mko(sc[0]*0.25,'sine',0.055,t,bl*beats);
-}
-if(mode==='combat'){
-for(let i=0;i<beats;i+=4){noise(0.045,t+i*bl,0.04);}
-for(let i=2;i<beats;i+=4){noise(0.032,t+i*bl,0.025);}
-if(st!==4)for(let i=0;i<beats*2;i++){noise(0.012,t+i*bl*0.5,0.012);}
-} else if(st===1||st===2||st===5){
-for(let i=0;i<beats;i+=4)noise(0.018,t+i*bl,0.02);
-for(let i=2;i<beats;i+=4)noise(0.012,t+i*bl,0.015);
-}
-}
-let nxt=0;
+
 function tick(){
-const a=gAC();if(!a||!playing)return;
-while(a.currentTime>=nxt-0.08){
-scheduleBar(nxt,bar);
-bar++;
-if(bar%sectionLen===0){
-section++;
-sectionLen=[6,8,8,10][Math.floor(Math.random()*4)];
+  const a=gAC();if(!a||!playing)return;
+  while(a.currentTime>=_nextBar-0.15){
+    scheduleBar(_nextBar,bar);
+    bar++;
+    _nextBar+=BAR;
+  }
+  _t=setTimeout(tick,200);
 }
-nxt+=0.22*8;
-}
-_t=setTimeout(tick,80);
-}
+
 return{
-start(){const a=gAC();if(!a||playing)return;mg=a.createGain();mg.gain.value=0.38;mg.connect(a.destination);playing=true;bar=0;section=0;nxt=a.currentTime+0.05;tick();},
-stop(){playing=false;clearTimeout(_t);if(mg&&ac){try{mg.gain.setTargetAtTime(0,ac.currentTime,0.4);}catch(e){}}mg=null;},
-setMode(m){
-if(m===mode)return;mode=m;
-section++;bar=Math.ceil(bar/sectionLen)*sectionLen;
-if(mg&&ac){try{mg.gain.setTargetAtTime(m==='combat'?0.44:0.38,ac.currentTime,0.3);}catch(e){}}
-},
-setPlanet(p){planet=p;section++;},
-toggle(){if(playing)this.stop();else this.start();return playing;},
-isPlaying(){return playing;}
+  start(){
+    const a=gAC();if(!a||playing)return;
+    playing=true;bar=0;_chordIdx=0;
+    _nextBar=a.currentTime+0.1;
+    const m=getMG();
+    if(m)m.gain.setTargetAtTime(0.8,a.currentTime,0.5);
+    tick();
+  },
+  stop(){
+    playing=false;clearTimeout(_t);
+    const a=gAC();
+    if(mg&&a){try{mg.gain.setTargetAtTime(0,a.currentTime,0.4);}catch(e){}}
+    setTimeout(()=>{mg=null;},600);
+  },
+  setMode(m){
+    if(m===mode)return;
+    mode=m;
+    bar=Math.ceil(bar/2)*2; // align to next even bar
+    const a=gAC();
+    if(mg&&a){try{mg.gain.setTargetAtTime(mode==='combat'?0.9:0.8,a.currentTime,0.3);}catch(e){}}
+  },
+  setPlanet(p){planet=p;_chordIdx=0;bar=0;},
+  toggle(){if(playing)this.stop();else this.start();return playing;},
+  isPlaying(){return playing;}
 }
 })();
 const FACTIONS={
@@ -3415,7 +3481,7 @@ city.owner=captorId;city.hp=Math.floor(city.maxHp/2);
 clearCityCache();
 if(captorId==='player'){
 G.score+=250;G.stars+=6;G.citiesCaptured++;SFX.capture();
-notify(city.name+' captured! +250★','gold');updateHUD();MUSIC.setMode('combat');
+notify(city.name+' captured! +250★','gold');setTimeout(()=>narrateMsg(cmdVoice('cityCapture')||'City secured.'),300);updateHUD();MUSIC.setMode('combat');
 const cp=uPos(captor||{q:city.q,r:city.r});RETRO.captureSparkle(cp.sx,cp.sy);
 }
 // If the previous owner (AI) now has no cities left, eliminate all their remaining units
@@ -3445,6 +3511,8 @@ SFX.event();
 showEventChoice(ev);
 }
 function showEventChoice(ev){
+// Clear old event badge
+const _ceb=document.getElementById('evt-badge');if(_ceb)_ceb.style.display='none';
 G._eventPending=true;
 const modal=document.getElementById('evt-modal');
 document.getElementById('evt-icon').textContent=ev.icon;
@@ -3461,7 +3529,12 @@ function resolveEvent(evId,choiceIdx){
 const ev=G._pendingEvent;if(!ev)return;
 const c=ev.choices[choiceIdx];if(!c)return;
 document.getElementById('evt-modal').classList.remove('open');
-G._eventPending=false;G._pendingEvent=null;
+G._eventPending=false;
+// Show event notification badge
+const _eb=document.getElementById('evt-badge');
+if(_eb&&ev){_eb.style.display='block';_eb.textContent=ev.icon;_eb.title=ev.name+': '+c.text;}
+G._lastEvent={ev,choice:c};
+G._pendingEvent=null;
 const eff=c.effect;
 if(eff==='stars')G.stars=Math.max(0,G.stars+(c.val||0));
 else if(eff==='credits'){G.stars+=(c.val||10);}
@@ -3697,7 +3770,8 @@ if(avail.length){const scaledCost=Math.ceil(avail[0].cost/diff.techMult);if(ai.s
 if(ai.stars>25&&Math.random()<(pers.bias==='economy'||pers.bias==='exodus'?0.4:0.2)){
 if(!ai.wonders)ai.wonders=new Set();
 const avWonders=Object.values(WONDERS).filter(w=>!ai.wonders.has(w.id)&&!G.wonders.has(w.id)&&!G.aiPlayers.some(a2=>a2!==ai&&a2.wonders&&a2.wonders.has(w.id))&&ai.techs.has(w.req)&&ai.stars>=w.cost);
-if(avWonders.length){const pick=avWonders[ri(avWonders.length)];ai.stars-=pick.cost;ai.wonders.add(pick.id);notify('⚠️ '+fac.name+' built the '+pick.icon+' '+pick.name+'!','warn');}
+if(avWonders.length){const pick=avWonders[ri(avWonders.length)];ai.stars-=pick.cost;ai.wonders.add(pick.id);const _wal=factionLine(ai.factionId,'wonderBuilt');
+notify(_wal||('⚠️ '+fac.name+' built the '+pick.icon+' '+pick.name+'!'),'warn');}
 }
 // ── HARD/ELON: WONDER PRIORITY ──
 if(diff.wonderPriority&&ai.stars>20){
@@ -4085,7 +4159,7 @@ const step=aiBFS(unit.q,unit.r,bestTarget.q,bestTarget.r,ut.move||1);
 if(step&&!gUnit(step.q,step.r)){
 unit.q=step.q;unit.r=step.r;unit.moved=true;
 const tc=gCity(unit.q,unit.r);
-if(tc&&tc.owner==='player'){tc.owner=myId;tc.hp=Math.floor(tc.maxHp/2);notify('⚠️ '+tc.name+' has fallen to '+fac.name+'!','warn');if(G.wrath!==null)G.wrath=Math.min(15,G.wrath+4);}
+if(tc&&tc.owner==='player'){tc.owner=myId;tc.hp=Math.floor(tc.maxHp/2);notify('⚠️ '+tc.name+' has fallen to '+fac.name+'!','warn');if(tc.owner==='player')setTimeout(()=>narrateMsg(cmdVoice('cityLost')||'We lost the city.'),400);if(G.wrath!==null)G.wrath=Math.min(15,G.wrath+4);}
 }
 }
 });
@@ -4210,7 +4284,7 @@ G.stars-=actualCost;G.techs.add(id);SFX.research();
 G.score+=50;
 const newEra=getCurrentEra();
 if(newEra!==G.era){
-SFX.era&&SFX.era();notify('⚡ NEW ERA: '+ERA_NAMES[newEra]+'!','gold');G.era=newEra;
+SFX.era&&SFX.era();notify('⚡ NEW ERA: '+ERA_NAMES[newEra]+'!','gold');G.era=newEra;setTimeout(()=>narrateMsg(cmdVoice('eraAdvance',newEra)||('A new era dawns: '+ERA_NAMES[newEra]+'.')),1200);
 MUSIC.setPlanet(G.era==='INTERSTELLAR'?'space':G.planet.toLowerCase());
 setTimeout(()=>RETRO.eraFanfare(ERA_NAMES[newEra]),200);
 }
@@ -4432,7 +4506,7 @@ if(Math.random()<chance){
 if(!G.diplo)G.diplo={};
 G.diplo[aiId]=8;
 changeRelation(aiId,8,'peace_accepted');
-SFX.peace&&SFX.peace();notify(`🕊️ ${ai.faction.icon} ${ai.faction.name}: "${randLine(lines.accept)}" — Ceasefire: 8 turns.`,'gold');
+SFX.peace&&SFX.peace();{const _pfl2=factionLine(ai.factionId,'peace');notify(_pfl2||`🕊️ Ceasefire with ${ai.faction.icon} ${ai.faction.name} — 8 turns`,'gold');}
 } else {
 changeRelation(aiId,-5,'peace_refused');
 notify(`⚔️ ${ai.faction.icon} ${ai.faction.name}: "${randLine(lines.refuse)}"`, 'warn');
@@ -4508,7 +4582,7 @@ if(G.openBorders&&G.openBorders[aiId])G.openBorders[aiId]=0;
 if(G.tradeDeals&&G.tradeDeals[aiId])G.tradeDeals[aiId]={turns:0};
 changeRelation(aiId,-25,'war_declared');
 const lines=getDiploLines(ai);
-SFX.war&&SFX.war();notify(`🗡️ War declared on ${ai.faction.icon} ${ai.faction.name}! "${randLine(lines.taunt)}"`, 'warn');
+SFX.war&&SFX.war();{const _fl=factionLine(ai.factionId,'warDeclare');notify(_fl||`🗡️ War declared on ${ai.faction.icon} ${ai.faction.name}!`,'warn');}
 showDiploScreen(aiId);
 }
 
@@ -4574,7 +4648,7 @@ G.stars-=w.cost;
 G.wonders.add(wid);
 G.score+=300;
 applyWonderEffect(wid);
-SFX.wonder&&SFX.wonder();
+SFX.wonder&&SFX.wonder();setTimeout(()=>narrateMsg(cmdVoice('firstWonder')||'A wonder stands.'),400);
 setTimeout(()=>RETRO.eraFanfare&&RETRO.eraFanfare(w.icon+' '+w.name),100);
 // Refresh wonders panel if open
 if(document.getElementById('stab-wonders')&&document.getElementById('stab-wonders').style.display!=='none')renderWondersPanel();
@@ -5368,6 +5442,8 @@ document.getElementById('ov-content').innerHTML=`
     <!-- Glowing divider line -->
     <div style="width:min(320px,70%);height:1px;margin:clamp(10px,2vh,22px) 0;background:linear-gradient(90deg,transparent,${_CYN}0.9),transparent);box-shadow:0 0 12px ${_CYN}0.5);animation:line-breathe 3s ease-in-out infinite;"></div>
 
+    <!-- World lore -->
+    <div style="max-width:min(460px,86vw);text-align:center;font-family:'Exo 2',sans-serif;font-size:clamp(7px,1.1vw,9px);color:rgba(216,232,248,0.2);line-height:1.9;margin-bottom:clamp(6px,1.2vh,12px);font-style:italic;padding:0 12px;">${WORLD_LORE}</div>
     <!-- Stat pills -->
     <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:clamp(10px,2.5vh,24px);">
       ${[['⚔','5 ERAS'],['🌌','3 PLANETS'],['🤖','5 AI PERSONALITIES'],['🏛','11 WONDERS'],['🎖',earned.size+'/'+Object.keys(ACHIEVEMENTS).length+' MEDALS']].map(([ic,lb2])=>`
@@ -5785,6 +5861,227 @@ function getActiveMapSize(){
   return{w:sz.w,h:sz.h};
 }
 
+
+// ── LORE & NARRATIVE SYSTEM ──────────────────────────────────────────
+
+const WORLD_LORE = "The Far Reach Accords collapsed in 2387. What was once a unified human expansion across three worlds fractured into competing powers — some born of Earth's old nations, others evolved entirely in the void. Now each empire charts its own course to the stars, or burns trying.";
+
+// Commander voice lines — player's inner monologue at key moments
+const CMD_VOICE = {
+  gameStart: [
+    "Another world. Another war. Let's make it count.",
+    "The stars don't care who wins. But I do.",
+    "Every empire starts with a single city and a plan. Mine's better.",
+    "History remembers the bold. Let's give it something to remember.",
+    "The void is patient. I am not.",
+  ],
+  firstCity: [
+    "A foothold. Now we build.",
+    "One city. The first of many.",
+    "Plant the flag. The rest follows.",
+  ],
+  firstTech: [
+    "Knowledge is the first weapon.",
+    "The ancients called it progress. We call it survival.",
+    "Every discovery changes what's possible.",
+  ],
+  eraAdvance: {
+    INDUSTRIAL: [
+      "Steam and steel. The age of muscle is over.",
+      "Industry now. The factories will feed the war.",
+      "We have crossed into a new age. Our rivals haven't noticed yet.",
+    ],
+    ATOMIC: [
+      "We have split the atom. The world will never be the same.",
+      "Atomic age. Handle with care — or don't.",
+      "Power enough to build a civilization. Or end one.",
+    ],
+    SPACE: [
+      "The sky is no longer the limit. It never was.",
+      "We reach for the stars. Not metaphorically.",
+      "Space age. Everything changes now.",
+    ],
+    INTERSTELLAR: [
+      "We have become something the old world could not imagine.",
+      "Interstellar. The word itself sounds like destiny.",
+      "Beyond the last horizon. This is what we came for.",
+    ],
+  },
+  firstWonder: [
+    "A monument to what we are capable of.",
+    "Wonders are how civilizations say: we were here.",
+    "Future generations will ask who built this. Tell them.",
+  ],
+  firstKill: [
+    "They chose this fight. We finished it.",
+    "War is never the answer. But sometimes it's the only question.",
+    "One less enemy. Move on.",
+  ],
+  cityLost: [
+    "We lost the city. Not the war.",
+    "A setback. Regroup and strike back harder.",
+    "They took one city. We'll take three.",
+    "This isn't over. Not by a long way.",
+  ],
+  cityCapture: [
+    "The city is ours. Hold it.",
+    "Another flag flies in our colours.",
+    "Captured. Fortify and press the advantage.",
+    "One more brick in the empire.",
+  ],
+  lowOnCredits: [
+    "The treasury is thin. We need cities, not battles.",
+    "Can't fight on an empty budget. Expand.",
+    "Credits are running low. A desperate army is a dead army.",
+  ],
+  nearVictory: [
+    "The endgame is near. Don't get sentimental.",
+    "Almost there. One final push.",
+    "Victory is within reach. Do not falter now.",
+  ],
+  planetsReached: [
+    "Another world falls under our banner.",
+    "The second planet. Our empire spans the void.",
+    "New world, same mission. Dominate.",
+  ],
+};
+
+// Faction rival lines — fire at key moments
+const FACTION_LINES = {
+  APEX: {
+    warDeclare: [
+      "🚀 \"This acquisition was inevitable. Nothing personal.\"",
+      "🚀 \"Our analysts give you a 12% survival probability. Generous, really.\"",
+      "🚀 \"We're disrupting the geopolitical landscape. You're the disruption.\"",
+    ],
+    wonderBuilt: [
+      "🚀 \"Another asset secured. Synergies abound.\"",
+      "🚀 \"The Wonder is ours. Shareholders are pleased.\"",
+    ],
+    losing: [
+      "🚀 \"This is merely a strategic pivot.\"",
+      "🚀 \"We're iterating on our military doctrine. Rapidly.\"",
+    ],
+    peace: [
+      "🚀 \"A ceasefire. Mutually beneficial. For now.\"",
+      "🚀 \"Let's call it a merger of interests.\"",
+    ],
+  },
+  COLLECTIVE: {
+    warDeclare: [
+      "☭ \"The Collective does not negotiate. It absorbs.\"",
+      "☭ \"Your individualism ends today.\"",
+      "☭ \"We are many. You are one. The math is simple.\"",
+    ],
+    wonderBuilt: [
+      "☭ \"The people have built something eternal.\"",
+      "☭ \"Another monument to collective will.\"",
+    ],
+    losing: [
+      "☭ \"The Collective has faced worse. And prevailed.\"",
+      "☭ \"You fight one soldier. We are ten thousand.\"",
+    ],
+    peace: [
+      "☭ \"A temporary alignment of interests. Do not mistake it for friendship.\"",
+      "☭ \"The Collective agrees to pause. For now.\"",
+    ],
+  },
+  GREYS: {
+    warDeclare: [
+      "👽 \"We have observed your kind for millennia. You have not improved.\"",
+      "👽 \"The experiment concludes. You are the variable being eliminated.\"",
+      "👽 \"We have seen ten thousand wars. We remember all of them.\"",
+    ],
+    wonderBuilt: [
+      "👽 \"Your primitive constructions are... adequate.\"",
+      "👽 \"We built the same structure 4,000 years ago. On a different world.\"",
+    ],
+    losing: [
+      "👽 \"You fight well — for a young species.\"",
+      "👽 \"Recalculating. This outcome was not predicted.\"",
+    ],
+    peace: [
+      "👽 \"Conflict is inefficient. We agree to cease — temporarily.\"",
+      "👽 \"Peace. A concept your species rarely masters.\"",
+    ],
+  },
+  BENEVOLENT: {
+    warDeclare: [
+      "🌊 \"The tide turns against you. We did not wish this.\"",
+      "🌊 \"You forced our hand. The deep does not forgive.\"",
+      "🌊 \"We offered peace. You chose this.\"",
+    ],
+    wonderBuilt: [
+      "🌊 \"The ocean remembers. So do we.\"",
+      "🌊 \"Built in harmony with the world. Unlike yours.\"",
+    ],
+    losing: [
+      "🌊 \"The tide goes out. It always comes back.\"",
+      "🌊 \"We have endured deeper depths than this.\"",
+    ],
+    peace: [
+      "🌊 \"Let the waters still. We accept.\"",
+      "🌊 \"Peace is the natural state of all things. We return to it.\"",
+    ],
+  },
+};
+
+// Campaign mission briefings — opening and closing narrative
+const MISSION_BRIEFINGS = {
+  1: {
+    open: "Commander. The Far Reach Accords are dust. A rival force has established a foothold nearby. Your orders are simple: remove them. Learn to move, learn to fight. The rest comes later.",
+    close: "The rival HQ is silent. First blood drawn. The stars are still far away, Commander — but you have taken the first step.",
+  },
+  2: {
+    open: "A single victory means nothing without an empire to back it up. Build cities. Grow your economy. A commander with empty coffers is just a mercenary with a flag.",
+    close: "Your cities are growing. The credits are flowing. This is what an empire looks like in its infancy — fragile, hungry, and full of potential.",
+  },
+  3: {
+    open: "Brute force has its limits. The empires that last are built on knowledge — technologies that turn farmers into engineers and warriors into legends. The tech tree awaits.",
+    close: "You have made your first mark on the age of invention. Others are doing the same. Do not let them outpace you.",
+  },
+  4: {
+    open: "Two rivals now stand against you. Strength alone won't carry this. The great Wonders of the world bend history — build one before your enemies do.",
+    close: "The Wonder stands. Rivals will learn to fear what you are capable of building. This is only the beginning.",
+  },
+  5: {
+    open: "Three empires. One planet. Diplomacy is not weakness — it is strategy. Know when to talk, when to buy time, and when to strike. A clever commander survives. A proud one doesn't.",
+    close: "You navigated the politics and the battlefield. Rare combination. The galaxy is watching.",
+  },
+  6: {
+    open: "Earth is a cradle. Civilizations that stay in the cradle die there. The Moon is within reach. Claim it, and your empire spans worlds — something no single-planet power can match.",
+    close: "Two planets. One empire. The void between them is no longer empty — it belongs to you.",
+  },
+  7: {
+    open: "The full arsenal of human knowledge is now yours. Your rivals have hardened. They coordinate, they strike precisely, and they remember every mistake you make. No more easy victories.",
+    close: "A hardened enemy, defeated with the full weight of civilization behind you. The Interstellar age beckons.",
+  },
+  8: {
+    open: "This is it, Commander. Three rivals, maximum stakes, no rules. The Exodus Ship is the key to everything — build it, launch it through the Black Hole, and Far Reach remembers your name forever. Or die trying.",
+    close: "The stars are yours. They always were.",
+  },
+};
+
+// Random commander voice — call at key moments
+function cmdVoice(category, subKey){
+  const lines = subKey ? CMD_VOICE[category]?.[subKey] : CMD_VOICE[category];
+  if(!lines||!lines.length) return null;
+  return lines[Math.floor(Math.random()*lines.length)];
+}
+
+// Rival faction line — call when AI does something notable  
+function factionLine(factionId, event){
+  const lines = FACTION_LINES[factionId]?.[event];
+  if(!lines||!lines.length) return null;
+  return lines[Math.floor(Math.random()*lines.length)];
+}
+
+// Show a narrative message in the msgbar with a brief pause
+function narrateMsg(text, delay=0){
+  if(delay > 0) setTimeout(()=>setMsg(text), delay);
+  else setMsg(text);
+}
+
 // ── CAMPAIGN SYSTEM ─────────────────────────────────────────────────
 const CAMPAIGN_KEY='farreach_campaign';
 const CAMPAIGN_MISSIONS=[
@@ -5895,7 +6192,8 @@ document.getElementById('ov-content').innerHTML=`
   <div style="font-size:48px;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(240,192,64,0.6));">✨</div>
   <div style="font-family:Orbitron,monospace;font-size:10px;letter-spacing:4px;color:rgba(64,216,255,0.5);margin-bottom:6px;">MISSION ${mission.id} COMPLETE</div>
   <div style="font-family:Orbitron,monospace;font-size:clamp(18px,4vw,28px);font-weight:900;color:var(--gold);letter-spacing:2px;margin-bottom:6px;text-align:center;">${mission.title.toUpperCase()}</div>
-  <div style="font-size:10px;color:rgba(216,232,248,0.45);margin-bottom:24px;text-align:center;">${reason||'Victory secured.'}</div>
+  <div style="font-size:10px;color:rgba(216,232,248,0.45);margin-bottom:8px;text-align:center;">${reason||'Victory secured.'}</div>
+  <div style="max-width:360px;text-align:center;padding:10px 16px;border:1px solid rgba(64,216,255,0.1);border-radius:6px;background:rgba(4,8,24,0.4);margin-bottom:16px;font-size:9px;color:rgba(216,232,248,0.5);line-height:1.8;font-style:italic;">"${(MISSION_BRIEFINGS[mission.id]||{close:''}).close}"</div>
   <!-- Unlock reveal -->
   <div style="border:1px solid rgba(240,192,64,0.35);border-radius:8px;background:rgba(240,192,64,0.06);padding:16px 24px;margin-bottom:24px;text-align:center;max-width:340px;">
     <div style="font-family:Orbitron,monospace;font-size:7px;letter-spacing:3px;color:rgba(240,192,64,0.5);margin-bottom:8px;">🔓 UNLOCKED</div>
@@ -5964,7 +6262,7 @@ document.getElementById('ov-content').innerHTML=`
           <div style="font-size:8px;color:rgba(216,232,248,0.32);line-height:1.4;">${m.desc}</div>
           ${!done&&!locked?`<div style="font-size:7px;color:rgba(64,216,255,0.4);margin-top:4px;">🔓 Unlocks: ${m.reward}</div>`:''}
         </div>
-        ${!locked?`<button onclick="launchCampaignMission(${i})" style="flex-shrink:0;padding:8px 14px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:1px;border:1px solid ${done?'rgba(64,216,255,0.3)':'rgba(240,192,64,0.45)'};background:${done?'rgba(64,216,255,0.06)':'rgba(240,192,64,0.08)'};color:${done?'var(--cyan)':'var(--gold)'};cursor:pointer;border-radius:4px;min-height:36px;">${done?'Replay':'Play'}</button>`:'<div style="flex-shrink:0;width:52px;text-align:center;font-size:16px;">🔒</div>'}
+        ${!locked?`<button onclick="showMissionBriefing(${i})" style="flex-shrink:0;padding:8px 14px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:1px;border:1px solid ${done?'rgba(64,216,255,0.3)':'rgba(240,192,64,0.45)'};background:${done?'rgba(64,216,255,0.06)':'rgba(240,192,64,0.08)'};color:${done?'var(--cyan)':'var(--gold)'};cursor:pointer;border-radius:4px;min-height:36px;">${done?'Replay':'Play'}</button>`:'<div style="flex-shrink:0;width:52px;text-align:center;font-size:16px;">🔒</div>'}
       </div>`;
     }).join('')}
   </div>
@@ -6072,13 +6370,57 @@ renderCommanderScreen();
 function setMapSize(id){const cmd=loadCommander();cmd.activeMapSize=id;saveCommander(cmd);}
 function setSkin(factionId,skinId){const cmd=loadCommander();if(!cmd.activeSkins)cmd.activeSkins={};cmd.activeSkins[factionId]=skinId;saveCommander(cmd);applyCommanderSkins();}
 
+
+function showMissionBriefing(missionIdx){
+if(!pickedFaction){notify('Pick a faction first','warn');return;}
+const m=CAMPAIGN_MISSIONS[missionIdx];
+const b=MISSION_BRIEFINGS[m.id]||{open:'Your orders are clear. Execute them.',close:'Mission complete.'};
+const data=loadCampaign();
+const done=data.completed.includes(m.id);
+showOv();
+document.getElementById('ov-content').innerHTML=`
+<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;gap:16px;position:relative;">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(64,216,255,0.04),transparent 70%);pointer-events:none;"></div>
+  <!-- Mission number -->
+  <div style="font-family:Orbitron,monospace;font-size:8px;letter-spacing:4px;color:rgba(64,216,255,0.4);">MISSION ${m.id} OF 8</div>
+  <!-- Title -->
+  <div style="font-family:Orbitron,monospace;font-size:clamp(18px,4vw,26px);font-weight:900;color:var(--gold);letter-spacing:2px;text-align:center;">${m.title.toUpperCase()}</div>
+  <!-- Briefing text -->
+  <div style="max-width:420px;text-align:center;padding:16px 20px;border:1px solid rgba(64,216,255,0.12);border-radius:8px;background:rgba(4,8,24,0.5);">
+    <div style="font-size:8px;letter-spacing:3px;color:rgba(64,216,255,0.35);font-family:Orbitron,monospace;margin-bottom:10px;">COMMANDER BRIEFING</div>
+    <div style="font-size:clamp(9px,1.4vw,11px);color:rgba(216,232,248,0.65);line-height:1.8;font-style:italic;">"${b.open}"</div>
+  </div>
+  <!-- Conditions -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:380px;">
+    <div style="padding:6px 12px;border:1px solid rgba(64,216,255,0.15);border-radius:4px;font-size:8px;color:rgba(64,216,255,0.5);font-family:Orbitron,monospace;">⏱ ${m.turns} TURNS</div>
+    <div style="padding:6px 12px;border:1px solid rgba(64,216,255,0.15);border-radius:4px;font-size:8px;color:rgba(64,216,255,0.5);font-family:Orbitron,monospace;">🤖 ${m.aiCount} RIVAL${m.aiCount>1?'S':''}</div>
+    <div style="padding:6px 12px;border:1px solid rgba(64,216,255,0.15);border-radius:4px;font-size:8px;color:rgba(64,216,255,0.5);font-family:Orbitron,monospace;">💡 ${m.aiDiff}</div>
+  </div>
+  <!-- Tip -->
+  <div style="max-width:380px;padding:10px 14px;border-left:2px solid rgba(240,192,64,0.4);background:rgba(240,192,64,0.04);">
+    <div style="font-size:8px;color:rgba(240,192,64,0.5);font-family:Orbitron,monospace;margin-bottom:4px;">TACTICAL NOTE</div>
+    <div style="font-size:9px;color:rgba(216,232,248,0.5);line-height:1.6;">${m.tip}</div>
+  </div>
+  <!-- Buttons -->
+  <div style="display:flex;gap:10px;width:min(340px,90%);">
+    <button onclick="showCampaignScreen()" style="flex:1;padding:10px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;border:1px solid rgba(60,140,255,0.18);background:transparent;color:rgba(216,232,248,0.3);cursor:pointer;border-radius:4px;min-height:40px;">← Back</button>
+    <button onclick="launchCampaignMission(${missionIdx})" style="flex:2;padding:12px;font-family:Orbitron,monospace;font-size:9px;letter-spacing:2px;border:1px solid rgba(240,192,64,0.45);background:rgba(240,192,64,0.08);color:var(--gold);cursor:pointer;border-radius:4px;min-height:44px;">${done?'▶ REPLAY':'▶ LAUNCH MISSION'}</button>
+  </div>
+</div>`;
+}
+
+function showLastEvent(){
+  const le=G&&G._lastEvent;if(!le)return;
+  const ev=le.ev,c=le.choice;
+  notify(ev.icon+' '+ev.name+': '+c.text);
+}
 function launchGame(){
 if(!pickedFaction)return;
 const aiSetup=(window._aiSlots||[]).slice(0,setupAICount);
 hideOv();
 initGame(pickedFaction,aiSetup,'EARTH');
 updateHUD();renderTechs();
-setMsg('The '+FACTIONS[pickedFaction].name+' awakens. Your journey to the stars begins on Earth.');
+setMsg(cmdVoice('gameStart')||('The '+FACTIONS[pickedFaction].name+' awakens. Your journey to the stars begins on Earth.'));
 }
 function launchCampaignMission(missionIdx){
 if(!pickedFaction){notify('Pick a faction first','warn');return;}
@@ -6531,10 +6873,31 @@ resize();
 showPickScreen();
 function toggleFullscreen(){
 const btn=document.getElementById('fullscreen-btn');
+const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+if(isMobile){
+  // iOS Safari doesn't support requestFullscreen — simulate with scroll trick + meta viewport
+  const isFs=document.body.classList.toggle('mob-fullscreen');
+  if(btn)btn.textContent=isFs?'⊠':'⛶';
+  if(isFs){
+    // Scroll to hide browser chrome on iOS
+    window.scrollTo(0,1);
+    try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{});}catch(e){}
+  } else {
+    window.scrollTo(0,0);
+    try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock();}catch(e){}
+  }
+  resizeCanvas&&resizeCanvas();
+  return;
+}
 if(!document.fullscreenElement){
-document.documentElement.requestFullscreen().then(()=>{if(btn)btn.textContent='⊠';}).catch(()=>{});
+  document.documentElement.requestFullscreen().then(()=>{if(btn)btn.textContent='⊠';}).catch(()=>{
+    // Fallback for browsers that block fullscreen
+    document.body.classList.add('mob-fullscreen');
+    if(btn)btn.textContent='⊠';
+    resizeCanvas&&resizeCanvas();
+  });
 } else {
-document.exitFullscreen().then(()=>{if(btn)btn.textContent='⛶';}).catch(()=>{});
+  document.exitFullscreen().then(()=>{if(btn)btn.textContent='⛶';}).catch(()=>{});
 }
 }
 document.addEventListener('fullscreenchange',()=>{
