@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EQBNFWQ0M5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-EQBNFWQ0M5');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,6 +18,7 @@
 <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Far%20Reach%22,%22short_name%22:%22Far%20Reach%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%2304060e%22,%22theme_color%22:%22%2340d8ff%22,%22description%22:%22A%20hex-based%20strategy%20game%20from%20castle%20to%20the%20stars%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20fill%3D'%2304060e'/%3E%3Ctext%20x%3D'256'%20y%3D'340'%20text-anchor%3D'middle'%20font-size%3D'300'%3E%F0%9F%8C%8C%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]}">
 <style>@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;1,300&display=swap');:root{--bg:#04060e;--panel:rgba(4,8,20,0.96);--bord:rgba(60,140,255,0.3);--gold:#f0c040;--gold-lt:#ffe080;--cyan:#40d8ff;--red:#ff4444;--green:#40ff80;--parchment:#d8e8f8;--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);--safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px)}*{box-sizing:border-box;margin:0;padding:0}html{height:100%;height:-webkit-fill-available}body{background:var(--bg);font-family:'Exo 2',sans-serif;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;color:var(--parchment);padding-left:var(--safe-l);padding-right:var(--safe-r)}#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s infinite}@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}#hdr{position:relative;z-index:10;background:linear-gradient(180deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-bottom:1px solid var(--bord);padding:6px 14px;padding-top:calc(6px+var(--safe-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 24px rgba(0,0,0,0.9),0 0 40px rgba(0,30,80,0.3)}#logo{display:none}.hstats{display:flex;align-items:stretch;gap:0;flex:1;justify-content:center;}.hs{display:flex;align-items:center;gap:6px;padding:4px 14px;border-left:1px solid rgba(60,140,255,0.12);font-size:9px}.hs:first-child{border-left:none}.hs-icon{font-size:14px;line-height:1;flex-shrink:0}.hs-block{display:flex;flex-direction:column;line-height:1}.hs-v{font-family:'Orbitron',monospace;color:var(--cyan);font-size:14px;font-weight:700;min-width:20px;line-height:1.1}.hs-l{color:rgba(216,232,248,0.32);font-size:7px;text-transform:uppercase;letter-spacing:1px;margin-top:1px}#campaign-badge{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1px;color:var(--gold);border:1px solid rgba(240,192,64,0.2);padding:2px 7px;background:rgba(240,192,64,0.04);border-radius:2px;}
 #tbadge{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--cyan);border:1px solid var(--bord);padding:3px 8px;background:rgba(64,216,255,0.04);border-radius:2px}#era-badge{font-size:8px;color:var(--gold);letter-spacing:1px;border:1px solid rgba(240,192,64,0.22);padding:3px 8px;background:rgba(240,192,64,0.04);border-radius:2px;display:inline-block;}#music-btn,#planet-btn{background:none;border:1px solid var(--bord);color:var(--cyan);font-size:13px;padding:4px 8px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-left:3px;min-width:32px;min-height:32px}#music-btn:hover,#planet-btn:hover{background:rgba(64,216,255,0.1);border-color:var(--cyan)}#wrap{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;min-height:0}#cvs-wrap{flex:1;position:relative;overflow:hidden}canvas{position:absolute;top:0;left:0;cursor:crosshair;touch-action:none}#side{width:260px;min-width:200px;max-width:420px;background:var(--panel);border-left:1px solid var(--bord);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative;resize:horizontal;}#side-drag{position:absolute;left:0;top:0;bottom:0;width:5px;cursor:ew-resize;background:transparent;z-index:20;transition:background 0.2s;}#side-drag:hover{background:rgba(64,216,255,0.18);}.ss{border-bottom:1px solid rgba(60,140,255,0.1);padding:8px 10px}.st{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:3px;color:var(--cyan);margin-bottom:5px}#sel-panel{flex:1;overflow-y:auto;padding:9px;scrollbar-width:thin;scrollbar-color:var(--bord) transparent}.igrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.ic{background:rgba(64,216,255,0.04);border:1px solid rgba(64,216,255,0.1);padding:5px 6px;border-radius:3px}.icl{font-size:7px;color:rgba(216,232,248,0.3);letter-spacing:1px;text-transform:uppercase}.icv{font-family:'Orbitron',monospace;font-size:12px;color:var(--cyan)}.hpw{margin:5px 0}.hpb{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden}.hpf{height:100%;border-radius:3px;transition:width 0.3s}.abtn{width:100%;margin-top:4px;padding:6px 8px;background:rgba(64,216,255,0.03);border:1px solid rgba(64,216,255,0.15);color:var(--parchment);font-family:'Exo 2',sans-serif;font-size:10px;cursor:pointer;text-align:left;transition:all 0.12s;border-radius:3px;min-height:36px}.abtn:hover:not(:disabled){background:rgba(64,216,255,0.1);border-color:var(--cyan);color:var(--cyan)}.abtn:disabled{opacity:0.2;cursor:not-allowed}.abtn.hi{border-color:var(--gold);color:var(--gold-lt);background:rgba(240,192,64,0.05)}.trow{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:9px}.tpip{width:7px;height:7px;border-radius:50%;border:1px solid rgba(64,216,255,0.2);flex-shrink:0}.tpip.done{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 5px rgba(64,216,255,0.5)}.tpip.avail{border-color:var(--gold)}.era-hdr{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;color:var(--gold);padding:5px 0 2px;opacity:0.65}#ftr{position:relative;z-index:10;background:linear-gradient(0deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-top:1px solid var(--bord);padding:7px 14px;padding-bottom:calc(7px+var(--safe-bot));display:flex;align-items:center;gap:10px;flex-shrink:0}#fullscreen-btn{position:fixed;bottom:14px;left:14px;z-index:400;background:rgba(4,8,20,0.85);border:1px solid rgba(64,216,255,0.3);color:var(--cyan);width:38px;height:38px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:all 0.2s;}#fullscreen-btn:hover{background:rgba(64,216,255,0.12);border-color:var(--cyan);box-shadow:0 0 12px rgba(64,216,255,0.3);}#endbtn{padding:10px 20px;background:linear-gradient(135deg,rgba(0,30,80,0.8),rgba(0,50,120,0.6));border:1px solid rgba(64,216,255,0.5);color:var(--cyan);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;min-height:44px;box-shadow:0 0 12px rgba(64,216,255,0.1) inset}#endbtn:hover{box-shadow:0 0 20px rgba(64,216,255,0.35);border-color:var(--cyan)}#endbtn:active{transform:scale(0.97)}#msgbar{flex:1;font-size:9px;color:rgba(216,232,248,0.35);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fdmg{position:absolute;font-family:'Orbitron',monospace;font-weight:700;pointer-events:none;z-index:300;text-shadow:0 1px 8px rgba(0,0,0,0.9);animation:fdmg-anim 1.1s ease-out forwards}@keyframes fdmg-anim{0%{opacity:1;transform:translateY(0) scale(1.2)}80%{opacity:1}100%{opacity:0;transform:translateY(-42px) scale(0.7)}}.retro-burst{position:absolute;pointer-events:none;z-index:350}@keyframes burst-ring{0%{transform:translate(-50%,-50%) scale(0);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}@keyframes burst-star{0%{transform:translate(-50%,-50%) scale(0) rotate(0deg);opacity:1}60%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.4) rotate(180deg);opacity:0}}@keyframes retro-flash{0%{opacity:0.9}50%{opacity:0.2}100%{opacity:0}}@keyframes pixel-explode{0%{transform:translate(-50%,-50%) scale(0);opacity:1}40%{transform:translate(-50%,-50%) scale(1.1);opacity:1}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}@keyframes level-up-badge{0%{transform:translateX(-50%) translateY(10px) scale(0.5);opacity:0}20%{transform:translateX(-50%) translateY(0) scale(1.15);opacity:1}80%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(-20px) scale(0.8);opacity:0}}@keyframes era-fanfare{0%{transform:translateX(-50%) scale(0.2);opacity:0}25%{transform:translateX(-50%) scale(1.1);opacity:1}75%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) scale(1.05);opacity:0}}@keyframes comet-fly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--cx),var(--cy)) scale(0);opacity:0}}@keyframes scanline{0%{top:-4px}100%{top:100%}}
+@keyframes lore-fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 @keyframes hero-pulse{0%,100%{text-shadow:0 0 60px rgba(64,216,255,0.8),0 0 120px rgba(64,216,255,0.3),0 4px 0 rgba(0,0,0,0.9)}50%{text-shadow:0 0 80px rgba(64,216,255,1),0 0 160px rgba(64,216,255,0.45),0 4px 0 rgba(0,0,0,0.9)}}
 @keyframes line-breathe{0%,100%{opacity:0.6;width:min(220px,60%)}50%{opacity:1;width:min(300px,80%)}}
 @keyframes tagline-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -387,6 +396,17 @@ body.mob-fullscreen #game-wrap,body.mob-fullscreen #CV,body.mob-fullscreen canva
     <button id="mob-close" onclick="mobCollapse()">✕</button>
     <div id="mob-sel-panel"></div>
   </div>
+</div>
+<!-- Lore cinematic overlay -->
+<div id="lore-cinema" style="display:none;position:fixed;inset:0;z-index:900;background:#000;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;" onclick="skipLoreCinema()">
+  <div id="lore-cin-inner" style="max-width:min(560px,88vw);padding:32px 24px;text-align:center;pointer-events:none;">
+    <div id="lore-world-text" style="font-family:'Exo 2',sans-serif;font-size:clamp(10px,1.6vw,13px);color:rgba(216,232,248,0);line-height:2.0;font-style:italic;margin-bottom:32px;transition:color 1.2s ease;"></div>
+    <div id="lore-divider" style="width:0;height:1px;background:linear-gradient(90deg,transparent,rgba(64,216,255,0.4),transparent);margin:0 auto 28px;transition:width 1.4s ease;"></div>
+    <div id="lore-faction-icon" style="font-size:0;margin-bottom:12px;transition:font-size 0.8s ease;"></div>
+    <div id="lore-faction-name" style="font-family:Orbitron,monospace;font-size:0;letter-spacing:4px;color:rgba(216,232,248,0);margin-bottom:16px;transition:font-size 0.8s ease,color 1.0s ease;"></div>
+    <div id="lore-faction-text" style="font-family:'Exo 2',sans-serif;font-size:clamp(9px,1.4vw,12px);color:rgba(216,232,248,0);line-height:1.9;font-style:italic;transition:color 1.2s ease;"></div>
+  </div>
+  <div id="lore-skip-hint" style="position:absolute;bottom:24px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:3px;color:rgba(216,232,248,0.2);opacity:0;transition:opacity 0.8s ease;">TAP ANYWHERE TO SKIP</div>
 </div>
 <!-- Event choice modal — full overlay, hidden by default -->
 <div id="evt-modal">
@@ -812,22 +832,22 @@ return{
 const FACTIONS={
 APEX:{id:'APEX',name:'Apex Ventures',icon:'🚀',
 color:'#1a8aff',light:'#80c8ff',cityColor:'#0a5aaa',cityLight:'#60aaff',
-desc:'Private tech empire. Fast innovation, cheap rockets, reaches space first.',
+desc:'Private tech empire. Fast innovation, cheap rockets, reaches space first.',lore:'Born from the merger of six Earth tech conglomerates in 2291, Apex Ventures turned the collapse of the Accords into a business opportunity. They were the first to reach orbit — and the first to charge for the ride.',
 bonus:'🚀 Disruption: All tech costs -20%. Rockets & colony ships cost -2 credits.',
 techDiscount:0.8,rocketDiscount:2},
 COLLECTIVE:{id:'COLLECTIVE',name:'The Collective',icon:'☭',
 color:'#cc2020',light:'#ff7070',cityColor:'#881010',cityLight:'#ff5050',
-desc:'Vast state machine. Overwhelming numbers, slow tech, unstoppable momentum.',
+desc:'Vast state machine. Overwhelming numbers, slow tech, unstoppable momentum.',lore:'What began as a labour collective on the Martian mining stations became the largest single government in human history. The Collective does not ask for loyalty. It simply absorbs, until resistance becomes a memory.',
 bonus:'☭ Numbers: Units cost -1. Cities spawn +1 free unit when population caps.',
 unitDiscount:1,massProduction:true},
 GREYS:{id:'GREYS',name:'The Greys',icon:'👽',
 color:'#50d0a0',light:'#90ffcc',cityColor:'#206848',cityLight:'#60e898',
-desc:'Ancient visitors. Psychic abilities, already ahead in tech, but fragile.',
+desc:'Ancient visitors. Psychic abilities, already ahead in tech, but fragile.',lore:'The Greys arrived in 2309 — not as invaders, but as observers. They had watched humanity for four thousand years, waiting. When the Accords fell, they stopped watching. Nobody knows what changed their minds.',
 bonus:'👽 Psionic: Start in Atomic era. Psychic units disable enemy units for 1 turn.',
 passOcean:true,passMountain:true,startAdvanced:true},
 BENEVOLENT:{id:'BENEVOLENT',name:'The Benevolent',icon:'🌊',
 color:'#2060c0',light:'#80b8ff',cityColor:'#103880',cityLight:'#5090e0',
-desc:'Ancient ocean-born aliens. Few in number, peaceful by nature — until pushed. Then their Leviathan wrath is overwhelming.',
+desc:'Ancient ocean-born aliens. Few in number, peaceful by nature — until pushed. Then their Leviathan wrath is overwhelming.',lore:'They came from the deep oceans of a world that no longer exists. The Benevolent have outlasted three civilisations and two extinction events. They did not survive by being weak — they survived by choosing, very carefully, when to be otherwise.',
 bonus:'🌊 Wrath: Small elite army. Leviathan unlocked when attacked. Each Leviathan deals 3× damage when wrath is maxed.',
 passOcean:true,wrathMechanic:true,smallPop:true},
 }
@@ -1086,8 +1106,7 @@ const aiSetup=[
 isDailyChallenge=true;
 SEED=seed;
 hideOv();
-initGame(playerFacId,aiSetup,planet);
-updateHUD();renderTechs();
+showLoreCinema(playerFacId,()=>{initGame(playerFacId,aiSetup,planet);updateHUD();renderTechs();});
 const badge=document.getElementById('daily-badge');if(badge)badge.style.display='';
 const planets={'EARTH':'🌍','MOON':'🌕','MARS':'🔴'};
 notify(`📅 ${getDailyDateStr()} — ${planets[planet]||''} ${planet}`,'gold');
@@ -5442,8 +5461,6 @@ document.getElementById('ov-content').innerHTML=`
     <!-- Glowing divider line -->
     <div style="width:min(320px,70%);height:1px;margin:clamp(10px,2vh,22px) 0;background:linear-gradient(90deg,transparent,${_CYN}0.9),transparent);box-shadow:0 0 12px ${_CYN}0.5);animation:line-breathe 3s ease-in-out infinite;"></div>
 
-    <!-- World lore -->
-    <div style="max-width:min(460px,86vw);text-align:center;font-family:'Exo 2',sans-serif;font-size:clamp(7px,1.1vw,9px);color:rgba(216,232,248,0.2);line-height:1.9;margin-bottom:clamp(6px,1.2vh,12px);font-style:italic;padding:0 12px;">${WORLD_LORE}</div>
     <!-- Stat pills -->
     <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:clamp(10px,2.5vh,24px);">
       ${[['⚔','5 ERAS'],['🌌','3 PLANETS'],['🤖','5 AI PERSONALITIES'],['🏛','11 WONDERS'],['🎖',earned.size+'/'+Object.keys(ACHIEVEMENTS).length+' MEDALS']].map(([ic,lb2])=>`
@@ -5470,6 +5487,7 @@ document.getElementById('ov-content').innerHTML=`
           ${streak>1?`<span style="display:block;font-size:7px;margin-top:2px;opacity:0.6;">🔥 ${streak}-day streak</span>`:''}
         </button>
         <button onclick="showAchievementsScreen()" style="padding:11px 10px;${_F};font-size:clamp(8px,1.1vw,10px);letter-spacing:1px;border:1px solid ${_GLD}0.15);background:${_GLD}0.03);color:${_GLD}0.5);cursor:pointer;border-radius:5px;min-height:44px;">🎖</button>
+        <button onclick="showFactionLore(pickedFaction||'APEX')" style="padding:11px 10px;${_F};font-size:clamp(8px,1.1vw,10px);letter-spacing:1px;border:1px solid rgba(64,216,255,0.15);background:rgba(64,216,255,0.03);color:rgba(64,216,255,0.5);cursor:pointer;border-radius:5px;min-height:44px;" title="Faction Lore">📖</button>
       </div>
     </div>
   </div>
@@ -5598,8 +5616,7 @@ const pnames=Object.keys(AI_PERSONALITIES).sort(()=>Math.random()-0.5);
 const count=1+Math.floor(Math.random()*3);
 const aiSetup=Array.from({length:count},(_,i)=>({factionId:others[i%others.length].id,personality:pnames[i%pnames.length]}));
 hideOv();
-initGame(pickedFaction,aiSetup,'EARTH');
-updateHUD();renderTechs();
+showLoreCinema(pickedFaction,()=>{initGame(pickedFaction,aiSetup,'EARTH');updateHUD();renderTechs();});
 const rivalDesc=aiSetup.map(a=>FACTIONS[a.factionId].icon+' '+AI_PERSONALITIES[a.personality].name).join(', ');
 setMsg('Quick Start! '+AI_DIFFICULTY[diffId].label+' · Rivals: '+rivalDesc);
 }
@@ -5865,6 +5882,59 @@ function getActiveMapSize(){
 // ── LORE & NARRATIVE SYSTEM ──────────────────────────────────────────
 
 const WORLD_LORE = "The Far Reach Accords collapsed in 2387. What was once a unified human expansion across three worlds fractured into competing powers — some born of Earth's old nations, others evolved entirely in the void. Now each empire charts its own course to the stars, or burns trying.";
+
+// Faction-specific origin stories shown in the pre-game lore cinematic
+const FACTION_LORE = {
+  APEX: {
+    title: "Apex Ventures",
+    icon: "🚀",
+    colour: "#1a8aff",
+    lines: [
+      "When the Accords failed, the corporations moved faster than any government.",
+      "Apex Ventures had already surveyed two planets and filed the mineral rights.",
+      "They don't call it conquest. They call it market expansion.",
+      "Their engineers design weapons the way others design products — fast, cheap, and always one version ahead.",
+      "They will reach the stars first. The question is whether anyone else survives the IPO.",
+    ]
+  },
+  COLLECTIVE: {
+    title: "The Collective",
+    icon: "☭",
+    colour: "#e83030",
+    lines: [
+      "The Collective was born from the ruins of the last great alliance.",
+      "No leaders. No borders. Every city an equal node in a network that spans worlds.",
+      "They fight not for territory, but for the idea that no single empire should own the stars.",
+      "Their armies are vast because every citizen is a soldier, and every soldier believes.",
+      "You will not break them. You can only outlast them — if you can.",
+    ]
+  },
+  GREYS: {
+    title: "The Greys",
+    icon: "👽",
+    colour: "#8888ff",
+    lines: [
+      "They were here before the Accords. Before the colonies. Before the first ship left Earth.",
+      "The Greys have watched humanity expand across three worlds with patient, ancient eyes.",
+      "Now they have decided the experiment is over.",
+      "Their technology is not advanced — it is simply from further along a path you haven't found yet.",
+      "They do not want your cities. They want the outcome. And they have already calculated it.",
+    ]
+  },
+  BENEVOLENT: {
+    title: "The Benevolent",
+    icon: "🌊",
+    colour: "#00c8c8",
+    lines: [
+      "They built their first cities beneath the ocean, away from the wars above.",
+      "The Benevolent offered peace to every faction when the Accords collapsed. Twice.",
+      "No one accepted.",
+      "They are not warlike. But something older than strategy lives in their depths —",
+      "a creature of tides and wrath that wakes when the waters are disturbed.",
+      "You were warned.",
+    ]
+  },
+};
 
 // Commander voice lines — player's inner monologue at key moments
 const CMD_VOICE = {
@@ -6409,18 +6479,185 @@ document.getElementById('ov-content').innerHTML=`
 </div>`;
 }
 
+
+function showFactionLore(factionId){
+  const lore = FACTION_LORE[factionId] || FACTION_LORE.APEX;
+  const col = lore.colour;
+  const lines = lore.lines;
+  showOv();
+  let lineIdx = 0;
+  let animFrameId = null;
+  let skipUsed = false;
+
+  function buildScreen(visibleLines){
+    document.getElementById('ov-content').innerHTML = `
+    <div id="lore-wrap" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:24px 20px;box-sizing:border-box;cursor:pointer;" onclick="">
+      <!-- Subtle radial bg -->
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,${col}18,transparent 70%);pointer-events:none;"></div>
+      <!-- Skip button -->
+      <button id="lore-skip" onclick="skipFactionLore()" style="position:absolute;top:16px;right:16px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;color:rgba(216,232,248,0.3);background:none;border:1px solid rgba(216,232,248,0.12);border-radius:4px;padding:6px 12px;cursor:pointer;z-index:10;">SKIP ›</button>
+      <!-- Faction header -->
+      <div style="text-align:center;margin-bottom:clamp(20px,4vh,36px);">
+        <div style="font-size:clamp(28px,6vw,48px);margin-bottom:8px;">${lore.icon}</div>
+        <div style="font-family:Orbitron,monospace;font-size:clamp(11px,2vw,15px);font-weight:900;letter-spacing:4px;color:${col};text-shadow:0 0 30px ${col}88;">${lore.title.toUpperCase()}</div>
+        <div style="width:min(180px,40vw);height:1px;margin:10px auto 0;background:linear-gradient(90deg,transparent,${col}cc,transparent);"></div>
+      </div>
+      <!-- Story lines -->
+      <div style="max-width:min(460px,88vw);text-align:center;min-height:clamp(120px,25vh,200px);display:flex;flex-direction:column;justify-content:center;gap:10px;">
+        ${visibleLines.map((l,i)=>`
+          <div style="font-family:'Exo 2',sans-serif;font-size:clamp(10px,1.5vw,13px);color:rgba(216,232,248,${0.45+i*0.12});line-height:1.7;font-style:italic;animation:lore-fade 0.6s ease forwards;opacity:0;animation-delay:${i*0.05}s;">"${l}"</div>
+        `).join('')}
+      </div>
+      <!-- Progress dots -->
+      <div style="display:flex;gap:6px;margin-top:clamp(16px,3vh,28px);">
+        ${lines.map((_,i)=>`<div style="width:6px;height:6px;border-radius:50%;background:${i<visibleLines.length?col+'cc':'rgba(255,255,255,0.15)'};transition:background 0.3s;"></div>`).join('')}
+      </div>
+      <!-- Next / Play button -->
+      <div style="margin-top:clamp(16px,3vh,28px);">
+        ${visibleLines.length < lines.length
+          ? `<button onclick="advanceFactionLore()" style="font-family:Orbitron,monospace;font-size:9px;letter-spacing:3px;color:${col};background:none;border:1px solid ${col}55;border-radius:4px;padding:10px 24px;cursor:pointer;min-height:40px;">CONTINUE ›</button>`
+          : `<button onclick="skipFactionLore()" style="font-family:Orbitron,monospace;font-size:9px;letter-spacing:3px;color:var(--gold);background:rgba(240,192,64,0.06);border:1px solid rgba(240,192,64,0.4);border-radius:4px;padding:12px 28px;cursor:pointer;min-height:44px;box-shadow:0 0 20px rgba(240,192,64,0.1);">▶ BEGIN</button>`
+        }
+      </div>
+    </div>`;
+  }
+
+  // Store state on window for button callbacks
+  window._loreState = { factionId, lines, idx: 1 };
+  buildScreen(lines.slice(0, 1));
+}
+
+function advanceFactionLore(){
+  const s = window._loreState;
+  if(!s) return;
+  s.idx = Math.min(s.idx + 1, s.lines.length);
+  const lore = FACTION_LORE[s.factionId];
+  const col = lore.colour;
+  const visibleLines = s.lines.slice(0, s.idx);
+
+  document.getElementById('ov-content').innerHTML = `
+    <div id="lore-wrap" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:24px 20px;box-sizing:border-box;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,${col}18,transparent 70%);pointer-events:none;"></div>
+      <button id="lore-skip" onclick="skipFactionLore()" style="position:absolute;top:16px;right:16px;font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;color:rgba(216,232,248,0.3);background:none;border:1px solid rgba(216,232,248,0.12);border-radius:4px;padding:6px 12px;cursor:pointer;z-index:10;">SKIP ›</button>
+      <div style="text-align:center;margin-bottom:clamp(20px,4vh,36px);">
+        <div style="font-size:clamp(28px,6vw,48px);margin-bottom:8px;">${lore.icon}</div>
+        <div style="font-family:Orbitron,monospace;font-size:clamp(11px,2vw,15px);font-weight:900;letter-spacing:4px;color:${col};text-shadow:0 0 30px ${col}88;">${lore.title.toUpperCase()}</div>
+        <div style="width:min(180px,40vw);height:1px;margin:10px auto 0;background:linear-gradient(90deg,transparent,${col}cc,transparent);"></div>
+      </div>
+      <div style="max-width:min(460px,88vw);text-align:center;min-height:clamp(120px,25vh,200px);display:flex;flex-direction:column;justify-content:center;gap:10px;">
+        ${visibleLines.map((l,i)=>`
+          <div style="font-family:'Exo 2',sans-serif;font-size:clamp(10px,1.5vw,13px);color:rgba(216,232,248,${0.45+i*0.12});line-height:1.7;font-style:italic;${i===visibleLines.length-1?'animation:lore-fade 0.5s ease forwards;opacity:0;':'opacity:1;'}">"${l}"</div>
+        `).join('')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:clamp(16px,3vh,28px);">
+        ${s.lines.map((_,i)=>`<div style="width:6px;height:6px;border-radius:50%;background:${i<visibleLines.length?col+'cc':'rgba(255,255,255,0.15)'};transition:background 0.3s;"></div>`).join('')}
+      </div>
+      <div style="margin-top:clamp(16px,3vh,28px);">
+        ${s.idx < s.lines.length
+          ? `<button onclick="advanceFactionLore()" style="font-family:Orbitron,monospace;font-size:9px;letter-spacing:3px;color:${col};background:none;border:1px solid ${col}55;border-radius:4px;padding:10px 24px;cursor:pointer;min-height:40px;">CONTINUE ›</button>`
+          : `<button onclick="skipFactionLore()" style="font-family:Orbitron,monospace;font-size:9px;letter-spacing:3px;color:var(--gold);background:rgba(240,192,64,0.06);border:1px solid rgba(240,192,64,0.4);border-radius:4px;padding:12px 28px;cursor:pointer;min-height:44px;box-shadow:0 0 20px rgba(240,192,64,0.1);">▶ BEGIN</button>`
+        }
+      </div>
+    </div>`;
+}
+
+function skipFactionLore(){
+  window._loreState = null;
+  showPickScreen();
+}
+
 function showLastEvent(){
   const le=G&&G._lastEvent;if(!le)return;
   const ev=le.ev,c=le.choice;
   notify(ev.icon+' '+ev.name+': '+c.text);
 }
+
+// ── PRE-GAME LORE CINEMATIC ──────────────────────────────────────────
+let _loreTimeout = null;
+let _loreSkipped = false;
+let _loreCallback = null;
+
+function showLoreCinema(factionId, onComplete) {
+  const fac = FACTIONS[factionId];
+  if (!fac) { onComplete && onComplete(); return; }
+  _loreCallback = onComplete;
+  _loreSkipped = false;
+
+  const el = document.getElementById('lore-cinema');
+  const worldEl = document.getElementById('lore-world-text');
+  const divEl = document.getElementById('lore-divider');
+  const iconEl = document.getElementById('lore-faction-icon');
+  const nameEl = document.getElementById('lore-faction-name');
+  const textEl = document.getElementById('lore-faction-text');
+  const skipEl = document.getElementById('lore-skip-hint');
+
+  // Reset state
+  worldEl.style.color = 'rgba(216,232,248,0)';
+  divEl.style.width = '0';
+  iconEl.style.fontSize = '0';
+  nameEl.style.fontSize = '0';
+  nameEl.style.color = 'rgba(216,232,248,0)';
+  textEl.style.color = 'rgba(216,232,248,0)';
+  skipEl.style.opacity = '0';
+
+  // Set content
+  worldEl.textContent = WORLD_LORE;
+  iconEl.textContent = fac.icon;
+  nameEl.textContent = fac.name.toUpperCase();
+  textEl.textContent = '"' + (fac.lore || fac.desc) + '"';
+
+  el.style.display = 'flex';
+
+  // Sequence of timed reveals
+  const seq = [
+    [400,  () => { worldEl.style.color = 'rgba(216,232,248,0.55)'; }],
+    [500,  () => { skipEl.style.opacity = '1'; }],
+    [2200, () => { divEl.style.width = '200px'; }],
+    [3400, () => { iconEl.style.fontSize = '42px'; }],
+    [3800, () => {
+      nameEl.style.fontSize = 'clamp(11px,1.8vw,14px)';
+      nameEl.style.color = fac.light || 'rgba(216,232,248,0.9)';
+    }],
+    [4600, () => { textEl.style.color = 'rgba(216,232,248,0.5)'; }],
+    [7800, () => { endLoreCinema(false); }],
+  ];
+
+  seq.forEach(([delay, fn]) => {
+    const t = setTimeout(() => { if (!_loreSkipped) fn(); }, delay);
+    if (!_loreTimeout) _loreTimeout = [];
+    _loreTimeout.push(t);
+  });
+}
+
+function skipLoreCinema() {
+  if (_loreSkipped) return;
+  endLoreCinema(true);
+}
+
+function endLoreCinema(skipped) {
+  _loreSkipped = true;
+  if (_loreTimeout) { _loreTimeout.forEach(clearTimeout); _loreTimeout = null; }
+  const el = document.getElementById('lore-cinema');
+  // Fade out
+  el.style.transition = 'opacity 0.6s ease';
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.style.display = 'none';
+    el.style.opacity = '1';
+    el.style.transition = '';
+    if (_loreCallback) { _loreCallback(); _loreCallback = null; }
+  }, skipped ? 0 : 650);
+}
+
 function launchGame(){
 if(!pickedFaction)return;
 const aiSetup=(window._aiSlots||[]).slice(0,setupAICount);
 hideOv();
-initGame(pickedFaction,aiSetup,'EARTH');
-updateHUD();renderTechs();
-setMsg(cmdVoice('gameStart')||('The '+FACTIONS[pickedFaction].name+' awakens. Your journey to the stars begins on Earth.'));
+showLoreCinema(pickedFaction,()=>{
+  initGame(pickedFaction,aiSetup,'EARTH');
+  updateHUD();renderTechs();
+  setMsg(cmdVoice('gameStart')||('The '+FACTIONS[pickedFaction].name+' awakens. Your journey to the stars begins on Earth.'));
+});
 }
 function launchCampaignMission(missionIdx){
 if(!pickedFaction){notify('Pick a faction first','warn');return;}
@@ -6436,7 +6673,7 @@ personality:aiPersonalities[i%3],
 const prevDiff=globalDifficulty;
 globalDifficulty=m.aiDiff;
 hideOv();
-initGame(pickedFaction,aiSetup,m.planet);
+showLoreCinema(pickedFaction,()=>{initGame(pickedFaction,aiSetup,m.planet);
 // Apply campaign flags to G
 G.campaignMission=m;
 G.campaignFeatures=m.features;
@@ -6445,6 +6682,7 @@ globalDifficulty=m.aiDiff;
 // Apply feature gates
 applyCampaignGates(m.features);
 updateHUD();renderTechs();
+});
 // Show tip
 setTimeout(()=>notify('💡 '+m.tip),800);
 setMsg(m.title+' — '+m.desc);
