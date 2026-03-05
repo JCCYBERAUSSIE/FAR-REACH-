@@ -1364,6 +1364,12 @@ choices:[
 {text:'Distribute to troops — all units fully healed',effect:'full_heal',msg:'Units resupplied and fully healed!'},
 {text:'Strip for parts — research discount next tech',effect:'next_tech_free',msg:'Parts salvaged — next research costs 0💎.'},
 ]},
+// ── MONSTERS (neutral, owner:'monster') ──────────────────────────
+WOLF_PACK:{name:'Wolf Pack',icon:'🐺',atk:3,def:1,hp:8,move:1,cost:0,era:'MEDIEVAL',req:null,isMonster:true,loot:2},
+TROLL:{name:'Troll',icon:'👹',atk:5,def:3,hp:14,move:1,cost:0,era:'MEDIEVAL',req:null,isMonster:true,loot:4},
+DRAGON:{name:'Dragon',icon:'🐉',atk:8,def:4,hp:20,move:2,cost:0,era:'MEDIEVAL',req:null,isMonster:true,loot:8},
+VOID_BEAST:{name:'Void Beast',icon:'👾',atk:6,def:5,hp:18,move:1,cost:0,era:'ATOMIC',req:null,isMonster:true,loot:6},
+ALIEN_SWARM:{name:'Alien Swarm',icon:'👾',atk:6,def:2,hp:8,move:2,cost:0,era:'INTERSTELLAR',isAlien:true},
 };
 // ── LATE-GAME CRISIS EVENTS ─────────────────────────────────────────
 // Fire once per game at turn thresholds. Affect ALL factions. Create shared urgency.
@@ -1924,7 +1930,7 @@ ctx2.fillStyle=`rgba(220,100,50,${0.022+0.014*Math.sin(t*1.8)})`;ctx2.fillRect(s
 }
 ctx2.restore();
 }
-function getFac(owner){if(owner==='player')return playerFaction;if(owner==='ALIENS')return{id:'ALIENS',name:'Alien Swarm',icon:'👾',color:'#40ff40',light:'#90ff90',cityColor:'#206820',cityLight:'#60d060'};const ai=G.aiPlayers&&G.aiPlayers.find(a=>a.id===owner);return ai?ai.faction:Object.values(FACTIONS)[0];}
+function getFac(owner){if(owner==='player')return playerFaction;if(owner==='ALIENS')return{id:'ALIENS',name:'Alien Swarm',icon:'👾',color:'#40ff40',light:'#90ff90',cityColor:'#206820',cityLight:'#60d060'};if(owner==='monster')return{id:'monster',name:'Monster',icon:'👹',color:'#aa2200',light:'#ff6644',cityColor:'#661100',cityLight:'#cc4422'};const ai=G.aiPlayers&&G.aiPlayers.find(a=>a.id===owner);return ai?ai.faction:Object.values(FACTIONS)[0];}
 function rRect(c2,x,y,w,h,rad){c2.beginPath();c2.moveTo(x+rad,y);c2.lineTo(x+w-rad,y);c2.quadraticCurveTo(x+w,y,x+w,y+rad);c2.lineTo(x+w,y+h-rad);c2.quadraticCurveTo(x+w,y+h,x+w-rad,y+h);c2.lineTo(x+rad,y+h);c2.quadraticCurveTo(x,y+h,x,y+h-rad);c2.lineTo(x,y+rad);c2.quadraticCurveTo(x,y,x+rad,y);c2.closePath();}
 function drawUnitIcon(c,type,cx,cy,s,col,lit){
 c.save();
@@ -2172,6 +2178,69 @@ c.fillStyle=lit;c.beginPath();c.arc(cx+q(0.3),cy-q(0.1),q(0.09),0,Math.PI*2);c.f
 [[0,-0.85],[-.35,-0.75],[.35,-0.75]].forEach(([ox,oy])=>{
 c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx+q(ox-0.07),cy+q(0));c.lineTo(cx+q(ox),cy+q(oy));c.lineTo(cx+q(ox+0.07),cy+q(0));c.closePath();c.fill();
 });
+break;}
+case'WOLF_PACK':{
+// Fanged skull
+c.strokeStyle=lit;c.lineWidth=s*0.14;
+c.beginPath();c.arc(cx,cy-q(0.1),q(0.72),0,Math.PI*2);c.stroke();
+// Eyes
+c.fillStyle='#ff4444';
+c.beginPath();c.arc(cx-q(0.25),cy-q(0.2),q(0.18),0,Math.PI*2);c.fill();
+c.beginPath();c.arc(cx+q(0.25),cy-q(0.2),q(0.18),0,Math.PI*2);c.fill();
+// Fangs
+c.strokeStyle=lit+'cc';c.lineWidth=s*0.1;
+c.beginPath();c.moveTo(cx-q(0.22),cy+q(0.3));c.lineTo(cx-q(0.22),cy+q(0.65));c.stroke();
+c.beginPath();c.moveTo(cx+q(0.22),cy+q(0.3));c.lineTo(cx+q(0.22),cy+q(0.65));c.stroke();
+break;}
+case'TROLL':{
+// Hunched brute silhouette
+c.fillStyle=col+'cc';
+c.beginPath();c.arc(cx,cy-q(0.35),q(0.45),0,Math.PI*2);c.fill();// head
+c.beginPath();c.arc(cx,cy+q(0.25),q(0.62),0,Math.PI,true);c.lineTo(cx-q(0.62),cy+q(0.25));c.fill();// body
+// Glowing eyes
+c.fillStyle='#ff6600';
+c.beginPath();c.arc(cx-q(0.18),cy-q(0.38),q(0.13),0,Math.PI*2);c.fill();
+c.beginPath();c.arc(cx+q(0.18),cy-q(0.38),q(0.13),0,Math.PI*2);c.fill();
+// Club
+c.strokeStyle=lit;c.lineWidth=s*0.18;
+c.beginPath();c.moveTo(cx+q(0.55),cy+q(0.7));c.lineTo(cx+q(0.25),cy-q(0.3));c.stroke();
+c.beginPath();c.arc(cx+q(0.2),cy-q(0.38),q(0.28),0,Math.PI*2);c.strokeStyle=lit+'88';c.lineWidth=s*0.1;c.stroke();
+break;}
+case'DRAGON':{
+// Dragon head with wings hint
+c.fillStyle=col+'cc';
+// Body
+c.beginPath();c.ellipse(cx,cy,q(0.5),q(0.7),0,0,Math.PI*2);c.fill();
+// Wing left
+c.strokeStyle=lit+'88';c.lineWidth=s*0.08;
+c.beginPath();c.moveTo(cx-q(0.5),cy-q(0.1));c.lineTo(cx-q(1.0),cy-q(0.7));c.lineTo(cx-q(0.5),cy+q(0.3));c.stroke();
+// Wing right
+c.beginPath();c.moveTo(cx+q(0.5),cy-q(0.1));c.lineTo(cx+q(1.0),cy-q(0.7));c.lineTo(cx+q(0.5),cy+q(0.3));c.stroke();
+// Eyes glow
+c.fillStyle='#ff2200';
+c.beginPath();c.arc(cx-q(0.2),cy-q(0.15),q(0.16),0,Math.PI*2);c.fill();
+c.beginPath();c.arc(cx+q(0.2),cy-q(0.15),q(0.16),0,Math.PI*2);c.fill();
+// Fire breath
+const fg=c.createLinearGradient(cx,cy+q(0.7),cx+q(0.4),cy+q(1.1));
+fg.addColorStop(0,'rgba(255,100,0,0.9)');fg.addColorStop(1,'rgba(255,200,0,0)');
+c.fillStyle=fg;c.beginPath();c.moveTo(cx-q(0.15),cy+q(0.65));c.lineTo(cx+q(0.5),cy+q(1.0));c.lineTo(cx+q(0.15),cy+q(0.65));c.closePath();c.fill();
+break;}
+case'VOID_BEAST':{
+// Cosmic horror — tentacles + eye
+const vg=c.createRadialGradient(cx,cy,0,cx,cy,q(0.8));
+vg.addColorStop(0,'rgba(180,0,255,0.9)');vg.addColorStop(1,'rgba(60,0,120,0.2)');
+c.fillStyle=vg;c.beginPath();c.arc(cx,cy,q(0.72),0,Math.PI*2);c.fill();
+// Tentacles
+c.strokeStyle='rgba(140,0,200,0.8)';c.lineWidth=s*0.1;
+for(let ti=0;ti<6;ti++){
+  const ta=ti*Math.PI/3;
+  c.beginPath();c.moveTo(cx+Math.cos(ta)*q(0.6),cy+Math.sin(ta)*q(0.6));
+  c.lineTo(cx+Math.cos(ta)*q(1.05),cy+Math.sin(ta)*q(1.05));c.stroke();
+}
+// Central eye
+c.fillStyle='rgba(255,255,255,0.95)';c.beginPath();c.arc(cx,cy,q(0.28),0,Math.PI*2);c.fill();
+c.fillStyle='rgba(0,0,0,0.9)';c.beginPath();c.arc(cx+q(0.06),cy,q(0.16),0,Math.PI*2);c.fill();
+c.fillStyle='rgba(255,0,100,0.8)';c.beginPath();c.arc(cx+q(0.08),cy-q(0.04),q(0.07),0,Math.PI*2);c.fill();
 break;}
 default:{
 c.strokeStyle=lit;c.lineWidth=s*0.2;c.beginPath();c.moveTo(cx-q(0.6),cy);c.lineTo(cx+q(0.6),cy);c.moveTo(cx,cy-q(0.6));c.lineTo(cx,cy+q(0.6));c.stroke();
@@ -2591,6 +2660,15 @@ c2.fillText(stars,ux+1,uy-sz-1);
 c2.fillStyle=rank===3?'#ffe060':rank===2?'#f0c040':'#d4a820';
 c2.fillText(stars,ux,uy-sz-2);
 }
+if(unit.stack&&unit.stack>1){
+const _sx=ux+sz-1,_sy=uy-sz-1;
+c2.fillStyle='rgba(0,200,255,0.9)';
+rRect(c2,_sx-7,_sy-7,14,12,3);c2.fill();
+c2.font='bold 8px Orbitron,monospace';
+c2.textAlign='center';c2.textBaseline='middle';
+c2.fillStyle='#001428';
+c2.fillText('x'+unit.stack,_sx,_sy-1);
+}
 if(unit.waypoint){
 c2.fillStyle='rgba(64,255,128,0.9)';
 c2.beginPath();c2.arc(ux+sz-2,uy+sz-2,3,0,Math.PI*2);c2.fill();
@@ -2740,6 +2818,29 @@ get cam(){return this.planets[this.planet].cam;},set cam(v){this.planets[this.pl
 get cities(){return this.planets[this.planet].cities;},set cities(v){this.planets[this.planet].cities=v;},
 get units(){return this.planets[this.planet].units;},set units(v){this.planets[this.planet].units=v;},
 get blackHole(){return this.planets[this.planet].blackHole;},set blackHole(v){this.planets[this.planet].blackHole=v;},
+}
+
+// ── Spawn monsters ─────────────────────────────────────────────────
+const MONSTER_TYPES=['WOLF_PACK','WOLF_PACK','TROLL','TROLL','DRAGON','VOID_BEAST'];
+const usedMPos=new Set(starts.map(s=>s.q+','+s.r));
+let mId=100;
+MONSTER_TYPES.forEach(mType=>{
+  let mq,mr,tries=0;
+  do{mq=2+Math.floor(Math.random()*(GW-4));mr=2+Math.floor(Math.random()*(GH-4));tries++;}
+  while((usedMPos.has(mq+','+mr)||G.grid[mq]?.[mr]?.terrain===T.OCEAN||G.grid[mq]?.[mr]?.terrain===T.MOUNTAIN)&&tries<40);
+  if(tries<40){
+    usedMPos.add(mq+','+mr);
+    if(UNITS[mType])G.units.push({id:mId++,q:mq,r:mr,owner:'monster',type:mType,hp:UNITS[mType].hp,moved:false,attacked:false,xp:0,rank:0});
+  }
+});
+// ── Spawn villages ─────────────────────────────────────────────────
+G.villages=[];
+const villageCount=Math.floor((GW*GH)/28);
+for(let vi=0;vi<villageCount;vi++){
+  let vq,vr,vt=0;
+  do{vq=1+Math.floor(Math.random()*(GW-2));vr=1+Math.floor(Math.random()*(GH-2));vt++;}
+  while((usedMPos.has(vq+','+vr)||G.grid[vq]?.[vr]?.terrain===T.OCEAN||G.grid[vq]?.[vr]?.terrain===T.MOUNTAIN)&&vt<40);
+  if(vt<40){usedMPos.add(vq+','+vr);G.villages.push({q:vq,r:vr,pillaged:false});}
 }
 revealFog(starts[0].q,starts[0].r,3);
 const mc=hxy(GW/2,GH/2),pc=hxy(starts[0].q,starts[0].r);
@@ -2895,6 +2996,42 @@ ctx.fillText(label,dest.x,dest.y-14);
 }
 ctx.restore();
 });
+// ── VILLAGE OVERLAYS ────────────────────────────────────────────────────────
+if(G.villages){
+  G.villages.forEach(v=>{
+    if(G.fog[v.q]&&G.fog[v.q][v.r]==='hidden')return;
+    const{x,y}=hxy(v.q,v.r);
+    const vx2=x+ox,vy2=y+oy;
+    ctx.save();
+    if(v.pillaged){
+      // Burnt ruins
+      ctx.globalAlpha=0.55;
+      ctx.font=`${HS*0.55}px serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('🔥',vx2,vy2);
+    } else {
+      // Village house
+      ctx.globalAlpha=0.92;
+      // Glow
+      const vg=ctx.createRadialGradient(vx2,vy2,2,vx2,vy2,HS*0.65);
+      vg.addColorStop(0,'rgba(255,220,120,0.35)');vg.addColorStop(1,'rgba(255,220,120,0)');
+      ctx.fillStyle=vg;ctx.beginPath();ctx.arc(vx2,vy2,HS*0.65,0,Math.PI*2);ctx.fill();
+      // House body
+      ctx.fillStyle='rgba(200,160,80,0.92)';
+      ctx.fillRect(vx2-HS*0.22,vy2-HS*0.08,HS*0.44,HS*0.32);
+      // Roof
+      ctx.fillStyle='rgba(160,80,40,0.95)';
+      ctx.beginPath();ctx.moveTo(vx2,vy2-HS*0.42);ctx.lineTo(vx2+HS*0.28,vy2-HS*0.08);ctx.lineTo(vx2-HS*0.28,vy2-HS*0.08);ctx.closePath();ctx.fill();
+      // Door
+      ctx.fillStyle='rgba(80,40,20,0.9)';
+      ctx.fillRect(vx2-HS*0.07,vy2+HS*0.04,HS*0.14,HS*0.2);
+      // Window light
+      ctx.fillStyle='rgba(255,220,100,0.8)';
+      ctx.fillRect(vx2+HS*0.09,vy2-HS*0.05,HS*0.1,HS*0.1);
+    }
+    ctx.restore();
+  });
+}
 // ── TERRITORY BORDERS — Civ-style thick coloured edges ──────────────────
 if(G.cities){
 try{
@@ -2950,8 +3087,11 @@ try{
 // Meteorite warning overlay
 if(G&&G._meteorTarget){
   const{q:mq,r:mr,turnsLeft:mt}=G._meteorTarget;
-  const msx=(mq-(GW-1)/2)*HX_W+(mr%2)*HX_W/2+cvW/2+G.cam.x*G.cam.zoom;
-  const msy=(mr-(GH-1)/2)*HX_H*0.75+cvH/2+G.cam.y*G.cam.zoom;
+  const _mhxy=hxy(mq,mr);
+  const _mmc=hxy(GW/2,GH/2);
+  const _z=G.cam.zoom||1;
+  const msx=cvW/2+(_mhxy.x-_mmc.x)*_z+G.cam.x*_z;
+  const msy=cvH/2+(_mhxy.y-_mmc.y)*_z+G.cam.y*_z;
   const pulse=0.5+0.5*Math.sin(Date.now()/200);
   ctx.save();
   ctx.globalAlpha=0.3+pulse*0.25;
@@ -3142,6 +3282,19 @@ if(G.aRange&&G.aRange.has(key)){if(cu&&isEnemy(cu.owner)&&!cu.disabled){doAttack
 if(G.mRange&&G.mRange.has(key)&&!cu){
 G.selU.q=q;G.selU.r=r;G.selU.moved=true;G.selU.fortified=false;
 revealFog(q,r,2);SFX.move();
+// Village pillage
+if(G.villages){
+  const vill=G.villages.find(v=>v.q===q&&v.r===r&&!v.pillaged);
+  if(vill){
+    vill.pillaged=true;
+    const loot=4+Math.floor(Math.random()*5);
+    G.stars+=loot;
+    G.score+=40;
+    notify('🏘️ Village pillaged! +'+loot+' credits','gold');
+    SFX.capture&&SFX.capture();
+    clearTileCache&&Object.keys(tileCache).forEach(k=>delete tileCache[k]);
+  }
+}
 const tc=gCity(q,r);
 if(G._warpingUnit&&tc&&tc.owner==='player'){doWarpTeleport(q,r);return;}
 if(tc&&isEnemy(tc.owner))capCity(tc,G.selU);
@@ -3244,6 +3397,8 @@ if(terr===T.M_LAVA||terr===T.R_CANYON)return false;
 if(terr===T.OCEAN)return fac.passOcean||unit.type==='GALLEY'||unit.type==='IRONCLAD'||unit.type==='DREADNOUGHT'||false;
 if(terr===T.MOUNTAIN||terr===T.M_RIDGE||terr===T.R_MOUN)return fac.passMountain||false;
 const _isNaval2=unit&&(unit.type==='GALLEY'||unit.type==='IRONCLAD'||unit.type==='DREADNOUGHT');if(_isNaval2&&terr!==T.OCEAN)return false;
+// Monsters block movement
+if(G.units&&G.units.find(u=>u.owner==='monster'&&u.q===q&&u.r===r))return false;
 return PASS[terr]!==false;
 }
 function isHostile(owner){return isEnemy(owner)&&!inPeace(owner)&&!isOpenBorders(owner);}
@@ -3720,9 +3875,9 @@ if(isFuture)SFX.laser();else SFX.attack();
 let bonus=0;
 if(playerFaction.id==='BENEVOLENT'&&G.wrath>8)bonus=Math.floor(G.wrath/3);
 const _commissarNear=G.units.some(u=>u.type==='COMMISSAR'&&u.owner===atk.owner&&hDist(u.q,u.r,atk.q,atk.r)<=1);
-const atkBonus=rankBonus(atk).atk+(atk._xenoAtk||0)+(_commissarNear?2:0)+(atk._wonderAtk||0);
+const atkBonus=rankBonus(atk).atk+(atk._xenoAtk||0)+(_commissarNear?2:0)+(atk._wonderAtk||0)+(atk._atkBonus||0);
 const outpostBonus=(()=>{const oc=gCity(def.q,def.r);return(oc&&oc.isOutpost&&oc.owner===def.owner)?oc._defBonus||3:0;})();
-const defBonus=rankBonus(def).def+(def.owner==='player'&&G.wonders&&G.wonders.has('SHIELD_ARRAY')?2:0)+(def._wonderDef||0)+(def.fortified?Math.ceil(UNITS[def.type].def*0.5):0)+outpostBonus;
+const defBonus=rankBonus(def).def+(def.owner==='player'&&G.wonders&&G.wonders.has('SHIELD_ARRAY')?2:0)+(def._wonderDef||0)+(def.fortified?Math.ceil(UNITS[def.type].def*0.5):0)+outpostBonus+(def._defBonus||0);
 if(at.disableEnemy&&!def.disabled){def.disabled=2;notify('Psychic link! Enemy disabled for 2 turns 💫');}
 const ad=Math.max(1,at.atk+atkBonus-dt.def-defBonus+ri(3)+bonus);
 const dd=at.ranged?0:Math.max(0,dt.atk+rankBonus(def).atk-at.def-atkBonus+ri(2)-1);
@@ -3741,10 +3896,18 @@ spawnDmg(dp.sx,dp.sy,ad,'#ff5050');
 if(dd>0)spawnDmg(ap.sx,ap.sy,dd,'#ff8040');
 if(def.hp<=0){
 RETRO.unitDeath(dp.sx,dp.sy,getFac(def.owner).color);
-G.units=G.units.filter(u=>u!==def);G.score+=65;G.unitsKilled++;
+G.units=G.units.filter(u=>u!==def);
+if(def.owner==='monster'){
+  const loot=UNITS[def.type]?.loot||2;
+  G.stars+=loot;
+  notify('🏆 '+UNITS[def.type].name+' slain! +'+loot+' credits looted!','gold');
+  G.score+=100;
+} else {
+  G.score+=65;G.unitsKilled++;
+  notify('Enemy eliminated! +65★','gold');
+}
 grantXP(atk,2);
-if(!at.ranged){atk.q=def.q;atk.r=def.r;const tc=gCity(atk.q,atk.r);if(tc&&isEnemy(tc.owner))capCity(tc,atk);}
-notify('Enemy eliminated! +65★','gold');
+if(!at.ranged){atk.q=def.q;atk.r=def.r;const tc=gCity(atk.q,atk.r);if(tc&&isEnemy(tc.owner)&&tc.owner!=='monster')capCity(tc,atk);}
 } else {
 grantXP(atk,1);
 notify(`Hit for ${ad} damage`);
@@ -4020,6 +4183,73 @@ continueAfterEvent();
 function continueAfterEvent(){
 if(G._aiContinue){const fn=G._aiContinue;G._aiContinue=null;setTimeout(fn,100);}
 }
+
+function doMonsterTurn(){
+  if(!G||!G.units)return;
+  const monsters=G.units.filter(u=>u.owner==='monster');
+  monsters.forEach(m=>{
+    if(m.hp<=0)return;
+    const mt=UNITS[m.type];
+    // Find adjacent non-monster unit to attack
+    const adj=hN(m.q,m.r);
+    let target=null;
+    for(const[nq,nr]of adj){
+      const u=gUnit(nq,nr);
+      if(u&&u.owner!=='monster'){target=u;break;}
+    }
+    if(target){
+      const dmg=Math.max(1,mt.atk-UNITS[target.type].def+Math.floor(Math.random()*3));
+      target.hp-=dmg;
+      try{const dp=uPos(target);spawnDmg(dp.sx,dp.sy,dmg,'#ff5050');}catch(e){}
+      if(target.owner==='player')SFX.attack&&SFX.attack();
+      if(target.hp<=0){
+        G.units=G.units.filter(u=>u!==target);
+        if(target.owner==='player'){G.unitsLost++;notify('⚠️ '+mt.name+' destroyed your '+UNITS[target.type].name+'!','warn');}
+      } else {
+        if(target.owner==='player')notify('⚔️ '+mt.name+' attacks for '+dmg+'!','warn');
+      }
+    } else {
+      // Move toward nearest non-monster unit
+      let nearest=null,nd=999;
+      G.units.filter(u=>u.owner!=='monster').forEach(u=>{
+        const d=hDist(m.q,m.r,u.q,u.r);
+        if(d<nd){nd=d;nearest=u;}
+      });
+      if(nearest&&nd<=4){
+        // Step toward nearest
+        let best=null,bd=nd;
+        for(const[nq,nr]of adj){
+          if(nq<0||nq>=GW||nr<0||nr>=GH)continue;
+          if(G.grid[nq]?.[nr]?.terrain===T.OCEAN)continue;
+          if(gUnit(nq,nr))continue;
+          const d=hDist(nq,nr,nearest.q,nearest.r);
+          if(d<bd){bd=d;best=[nq,nr];}
+        }
+        if(best){m.q=best[0];m.r=best[1];}
+      }
+    }
+    m.moved=true;
+  });
+}
+
+function fuseUnits(a, bId){
+  const b = G.units.find(u=>u.id===bId);
+  if(!a||!b||a.type!==b.type||a.owner!=='player')return;
+  const stackA = a.stack||1, stackB = b.stack||1;
+  if(stackA+stackB>3){notify('Max stack is 3!','warn');return;}
+  const ut = UNITS[a.type];
+  // Merge b into a: boost stats proportionally
+  a.stack = stackA + stackB;
+  a.hp = Math.min(ut.hp * a.stack, a.hp + b.hp);
+  a._atkBonus = (a._atkBonus||0) + Math.ceil(ut.atk * 0.4 * stackB);
+  a._defBonus = (a._defBonus||0) + Math.ceil(ut.def * 0.3 * stackB);
+  a.moved = true;
+  G.units = G.units.filter(u=>u!==b);
+  clearUnitCache();
+  notify('⚡ Units merged! Stack '+a.stack+'/3 — ATK +'+a._atkBonus+' DEF +'+a._defBonus,'gold');
+  SFX.capture&&SFX.capture();
+  desel(); updateHUD();
+}
 function endTurn(){
 if(G.phase!=='player')return;
 G.phase='ai';SFX.endturn&&SFX.endturn();
@@ -4162,6 +4392,7 @@ G.planet=G._playerPlanet;
 _pl.forEach(p=>{G.planet=p;G.units.filter(u=>u.owner==='player').forEach(u=>revealFog(u.q,u.r,2));});
 G.planet=G._playerPlanet;
 advanceWaypoints();
+doMonsterTurn();
 G.phase='player';setMsg('Your move, Commander');updateHUD();checkEnd();updatePlanetSwitcher();
 return;
 }
@@ -5185,6 +5416,10 @@ const canUpg=nextUt&&(!nextUt.req||G.techs.has(nextUt.req))&&G.stars>=upgCost;
 const upgBtn=nextUt?`<button class="abtn2 ${canUpg?'cyan':'dim'}" onclick="upgradeUnit(G.selU)" ${canUpg?'':'disabled'}>⬆ UPGRADE<small>${upgCost}💎</small></button>`:'';
 const canFortify=!unit.moved&&!unit.fortified;
 const fortBtn=`<button class="abtn2 ${canFortify?'gold':'dim'}" onclick="fortifyUnit(G.selU)" ${canFortify?'':'disabled'}>🛡 FORTIFY<small>+${Math.ceil(ut.def*0.5)} DEF</small></button>`;
+// Fusion: find adjacent same-type player unit (max stack 3)
+const fusionTarget=(!unit.moved&&(unit.stack||1)<3)?G.units.find(u=>u!==unit&&u.owner==='player'&&u.type===unit.type&&hDist(u.q,u.r,unit.q,unit.r)===1):null;
+const canFuse=!!fusionTarget;
+const fuseBtn=canFuse?`<button class="abtn2 cyan" onclick="fuseUnits(G.selU,${fusionTarget.id})">⚡ MERGE<small>Stack ${(unit.stack||1)+1}/3</small></button>`:'';
 const canWarp=G._warpGate&&!G._warpUsed&&!unit.moved;
 const warpBtn=G._warpGate?`<button class="abtn2 ${canWarp?'':'dim'}" style="${canWarp?'border-color:rgba(160,80,255,0.5);color:rgba(190,120,255,0.9)':''}" onclick="doWarpSelect(${unit.id})" ${canWarp?'':'disabled'}>🌀 WARP<small>Teleport</small></button>`:'';
 const canSettle=ut.isSettler&&!unit.moved&&!gCity(unit.q,unit.r);
@@ -5239,7 +5474,7 @@ const html=`
         <div class="sc-val">${ut.ranged?2:1}</div>
       </div>
     </div>
-    <div class="act-row">${upgBtn}${fortBtn}${warpBtn}${settleBtn}${disbBtn}</div>
+    <div class="act-row">${upgBtn}${fortBtn}${fuseBtn}${warpBtn}${settleBtn}${disbBtn}</div>
     ${notes}
   </div>`;
 setPanel(html);
@@ -6016,13 +6251,14 @@ function pickFaction(id){
 pickedFaction=id;
 // Close all faction detail popups
 Object.values(FACTIONS).forEach(f2=>{const d=document.getElementById('fd-'+f2.id);if(d)d.style.display='none';});
-document.querySelectorAll('.fcard').forEach(el=>{
+document.querySelectorAll('[id^="fc-"]').forEach(el=>{
 const elId=el.id.replace('fc-','');if(!FACTIONS[elId])return;
 const f=FACTIONS[elId];
 el.classList.remove('picked');
 el.style.borderColor=f.color+'22';
-el.style.background=`linear-gradient(135deg,${f.color}06,${f.color}02)`;
+el.style.background=f.color+'08';
 el.style.boxShadow='';
+el.style.transform='';
 });
 const f=FACTIONS[id];
 const card=document.getElementById('fc-'+id);
@@ -7254,7 +7490,7 @@ openBorders:G.openBorders||{},
 tradeDeals:G.tradeDeals||{},
 wonders:[...(G.wonders||[])],tidalEngine:G._tidalEngine||false,genesisLab:G._genesisLab||false,warpGate:G._warpGate||false,
 crisisHistory:G.crisisHistory?[...G.crisisHistory]:[],
-_alienTurnsLeft:G._alienTurnsLeft||0,_plagueLeft:G._plagueLeft||0,_solarStorm:G._solarStorm||0,
+_alienTurnsLeft:G._alienTurnsLeft||0,_plagueLeft:G._plagueLeft||0,_solarStorm:G._solarStorm||0,villages:(G.villages||[]).map(v=>({q:v.q,r:v.r,pillaged:v.pillaged})),
 savedAt:new Date().toLocaleTimeString(),
 }
 localStorage.setItem(SAVE_KEY,JSON.stringify(save));
@@ -7308,6 +7544,7 @@ tradeDeals:save.tradeDeals||{},
 wonders:new Set(save.wonders||[]),
 crisisHistory:new Set(save.crisisHistory||[]),
 _alienTurnsLeft:save._alienTurnsLeft||0,
+villages:(save.villages||[]),
 _plagueLeft:save._plagueLeft||0,
 _solarStorm:save._solarStorm||0,_tidalEngine:save.tidalEngine||false,_genesisLab:save.genesisLab||false,_warpGate:save.warpGate||false,_warpUsed:false,
 }
