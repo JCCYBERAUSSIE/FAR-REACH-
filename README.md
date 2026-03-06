@@ -1,324 +1,254 @@
-[README (1).md](https://github.com/user-attachments/files/25728626/README.1.md)
+[README.md](https://github.com/user-attachments/files/25784489/README.md)
 # Far Reach
 
-> *The Far Reach Accords collapsed in 2387. What was once a unified human expansion across three worlds fractured into competing powers — some born of Earth's old nations, others evolved entirely in the void. Now each empire charts its own course to the stars, or burns trying.*
+**A browser-based 4X strategy game of galactic conquest.**
 
-A complete 4X strategy game in a single 393KB HTML file. No installation, no server, no dependencies. Open and play.
-
----
-
-## Overview
-
-Far Reach is a turn-based hex-grid strategy game in the tradition of Civilization and The Battle of Polytopia. Build cities, research technologies across five eras, command armies, negotiate diplomacy, construct Wonders of the World, and race across three planets to claim victory before your rivals do.
-
-Everything — art, audio, AI, UI — is generated procedurally in a single self-contained HTML file. It works offline once loaded, runs on mobile and desktop, and requires no accounts or data collection.
-
-**Quick facts:**
-- 4 playable factions with unique abilities and colour skin unlocks
-- 5 technology eras: ⚔️ Medieval → 🏭 Industrial → ☢️ Atomic → 🚀 Space Age → 🌌 Interstellar
-- 3 planets: Earth, Moon, Mars
-- 18 unit types, 11 Wonders, 26 technologies, 8 random events
-- 5 AI difficulty levels including Elon Mode
-- 4 victory conditions: Domination, Exodus, Colonisation, Score
-- 8-mission Campaign + free Skirmish + Daily Challenge
-- Commander progression system: 50 levels, 15 titles, 12 faction skins, 4 map sizes
-- 12 achievements, 2 scenarios, Hall of Fame leaderboard
-- Full touch support — designed for iPhone and Android
+Build cities, research technologies across five eras, train armies, forge alliances, and eliminate rival factions to claim the stars — all in a single HTML file that runs on any device.
 
 ---
 
-## How to Play
+## Quick Start
 
-### Starting Out
+Open `farreach.html` in any modern browser. No installation, no server, no dependencies.
 
-Open `farreach.html` in any modern browser. The welcome screen offers three modes:
-
-**⚔ Campaign** — Recommended for new players. Eight progressive missions that introduce one mechanic per mission, from basic combat all the way to the full game. Completing Campaign unlocks Elon Mode and all Skirmish features.
-
-**🗺 Skirmish** — Full free play. Choose your faction, rivals, difficulty, and map size.
-
-**📅 Daily Challenge** — A new fixed-seed game each day. Builds a streak and awards bonus Commander XP.
-
-### The Core Loop
-
-Each turn you move and attack with units, build new units at cities, manage your technology research, handle any diplomacy, and end your turn. The AI then responds. Repeat until a victory condition is met or the turn limit expires.
-
-Cities generate credits each turn. Credits pay for units and buildings. Cities level up as population grows, unlocking stronger buildings and higher production caps. Fog of war limits what you can see until your units or cities reveal nearby tiles.
-
-### Victory Conditions
-
-| Condition | How |
-|---|---|
-| **Domination** | Capture every enemy HQ city |
-| **Exodus** | Build the Exodus Ship and reach the Black Hole hex |
-| **Colonisation** | Hold active cities on all three planets simultaneously |
-| **Score** | Highest score when the turn limit expires |
+- **Skirmish** — jump straight into a freeplay game with your chosen faction, map size, and difficulty
+- **Campaign** — eight story missions with specific objectives, briefings, and escalating challenge
+- **Daily Challenge** — a fresh seeded map every 24 hours, same for every player worldwide
 
 ---
 
 ## Factions
 
-| Faction | Special Ability | Playstyle |
+| Faction | Identity | Playstyle |
 |---|---|---|
-| 🚀 **Apex Ventures** | Tech costs −20%. Rockets and colony ships cost −2 credits | Fast research, early space era |
-| ☭ **The Collective** | All units cost −1 credit. Free unit when a city hits population cap | Economic snowball, unit flooding |
-| 👽 **The Greys** | Start in the Atomic era. Units traverse ocean and mountains. Psychic unit disables enemies | Aggressive early game, tactical flexibility |
-| 🌊 **The Benevolent** | Elite starting army. Leviathan awakens when attacked. Deals 3× damage at maximum Wrath | Defensive, punishes aggression hard |
+| 🚀 **Apex Ventures** | Corporate empire, blue | Aggressive expansion, Colony Vehicle & Exodus Ship cost reduction |
+| 🧠 **The Collective** | Hive mind, purple | Research specialists, unit production discounts |
+| 👽 **The Greys** | Alien federation, green | Exclusive Drone and Mind Probe units, unique tech access |
+| 🌊 **The Benevolent** | Ocean civilisation, teal | Tidecaller healer unit, ocean traversal advantage |
 
-Each faction has four colour skins — a default plus three unlockable variants that come with Commander progression. Skins are purely cosmetic and change how your faction's units and cities are rendered on the map.
-
----
-
-## Units (18)
-
-| Era | Units |
-|---|---|
-| ⚔️ Medieval | Warrior, Archer, Knight, Catapult |
-| 🏭 Industrial | Rifleman, Artillery, Engineer, Settler |
-| ☢️ Atomic | Tank, Jet Fighter, Psychic |
-| 🚀 Space Age | Astronaut, Laser Trooper, AI Robot, Colony Vehicle, Exodus Ship, ICBM |
-| 🌌 Interstellar | Leviathan |
-
-Units gain XP from combat and rank up through Seasoned → Veteran → Elite, increasing their stats. The **Engineer** builds Outposts (+3 defence bonus). The **Settler** founds new cities. The **ICBM** launches from near your HQ with massive area effect. The **Exodus Ship** is required for a non-domination victory. The **Leviathan** is the most powerful unit in the game — enormous health, area attacks, and faction-scaled damage when The Benevolent are at maximum Wrath.
+Each faction has unique starting bonuses, a roster of voice lines for key game events, and four unlockable cosmetic skins earned through Commander Progression.
 
 ---
 
-## Technologies (26)
+## Tech Eras
 
-Technologies are researched with credits and unlock units, buildings, and special abilities. Most techs have prerequisites. Completing all techs in an era triggers an era advance.
+Research advances your civilisation through five eras. Each era unlocks new units, buildings, and victory paths.
 
-**Era progression unlocks:**
-- Industrial era: Artillery, tanks, steam-powered cities
-- Atomic era: Nuclear weapons, jet fighters, radar
-- Space Age: Rocketry, orbital mechanics, colony ships, Moon Base, Mars Base
-- Interstellar: Warp Drive, Dark Energy, Exodus Drive, the Leviathan
-
-Key strategic techs: **Moon Base** (required to reach the Moon), **Mars Base** (required to reach Mars), **Exodus Drive** (required to build the Exodus Ship), **Warp Drive** (enables the Warp Gate Wonder).
-
----
-
-## Wonders (11)
-
-Each Wonder can only be built once per game across all players. Racing to Wonders before your rivals is central to mid-game strategy.
-
-| Wonder | Effect |
-|---|---|
-| 🗼 Great Library | All tech costs −3 credits |
-| 🏯 Iron Citadel | All your cities gain +5 max HP and +2 defence |
-| 🌐 Global Network | Reveals the entire map. Fog of war removed permanently |
-| ⚡ Arc Reactor | All your cities generate +3 credits per turn |
-| 🛡️ Shield Array | Your units gain +2 defence. Air defence intercepts enemy missiles |
-| 🛰️ Orbital Cannon | Unlocks Orbital Targeting: one free long-range strike per turn |
-| 🏛️ Colosseum | +2 population growth across all your cities |
-| 🌊 Tidal Engine | Ocean tiles generate +1 credit. Your units traverse ocean freely |
-| 🧬 Genesis Lab | Instantly colonises Moon and Mars with a starter city each |
-| 🌀 Warp Gate | Teleport one unit per turn to any city you own |
-| 🌑 Dark Forge | Unlocks the Leviathan for all factions. +3 attack to all your units |
-
----
-
-## AI Difficulty
-
-| Level | Description | Notes |
+| Era | Theme | Key Unlocks |
 |---|---|---|
-| 🥔 Potato | Harmless. Forgets what turn it is | 0.6× damage, 55% blunder chance |
-| 😴 Easy | Tries its best. Bless its heart | 0.85× damage, occasional mistakes |
-| ⚔️ Normal | Competent. Will punish mistakes | Balanced — a real challenge |
-| 💀 Hard | Relentless. Adapts. Remembers everything | Fog cheat, siege coordination, ICBM usage, Wonder priority |
-| 🚀 Elon Mode | Moves fast, breaks things, already on Mars | +6 income, 1.45× damage, 2× tech speed, taunts. Unlocks after completing Campaign |
+| ⚔️ **Medieval** | Swords & castles | Warriors, Archers, Knights, Catapults |
+| 🏭 **Industrial** | Steam & gunpowder | Riflemen, Artillery, Engineers, Ironclads |
+| ☢️ **Atomic** | Nuclear & aviation | Tanks, Jet Fighters, ICBMs, Radar |
+| 🚀 **Space Age** | Orbit & AI | Laser Troopers, AI Robots, Colony Vehicles |
+| 🌌 **Interstellar** | Exodus | Exodus Ship, Leviathan, Warp Drive, Dark Energy |
 
-Hard and Elon Mode AI uses coordinated siege groups, ICBM threat assessment, Wonder race priority scoring, retreat evaluation, and full fog-of-war cheating.
+### Research Queue
 
----
+Technologies take real turns to complete — early techs take 1–2 turns, late-game technologies take 5–6 turns. Only one technology can be researched at a time. Academies and the Great Library wonder each reduce research time by 1 turn. Locked techs display their prerequisites inline.
 
-## Campaign (8 Missions)
-
-Each mission introduces one new mechanic and gates it until the player is ready.
-
-| # | Title | New Mechanic | Unlock Reward |
-|---|---|---|---|
-| 1 | First Contact | Combat only | Buildings & Economy |
-| 2 | Growing Pains | Cities & income | Tech Tree |
-| 3 | Age of Invention | Technology | Wonders |
-| 4 | Monuments to Power | Wonders | Diplomacy |
-| 5 | The Art of War and Peace | Diplomacy | Multi-planet travel |
-| 6 | Beyond the Sky | Multi-planet | Full tech tree |
-| 7 | Arms Race | Full tech + Hard AI | Full Skirmish |
-| 8 | The Final Frontier | Everything, 3 rivals, Hard | Elon Mode |
-
-Each mission has an opening briefing and a closing narrative. Progress is saved automatically.
+**26 total technologies** across the five eras, with full prerequisite chains.
 
 ---
 
-## Commander Progression
+## Units
 
-XP accumulates across all game modes and persists between sessions.
+**25 military, civilian, and naval units** across all eras. All units are drawn as era-appropriate silhouettes in the style of classic 4X games.
 
-**XP sources:**
-- Win: +100 / Loss: +20
-- Each turn survived: +2
-- Each unit killed: +3
-- Each wonder built: +15
-- Each tech researched: +1
-- Daily Challenge bonus: +50
-- Campaign mission bonus: +75
+### Standard Units (all factions)
+Warrior · Archer · Knight · Catapult · Rifleman · Artillery · Engineer · Settler · Tank · Jet Fighter · Laser Trooper · AI Robot · Colony Vehicle · Exodus Ship · ICBM · Psychic · Astronaut
 
-**50 levels, 15 titles:** Recruit → Scout → Soldier → Veteran → Warlord → Tactician → Admiral → Sovereign → Architect → Legend → Immortal → Overlord → Dominator → Conqueror → Commander
+### Naval Units
+Galley (ocean only) · Ironclad (bombards coastlines) · Dreadnought (twin turret, long range)
 
-**Unlocks by level:**
+### Faction-Exclusive Units
+- **Apex Ventures** — Apex Drone (quad-rotor, fast recon)
+- **The Collective** — Commissar (grants +2 ATK aura to adjacent units)
+- **The Greys** — Mind Probe (steals a random tech from an adjacent enemy city)
+- **The Benevolent** — Tidecaller (heals 2 HP to all adjacent friendly units per turn)
 
-| Level | Unlock |
+### Monsters (neutral, hostile)
+Wolf Pack · Troll · Dragon · Void Beast — found scattered on the map, attack nearby units, drop loot and XP on defeat.
+
+### Unit Progression
+Units earn XP through combat and level up through four ranks: Seasoned → Veteran → Elite. Three identical unit types can **fuse** into a single stat-boosted stack. Ranked units retain their bonuses permanently.
+
+---
+
+## Cities & Buildings
+
+Cities grow from level 1 to 7. Their visual appearance evolves to match the current tech era:
+
+- **Medieval** — stone curtain walls, corner towers, keep with battlements and flag
+- **Industrial** — brick factories, 2–3 smokestacks, illuminated window rows
+- **Atomic** — full city skyline, central skyscraper with spire and antenna
+- **Space / Interstellar** — geodesic dome megacity, energy rings, platform with spires
+
+### City Districts (one per city)
+| District | Bonus |
 |---|---|
-| 5 | Standard+ map (24×18) |
-| 10 | First alternate skin for each faction |
-| 15 | Large map (30×22) |
-| 20 | Second alternate skin for each faction |
-| 25 | Massive map (38×28) |
-| 30–40 | Third and fourth alternate skins |
+| 🏭 Foundry | Unit training costs -1💎 |
+| ⚔️ Garrison | Newly trained units start with 1 XP |
+| 🌾 Granary | City heals +3 HP/turn |
+| 🎓 Academy | Tech research time -1 turn |
 
-The Commander card is shown on the welcome screen and after every game, with a full XP breakdown showing exactly what you earned.
+### Outposts
+Settlers can found **Outposts** — forward bases that give defending units +3 DEF and can train basic units (Warrior, Archer, Knight, Rifleman). A dirt **road** is automatically drawn between your HQ and each outpost, giving units that move through road tiles 2× movement speed.
 
 ---
 
-## Map Sizes
+## Wonders
 
-| Size | Grid | Approx. Session Length |
+**11 buildable wonders** — one per city, permanent empire-wide effects.
+
+| Wonder | Era | Effect |
 |---|---|---|
-| Small | 18×14 | 30–60 min |
-| Standard+ | 24×18 | 45–90 min |
-| Large | 30×22 | 60–120 min |
-| Massive | 38×28 | 90–180 min |
+| 📚 Great Library | Medieval | All tech costs -3💎, research time -1 turn |
+| 🏰 Iron Citadel | Medieval | All cities +10 max HP |
+| 🏛️ Colosseum | Medieval | All units +2 ATK and +4 max HP permanently |
+| 🌐 Global Network | Industrial | Full map reveal — no fog of war |
+| ⚡ Arc Reactor | Industrial | +3💎 income per city per turn |
+| 🌊 Tidal Engine | Industrial | +2💎 per ocean/wetland tile adjacent to your cities |
+| 🛡️ Shield Array | Atomic | All units +2 DEF permanently |
+| 🧬 Genesis Lab | Atomic | Cities auto-heal +3 HP/turn; units regen +2 HP extra per turn |
+| 🛰️ Orbital Cannon | Space | Devastating strike anywhere on the map, once every 3 turns |
+| 🌀 Warp Gate | Space | Teleport any unit to any owned city, once per turn |
+| ⚒️ Dark Forge | Interstellar | All units +3 ATK and +3 DEF permanently |
 
 ---
 
-## Random Events (8)
+## Random Events
 
-Events fire periodically during play and require a choice. A modal overlay appears; after you choose, it dismisses and leaves a notification badge you can tap to review.
+**12 random events** fire throughout the game, each presenting three choices with real strategic consequences — from earthquakes and plagues to alien ruins and enemy defectors.
 
-Earthquake, Plague Outbreak, Meteor Strike, Solar Flare, Desert Traders, Alien Ruin Found, Dust Storm, City Uprising.
+Earthquake · Plague Outbreak · Meteor Strike · Solar Flare · Desert Traders · Alien Ruin Found · Dust Storm · City Uprising · Comet Passing · Enemy Defector · Ancient Pathogen · Supply Cache
 
 ---
 
-## Achievements (12)
+## Late-Game Crisis Events
 
-| Achievement | Condition |
+Four major crises can strike after turn 45, forcing all factions to respond simultaneously.
+
+| Crisis | Effect |
 |---|---|
-| First Victory | Win any game |
-| Lightning Commander | Win in 20 turns or fewer |
-| Swift Campaign | Win in 35 turns or fewer |
-| Total Dominator | Eliminate all rivals |
-| Exodus Pioneer | Win via the Exodus Drive |
-| Red Planet | Reach Mars |
-| Moonwalker | Reach the Moon |
-| Impenetrable | Win without losing a city |
-| Warlord | Eliminate 10 enemy units in one game |
-| Faster Than Elon | Win on Elon Mode |
-| Wrath of the Deep | Win as The Benevolent at maximum Wrath |
-| Daily Challenger | Win the Daily Challenge |
-
----
-
-## Scenarios
-
-**Last Stand** — Your empire is on the brink. Three rivals surround you. Survive and turn the tide.
-
-**Space Race** — All factions start in the Space era with advanced tech. First to launch an Exodus Ship wins.
+| 👾 **Alien Invasion** | Alien Swarm units spawn and attack for 8 turns |
+| ☄️ **Meteorite Impact** | 5-turn countdown; impact destroys a 2-hex radius |
+| 🦠 **The Great Pandemic** | Units without MEDICINE tech take 2 HP/turn for 6 turns |
+| ☀️ **Solar Superstorm** | Research halted, ranged unit range halved for 4 turns |
 
 ---
 
 ## Diplomacy
 
-Relations between you and each AI are tracked on a −100 to +100 scale. They improve through peace agreements and trade; worsen through attacks, city captures, and broken ceasefires.
+Maintain long-term relations (-100 to +100) with every rival faction.
 
-Available actions: Propose Ceasefire, Offer Tribute, Propose Trade Deal, Request Open Borders, Declare War.
+- **Peace Treaty** — end active wars; AI acceptance based on relations and personality
+- **Open Borders** — grant mutual map traversal for 8 turns
+- **Trade Deal** — pay a fee for +2💎/turn for 10 turns
+- **Declare War** — drop relations, all factions are notified
+- **Gift Credits** — improve relations directly
 
-Each faction has distinct personality lines for war declarations, wonder completions, losing positions, and peace agreements. Elon Mode has its own set of taunts.
-
----
-
-## Audio
-
-**Music** — Fully procedural ambient score built with the Web Audio API. Slow warm pad chords (3.2s per bar) using layered detuned oscillators. Three distinct chord palettes per planet: Earth (warm minor), Moon (open major), Mars (low dusty minor). Shifts between a spacious explore mode and a tense staccato combat mode dynamically during play. Zero audio files — everything generated at runtime.
-
-**Sound Effects (18)** — move, attack, laser, build, research, capture, launch, event, victory, defeat, wrath, diplo, peace, war, wonder, fortify, unitLost, cityLost, era. Each uses layered synthesis: noise bursts for impacts, chord stacks for fanfares, simulated reverb echoes for big moments like era advance and wonder completion.
+AI personalities (Rusher, Builder, Tactician, Berserker, Researcher) affect diplomacy acceptance rates and combat aggression.
 
 ---
 
-## Mobile Support
+## Victory Conditions
 
-Far Reach is designed for phones and tablets. Specifically tested on iPhone Safari.
-
-- Pinch-to-zoom and pan on the hex map
-- Floating action buttons for Diplomacy and Wonders (bottom corners)
-- Full-screen mode: hides Safari address bar via scroll trick + `position:fixed` body
-- `env(safe-area-inset-*)` for notched devices
-- `touch-action: manipulation` throughout — no 300ms tap delay
-- `100dvh` for correct viewport height on mobile browsers
-- All tap targets minimum 44×44px
-
----
-
-## Running the Game
-
-**Locally:** Download `farreach.html`, open in any browser. No build step.
-
-**Hosted:** Drop on any static host — GitHub Pages, Netlify, itch.io. One file, zero config.
-
-**Requirements:** Chrome 90+, Firefox 88+, Safari 14+, Edge 90+. JavaScript must be enabled.
-
----
-
-## Data & Privacy
-
-All data stays on your device. Nothing is transmitted anywhere.
-
-localStorage keys used:
-
-| Key | Contents |
+| Victory | Condition |
 |---|---|
-| `farreach_save` | Current game save |
-| `farreach_campaign` | Campaign mission progress |
-| `farreach_commander` | XP, level, unlocked skins, map size preference |
-| `farreach_lb` | Hall of Fame top scores |
-| `farreach_achievements` | Achievement flags |
-| `farreach_daily_*` | Daily challenge state and streak |
-
-No accounts. No analytics. No ads. No network requests after initial load.
+| **Domination** | Eliminate all rival cities and units across every unlocked planet |
+| **Exodus** | Build an Exodus Ship and move it to the Black Hole hex |
 
 ---
 
-## Technical Architecture
+## AI Difficulty
 
-- **Single HTML file** — ~393KB, zero runtime dependencies, zero build tooling
-- **Rendering** — Two `<canvas>` elements: primary hex map + particle effects. All terrain, unit, city, and Wonder artwork drawn programmatically via Canvas 2D API. Zero image files
-- **Tile caching** — All terrain tiles and unit sprites pre-rendered to `OffscreenCanvas` and cached. Fog-of-war variants included
-- **Pathfinding** — BFS for unit movement range and AI target selection
-- **AI system** — Five difficulty profiles × four personality archetypes (Tactician, Rusher, Builder, Expansionist). Hard/Elon adds fog cheating, coordinated siege groups, Wonder priority scoring, ICBM threat modelling, retreat evaluation
-- **Audio** — Entirely procedural: `OscillatorNode`, `AudioBufferSourceNode`, `BiquadFilterNode`, `GainNode`. No audio files
-- **Persistence** — localStorage only. No external calls of any kind
-- **Mobile** — `env(safe-area-inset-*)`, `touch-action:manipulation`, `100dvh`, orientation lock on fullscreen, iOS address-bar-hide scroll trick
-- **Commander skins** — Applied at runtime by overwriting `FACTIONS[id].color` and `.light` before each game initialises
+| Level | Description |
+|---|---|
+| 🥔 Potato | Passive, wanders randomly, frequent blunders |
+| 😴 Easy | Gentle opponent, retreats early |
+| ⚔️ Normal | Balanced play, moderate aggression |
+| 💀 Hard | Fog-of-war awareness, coordinated multi-unit attacks, ICBM use |
+| 🚀 Elon Mode | Maximum aggression, bonus start resources, multi-tech per turn, taunts you |
+
+Hard and Elon AI respond dynamically to threats — attacking an AI city triggers a 4-turn rally, sending nearby units to defend.
+
+---
+
+## Planets & Map Sizes
+
+Three planets unlock through Commander Progression: **Earth → Moon → Mars**, each with unique terrain, resources, and ambient music palettes.
+
+| Map | Grid | Unlock Level | Estimated Length |
+|---|---|---|---|
+| Small | 18 × 14 | 1 | 30–60 min |
+| Standard+ | 24 × 18 | 5 | 45–90 min |
+| Large | 30 × 22 | 15 | 60–120 min |
+| Massive | 38 × 28 | 25 | 90–180 min |
+
+---
+
+## Commander Progression
+
+A persistent cross-session system that rewards continued play.
+
+- **50 levels**, 15 titles from Scout to Galactic Overlord
+- **XP** from wins, turns survived, units defeated, wonders built, techs researched, campaign missions, and daily challenges
+- **16 cosmetic faction skins** — four per faction, unlocked at milestone levels
+- **Map sizes** unlock at levels 5, 15, and 25
+
+---
+
+## Sound & Music
+
+**18 sound effects** synthesised via Web Audio API, routed through a master dynamics compressor and warmth filter. Effects cover unit selection, movement, combat, construction, research, capture, diplomacy, era advance, crisis events, victory, and defeat.
+
+**Adaptive music** uses layered ambient pad chords that switch between explore and combat modes in real time. Planet-specific palettes for Earth, Moon, and Mars.
+
+---
+
+## Controls
+
+### Desktop
+| Input | Action |
+|---|---|
+| Click unit | Select, show move range |
+| Click green hex | Move selected unit |
+| Click enemy in range | Attack |
+| Click city | Open city panel |
+| Right-click / click empty hex | Deselect |
+| Scroll wheel | Zoom |
+| Click + drag | Pan map |
+| End Turn button | End your turn |
+
+### Mobile
+- Tap to select, move, and attack
+- Pinch to zoom, drag to pan
+- Bottom sheet for city and unit info
+- Floating action buttons for tech, diplomacy, and wonders
+
+---
+
+## Technical Details
+
+- **Single file** — `farreach.html` (~490 KB), no dependencies, no server required
+- **Runs offline** — service worker enables PWA / offline play
+- **PWA-ready** — installable to home screen on iOS and Android
+- **Persistent save** — full game state written to localStorage
+- **Daily Challenge** — deterministic seeded RNG ensures the same map worldwide each day
+- **Version** — 1.0.0
+
+### Browser Support
+Chrome 90+, Safari 15+, Firefox 90+, Edge 90+. Requires Canvas 2D and Web Audio API.
 
 ---
 
 ## Roadmap
 
-- Google Play via TWA wrapper
-- iOS App Store via Capacitor
-- Steam via Electron
+- Native app wrappers — iOS App Store / Google Play (pending monetisation decision)
+- Additional planets
 - Async multiplayer
-- Additional factions and planets
-- Unit promotion choice trees
-- Map editor
+- Steam via Electron wrapper
 
 ---
 
-## Credits
-
-Designed and built in a series of human–AI development sessions.
-
-Inspired by the Civilization series (Firaxis) and The Battle of Polytopia (Midjiwan).
-
-Fonts: Orbitron, Exo 2 — Google Fonts, SIL Open Font Licence.
-
-All art and audio generated procedurally at runtime. No image files. No audio files.
+*Far Reach is independently developed. All rendering, audio, and generation runs entirely in-browser — no external assets, no analytics, no tracking.*
