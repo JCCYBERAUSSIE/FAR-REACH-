@@ -336,6 +336,7 @@ body.mob-fullscreen #game-wrap,body.mob-fullscreen #CV,body.mob-fullscreen canva
     <div class="hs hs-planet">
       <span class="hs-icon">🌍</span>
       <div class="hs-block"><span class="hs-v" id="h-planet">Earth</span><span class="hs-l">Planet</span></div>
+    <div id="h-research" style="display:none;align-items:center;gap:4px;padding:2px 8px;border:1px solid rgba(64,216,255,0.2);border-radius:3px;background:rgba(64,216,255,0.04);font-size:11px;white-space:nowrap;"></div>
     </div>
   </div>
   <!-- RIGHT: turn + controls -->
@@ -467,82 +468,103 @@ body.mob-fullscreen #game-wrap,body.mob-fullscreen #CV,body.mob-fullscreen canva
 <script>const VERSION='1.0.0';
 const _F='font-family:Orbitron,monospace',_B1='border:1px solid ',_RPC='rgba(216,232,248,',_CYN='rgba(64,216,255,',_GLD='rgba(240,192,64,';
 (function(){const s=document.getElementById('stars');for(let i=0;i<120;i++){const d=document.createElement('div');d.className='star';const sz=Math.random()*2+0.5;d.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*4}s;opacity:${Math.random()*0.5+0.1}`;s.appendChild(d);}})();
-let AC=null;
-function getAC(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return AC;}
+let AC=null,_sfxDst=null,_sfxComp=null;
+function getAC(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC;}
+// ── Master SFX chain: compressor → warm lowpass → gain ────────────────
+function getDst(){
+  const ac=getAC();if(!ac)return null;
+  if(!_sfxDst){
+    _sfxComp=ac.createDynamicsCompressor();
+    _sfxComp.threshold.value=-20;_sfxComp.knee.value=10;
+    _sfxComp.ratio.value=5;_sfxComp.attack.value=0.003;_sfxComp.release.value=0.15;
+    const warm=ac.createBiquadFilter();warm.type='lowpass';warm.frequency.value=3800;warm.Q.value=0.5;
+    _sfxDst=ac.createGain();_sfxDst.gain.value=0.32;
+    _sfxComp.connect(warm);warm.connect(_sfxDst);_sfxDst.connect(ac.destination);
+  }
+  return _sfxComp;
+}
 function playTone(freq,type,dur,vol,delay=0,endF=null){
-const ac=getAC();if(!ac)return;
-const o=ac.createOscillator(),g=ac.createGain();
-o.connect(g);g.connect(ac.destination);
-o.type=type;o.frequency.setValueAtTime(freq,ac.currentTime+delay);
-if(endF)o.frequency.linearRampToValueAtTime(endF,ac.currentTime+delay+dur);
-g.gain.setValueAtTime(vol,ac.currentTime+delay);
-g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);
-o.start(ac.currentTime+delay);o.stop(ac.currentTime+delay+dur+0.05);
+  const ac=getAC();const dst=getDst();if(!ac||!dst)return;
+  // Soften harsh types: sawtooth→triangle, high-freq square→sine
+  const t=type==='sawtooth'?'triangle':(type==='square'&&freq>300?'sine':type);
+  const o=ac.createOscillator(),g=ac.createGain();
+  const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=Math.min(freq*6,3200);lp.Q.value=0.35;
+  o.connect(lp);lp.connect(g);g.connect(dst);
+  o.type=t;o.frequency.setValueAtTime(freq,ac.currentTime+delay);
+  if(endF)o.frequency.linearRampToValueAtTime(endF,ac.currentTime+delay+dur);
+  const atk=Math.min(0.018,dur*0.15);
+  g.gain.setValueAtTime(0.001,ac.currentTime+delay);
+  g.gain.linearRampToValueAtTime(vol*0.5,ac.currentTime+delay+atk);
+  g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);
+  o.start(ac.currentTime+delay);o.stop(ac.currentTime+delay+dur+0.05);
 }
 // ── Richer synthesis building blocks ─────────────────────────────────
 function playNoise(dur,vol,delay=0,lpFreq=2000,hpFreq=40){
-  const ac=getAC();if(!ac)return;
-  const buf=ac.createBuffer(1,ac.sampleRate*dur,ac.sampleRate);
+  const ac=getAC();const dst=getDst();if(!ac||!dst)return;
+  const buf=ac.createBuffer(1,Math.ceil(ac.sampleRate*dur),ac.sampleRate);
   const data=buf.getChannelData(0);
   for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1);
   const src=ac.createBufferSource();src.buffer=buf;
-  const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=lpFreq;
-  const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=hpFreq;
+  const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=Math.min(lpFreq,2800);
+  const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=Math.max(hpFreq,80);
   const g=ac.createGain();
-  src.connect(hp);hp.connect(lp);lp.connect(g);g.connect(ac.destination);
-  g.gain.setValueAtTime(vol,ac.currentTime+delay);
+  src.connect(hp);hp.connect(lp);lp.connect(g);g.connect(dst);
+  const atk=Math.min(0.02,dur*0.18);
+  g.gain.setValueAtTime(0.001,ac.currentTime+delay);
+  g.gain.linearRampToValueAtTime(vol*0.42,ac.currentTime+delay+atk);
   g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);
   src.start(ac.currentTime+delay);src.stop(ac.currentTime+delay+dur+0.05);
 }
-function playChord(freqs,type,dur,vol,delay=0,attack=0.01){
-  const ac=getAC();if(!ac)return;
+function playChord(freqs,type,dur,vol,delay=0,attack=0.025){
+  const ac=getAC();const dst=getDst();if(!ac||!dst)return;
   freqs.forEach((f,i)=>{
     const o=ac.createOscillator(),g=ac.createGain();
-    o.connect(g);g.connect(ac.destination);
-    o.type=type;o.frequency.value=f;
+    const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=Math.min(f*6,3000);lp.Q.value=0.35;
+    o.connect(lp);lp.connect(g);g.connect(dst);
+    o.type='sine'; // always sine for chords — warmest
+    o.frequency.value=f;
     g.gain.setValueAtTime(0.001,ac.currentTime+delay);
-    g.gain.linearRampToValueAtTime(vol*(0.7+0.3*(freqs.length-i)/freqs.length),ac.currentTime+delay+attack);
+    g.gain.linearRampToValueAtTime(vol*0.42*(0.65+0.35*(freqs.length-i)/freqs.length),ac.currentTime+delay+attack);
     g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+dur);
     o.start(ac.currentTime+delay);o.stop(ac.currentTime+delay+dur+0.1);
   });
 }
 function playImpact(vol=0.3,delay=0){
-  // Punchy impact: noise burst + low thud
-  playNoise(0.06,vol*0.6,delay,300,20);
-  playTone(80,'sine',0.18,vol*0.8,delay,30);
-  playTone(160,'sine',0.08,vol*0.4,delay,60);
+  playNoise(0.05,vol*0.38,delay,260,35);
+  playTone(85,'sine',0.14,vol*0.5,delay,38);
 }
-function playReverb(freq,type,dur,vol,delay=0,roomSize=0.4){
-  // Simulate reverb via decaying echoes
-  const ac=getAC();if(!ac)return;
-  [0,roomSize*0.3,roomSize*0.6,roomSize*0.9].forEach((d,i)=>{
+function playReverb(freq,type,dur,vol,delay=0,roomSize=0.3){
+  // 2 echoes only (was 4) — prevents oscillator pile-up
+  const ac=getAC();const dst=getDst();if(!ac||!dst)return;
+  [0,roomSize*0.5].forEach((d,i)=>{
     const o=ac.createOscillator(),g=ac.createGain();
-    o.connect(g);g.connect(ac.destination);
-    o.type=type;o.frequency.value=freq*(1-i*0.002);
-    const v=vol*Math.pow(0.5,i);
-    g.gain.setValueAtTime(v,ac.currentTime+delay+d);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+d+dur*(1+i*0.4));
-    o.start(ac.currentTime+delay+d);o.stop(ac.currentTime+delay+d+dur*(1+i*0.4)+0.1);
+    const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;lp.Q.value=0.35;
+    o.connect(lp);lp.connect(g);g.connect(dst);
+    o.type='sine';o.frequency.value=freq*(1-i*0.003);
+    const v=vol*0.45*Math.pow(0.4,i);
+    g.gain.setValueAtTime(0.001,ac.currentTime+delay+d);
+    g.gain.linearRampToValueAtTime(v,ac.currentTime+delay+d+0.015);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+delay+d+dur*(1+i*0.3));
+    o.start(ac.currentTime+delay+d);o.stop(ac.currentTime+delay+d+dur*(1+i*0.3)+0.1);
   });
 }
 const SFX={
 // ── Movement: soft whoosh ─────────────────────────────────────────────
+select(){
+  playTone(440,'sine',0.04,0.022,0,420);
+},
 move(){
-  playNoise(0.08,0.04,0,600,200);
-  playTone(380,'sine',0.07,0.03,0.02,320);
+  playTone(320,'sine',0.06,0.028,0,280);
 },
 // ── Attack: impact punch with metallic ring ───────────────────────────
 attack(){
-  playImpact(0.22);
-  playTone(180,'sawtooth',0.12,0.06,0.02,60);
-  playNoise(0.04,0.15,0,800,400);
+  playImpact(0.18);
+  playTone(160,'sine',0.1,0.045,0.02,55);
 },
 // ── Laser: sci-fi zap with high whine ────────────────────────────────
 laser(){
-  playTone(1200,'sawtooth',0.06,0.06,0,300);
-  playTone(600,'sawtooth',0.08,0.07,0.02,150);
-  playNoise(0.05,0.08,0,4000,1000);
-  playTone(2400,'sine',0.04,0.03,0.03,800);
+  playTone(600,'sine',0.07,0.04,0,180);
+  playNoise(0.06,0.04,0,1800,400);
 },
 // ── Build: satisfying construction clunk ─────────────────────────────
 build(){
@@ -567,16 +589,14 @@ capture(){
 },
 // ── Launch: rocket ignition roar ─────────────────────────────────────
 launch(){
-  playNoise(0.8,0.2,0,800,30);
-  [0,0.15,0.32,0.52,0.74].forEach((d,i)=>playTone(80*Math.pow(1.2,i),'sawtooth',0.2,0.14,d));
-  playTone(200,'sawtooth',0.6,0.08,0.1,400);
+  playNoise(0.6,0.1,0,600,30);
+  [0,0.2,0.42].forEach((d,i)=>playTone(90*Math.pow(1.15,i),'sine',0.18,0.07,d));
 },
 // ── Event: ominous low rumble ─────────────────────────────────────────
 event(){
-  playNoise(0.2,0.1,0,300,20);
-  playTone(110,'square',0.18,0.1);
-  playTone(138,'square',0.14,0.07,0.14);
-  playTone(82,'sine',0.3,0.08,0.05);
+  playNoise(0.15,0.06,0,280,30);
+  playTone(110,'sine',0.18,0.055);
+  playTone(82,'sine',0.22,0.05,0.08);
 },
 // ── Victory: full orchestral swell ───────────────────────────────────
 victory(){
@@ -592,16 +612,15 @@ victory(){
 },
 // ── Defeat: collapsing minor descent ─────────────────────────────────
 defeat(){
-  playNoise(0.15,0.15,0,500,20);
-  playChord([220,261,311],'sawtooth',0.6,0.08,0.05,0.04);
-  [330,277,220,185,147,110].forEach((f,i)=>playTone(f,'sawtooth',0.25,0.1,i*0.22));
-  playNoise(0.4,0.06,0.4,200,20);
+  playNoise(0.12,0.06,0,420,25);
+  playChord([220,261,311],'sine',0.6,0.055,0.05,0.05);
+  [330,277,220,185,147].forEach((f,i)=>playTone(f,'sine',0.22,0.045,i*0.2));
 },
 // ── Wrath: Leviathan awakens ─────────────────────────────────────────
 wrath(){
-  playNoise(0.5,0.2,0,400,10);
-  [0,0.06,0.14,0.24,0.38].forEach((d,i)=>playTone(55*Math.pow(1.35,i),'sawtooth',0.25,0.15,d));
-  playChord([55,73,82],'square',0.6,0.08,0.1,0.05);
+  playNoise(0.3,0.08,0,350,20);
+  [0,0.15,0.32].forEach((d,i)=>playTone(55*Math.pow(1.3,i),'sine',0.22,0.06,d));
+  playChord([55,73,82],'sine',0.5,0.06,0.1,0.05);
 },
 // ── Diplo: diplomatic chime ───────────────────────────────────────────
 diplo(){
@@ -618,10 +637,9 @@ peace(){
 },
 // ── War: brutal declaration ───────────────────────────────────────────
 war(){
-  playNoise(0.12,0.2,0,600,20);
-  playImpact(0.2,0.04);
-  playChord([110,138,165],'sawtooth',0.4,0.1,0.06,0.03);
-  playTone(90,'sawtooth',0.5,0.12,0.1,40);
+  playNoise(0.1,0.07,0,500,25);
+  playImpact(0.15,0.04);
+  playChord([110,138,165],'sine',0.4,0.065,0.06,0.04);
 },
 // ── Wonder: epic reveal ───────────────────────────────────────────────
 wonder(){
@@ -1207,32 +1225,32 @@ try{document.execCommand('copy');notify('📋 Score copied!','gold');}catch(e){}
 ta.remove();
 }
 const TECHS=[
-{id:'FARMING',name:'Farming',cost:5,icon:'🌾',era:'MEDIEVAL',req:[]},
-{id:'MINING',name:'Mining',cost:5,icon:'⛏️',era:'MEDIEVAL',req:[]},
-{id:'ARCHERY',name:'Archery',cost:7,icon:'🏹',era:'MEDIEVAL',req:['FARMING']},
-{id:'RIDING',name:'Riding',cost:8,icon:'🐴',era:'MEDIEVAL',req:['FARMING']},
-{id:'SMITHING',name:'Smithing',cost:8,icon:'🔨',era:'MEDIEVAL',req:['MINING']},
-{id:'SIEGE',name:'Siege Craft',cost:9,icon:'💥',era:'MEDIEVAL',req:['MINING']},
-{id:'GUNPOWDER',name:'Gunpowder',cost:12,icon:'🔫',era:'INDUSTRIAL',req:['SMITHING']},
-{id:'STEAM',name:'Steam Power',cost:12,icon:'⚙️',era:'INDUSTRIAL',req:['MINING']},
-{id:'STEEL',name:'Steel',cost:14,icon:'🔩',era:'INDUSTRIAL',req:['SMITHING','STEAM']},
-{id:'MEDICINE',name:'Medicine',cost:10,icon:'💊',era:'INDUSTRIAL',req:['FARMING']},
-{id:'ELECTRICITY',name:'Electricity',cost:16,icon:'⚡',era:'INDUSTRIAL',req:['STEEL']},
-{id:'NUCLEAR',name:'Nuclear',cost:20,icon:'☢️',era:'ATOMIC',req:['ELECTRICITY','STEEL']},
-{id:'RADAR',name:'Radar',cost:16,icon:'📡',era:'ATOMIC',req:['ELECTRICITY']},
-{id:'AVIATION',name:'Aviation',cost:18,icon:'✈️',era:'ATOMIC',req:['STEAM','ELECTRICITY']},
-{id:'COMPUTING',name:'Computing',cost:18,icon:'💻',era:'ATOMIC',req:['ELECTRICITY','RADAR']},
-{id:'ROCKETRY',name:'Rocketry',cost:22,icon:'🔥',era:'ATOMIC',req:['NUCLEAR','AVIATION']},
-{id:'ORBIT',name:'Orbital Mechanics',cost:28,icon:'🛸',era:'SPACE',req:['ROCKETRY','COMPUTING']},
-{id:'LIFE_SUPPORT',name:'Life Support',cost:26,icon:'🧬',era:'SPACE',req:['MEDICINE','COMPUTING']},
-{id:'AI_WEAPONS',name:'AI Weapons',cost:28,icon:'🤖',era:'SPACE',req:['COMPUTING','ROCKETRY']},
-{id:'LASERS',name:'Laser Tech',cost:24,icon:'🔴',era:'SPACE',req:['NUCLEAR','COMPUTING']},
-{id:'MOONBASE',name:'Moon Base',cost:30,icon:'🌕',era:'SPACE',req:['ORBIT','LIFE_SUPPORT']},
-{id:'COLONY_SHIP',name:'Colony Ship',cost:35,icon:'🚀',era:'SPACE',req:['MOONBASE','LIFE_SUPPORT']},
-{id:'MARS_BASE',name:'Mars Base',cost:40,icon:'🔴',era:'INTERSTELLAR',req:['COLONY_SHIP']},
-{id:'WARP',name:'Warp Drive',cost:50,icon:'🌀',era:'INTERSTELLAR',req:['MARS_BASE','LASERS']},
-{id:'DARK_ENERGY',name:'Dark Energy',cost:45,icon:'🌑',era:'INTERSTELLAR',req:['MARS_BASE','AI_WEAPONS']},
-{id:'EXODUS',name:'Exodus Drive',cost:60,icon:'✨',era:'INTERSTELLAR',req:['WARP','DARK_ENERGY']},
+{id:'FARMING',name:'Farming',cost:5,icon:'🌾',era:'MEDIEVAL',req:[],turns:1},
+{id:'MINING',name:'Mining',cost:5,icon:'⛏️',era:'MEDIEVAL',req:[],turns:1},
+{id:'ARCHERY',name:'Archery',cost:7,icon:'🏹',era:'MEDIEVAL',req:['FARMING'],turns:1},
+{id:'RIDING',name:'Riding',cost:8,icon:'🐴',era:'MEDIEVAL',req:['FARMING'],turns:1},
+{id:'SMITHING',name:'Smithing',cost:8,icon:'🔨',era:'MEDIEVAL',req:['MINING'],turns:1},
+{id:'SIEGE',name:'Siege Craft',cost:9,icon:'💥',era:'MEDIEVAL',req:['MINING'],turns:2},
+{id:'GUNPOWDER',name:'Gunpowder',cost:12,icon:'🔫',era:'INDUSTRIAL',req:['SMITHING'],turns:2},
+{id:'STEAM',name:'Steam Power',cost:12,icon:'⚙️',era:'INDUSTRIAL',req:['MINING'],turns:2},
+{id:'STEEL',name:'Steel',cost:14,icon:'🔩',era:'INDUSTRIAL',req:['SMITHING','STEAM'],turns:3},
+{id:'MEDICINE',name:'Medicine',cost:10,icon:'💊',era:'INDUSTRIAL',req:['FARMING'],turns:2},
+{id:'ELECTRICITY',name:'Electricity',cost:16,icon:'⚡',era:'INDUSTRIAL',req:['STEEL'],turns:3},
+{id:'NUCLEAR',name:'Nuclear',cost:20,icon:'☢️',era:'ATOMIC',req:['ELECTRICITY','STEEL'],turns:4},
+{id:'RADAR',name:'Radar',cost:16,icon:'📡',era:'ATOMIC',req:['ELECTRICITY'],turns:3},
+{id:'AVIATION',name:'Aviation',cost:18,icon:'✈️',era:'ATOMIC',req:['STEAM','ELECTRICITY'],turns:3},
+{id:'COMPUTING',name:'Computing',cost:18,icon:'💻',era:'ATOMIC',req:['ELECTRICITY','RADAR'],turns:4},
+{id:'ROCKETRY',name:'Rocketry',cost:22,icon:'🔥',era:'ATOMIC',req:['NUCLEAR','AVIATION'],turns:4},
+{id:'ORBIT',name:'Orbital Mechanics',cost:28,icon:'🛸',era:'SPACE',req:['ROCKETRY','COMPUTING'],turns:5},
+{id:'LIFE_SUPPORT',name:'Life Support',cost:26,icon:'🧬',era:'SPACE',req:['MEDICINE','COMPUTING'],turns:4},
+{id:'AI_WEAPONS',name:'AI Weapons',cost:28,icon:'🤖',era:'SPACE',req:['COMPUTING','ROCKETRY'],turns:5},
+{id:'LASERS',name:'Laser Tech',cost:24,icon:'🔴',era:'SPACE',req:['NUCLEAR','COMPUTING'],turns:4},
+{id:'MOONBASE',name:'Moon Base',cost:30,icon:'🌕',era:'SPACE',req:['ORBIT','LIFE_SUPPORT'],turns:5},
+{id:'COLONY_SHIP',name:'Colony Ship',cost:35,icon:'🚀',era:'SPACE',req:['MOONBASE','LIFE_SUPPORT'],turns:5},
+{id:'MARS_BASE',name:'Mars Base',cost:40,icon:'🔴',era:'INTERSTELLAR',req:['COLONY_SHIP'],turns:6},
+{id:'WARP',name:'Warp Drive',cost:50,icon:'🌀',era:'INTERSTELLAR',req:['MARS_BASE','LASERS'],turns:3},
+{id:'DARK_ENERGY',name:'Dark Energy',cost:45,icon:'🌑',era:'INTERSTELLAR',req:['MARS_BASE','AI_WEAPONS'],turns:6},
+{id:'EXODUS',name:'Exodus Drive',cost:60,icon:'✨',era:'INTERSTELLAR',req:['WARP','DARK_ENERGY'],turns:6},
 ];
 const WONDERS={
 GREAT_LIBRARY:{id:'GREAT_LIBRARY',icon:'🗼',name:'Great Library',   cost:40,req:'COMPUTING',   era:'ATOMIC',      desc:'All tech costs reduced by 3💎 permanently.',         effect:'tech_discount'},
@@ -1561,6 +1579,21 @@ function processCrisisTick(){
     G._solarStorm--;
     G.noTechTurn=true;
     if(G._solarStorm===0){G.noTechTurn=false;notify('🌞 Solar storm has passed. Tech research resumed.','gold');}
+  }
+  // ── Research progress tick ──────────────────────────────────────────
+  if(G._researching){
+    if(G.noTechTurn){
+      notify('☀️ Solar storm delays research on '+G._researching.name+'!','warn');
+    } else {
+      G._researching.turnsLeft--;
+      if(G._researching.turnsLeft<=0){
+        const _rid=G._researching.id;
+        G._researching=null;
+        _completeResearch(_rid);
+      } else {
+        notify('⚗️ Researching '+G._researching.icon+' '+G._researching.name+' — '+G._researching.turnsLeft+' turn(s) left.');
+      }
+    }
   }
 }
 
@@ -1938,313 +1971,265 @@ c.strokeStyle=lit;c.fillStyle=col;c.lineWidth=s*0.12;c.lineCap='round';c.lineJoi
 const q=(n)=>n*s;
 switch(type){
 case'WARRIOR':{
-// Shield (left)
-c.fillStyle=col+'dd';c.beginPath();c.moveTo(cx-q(0.55),cy-q(0.65));c.lineTo(cx-q(0.1),cy-q(0.65));c.lineTo(cx-q(0.1),cy+q(0.1));c.quadraticCurveTo(cx-q(0.1),cy+q(0.7),cx-q(0.32),cy+q(0.82));c.quadraticCurveTo(cx-q(0.55),cy+q(0.7),cx-q(0.55),cy+q(0.1));c.closePath();c.fill();
-c.strokeStyle=lit+'bb';c.lineWidth=s*0.1;c.stroke();
-c.strokeStyle=lit+'55';c.lineWidth=s*0.06;c.beginPath();c.moveTo(cx-q(0.32),cy-q(0.65));c.lineTo(cx-q(0.32),cy+q(0.6));c.moveTo(cx-q(0.55),cy-q(0.1));c.lineTo(cx-q(0.1),cy-q(0.1));c.stroke();
-// Sword (right) — vertical, prominent
-c.strokeStyle=lit;c.lineWidth=s*0.16;c.lineCap='butt';c.beginPath();c.moveTo(cx+q(0.28),cy-q(0.85));c.lineTo(cx+q(0.28),cy+q(0.55));c.stroke();c.lineCap='round';
-c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx+q(0.28),cy-q(0.85));c.lineTo(cx+q(0.42),cy-q(0.55));c.lineTo(cx+q(0.14),cy-q(0.55));c.closePath();c.fill();
-c.strokeStyle=col+'cc';c.lineWidth=s*0.2;c.lineCap='butt';c.beginPath();c.moveTo(cx+q(0.05),cy+q(0.22));c.lineTo(cx+q(0.5),cy+q(0.22));c.stroke();c.lineCap='round';
+// Civ-style medieval soldier: helmet + sword raised
+// Helmet
+c.fillStyle=lit+'dd';c.beginPath();c.arc(cx,cy-q(0.52),q(0.32),0,Math.PI*2);c.fill();
+c.fillStyle=col+'cc';c.beginPath();c.arc(cx,cy-q(0.48),q(0.28),Math.PI,0);c.fill();// visor
+c.fillStyle=lit+'aa';c.beginPath();c.rect(cx-q(0.08),cy-q(0.52),q(0.16),q(0.18));c.fill();// nose guard
+// Body/torso — chunky armor
+c.fillStyle=col+'ee';c.beginPath();c.moveTo(cx-q(0.38),cy-q(0.18));c.lineTo(cx+q(0.32),cy-q(0.18));c.lineTo(cx+q(0.28),cy+q(0.42));c.lineTo(cx-q(0.34),cy+q(0.42));c.closePath();c.fill();
+c.strokeStyle=lit+'88';c.lineWidth=s*0.07;c.stroke();
+// Shield — left side, kite shape
+c.fillStyle=col+'ff';c.beginPath();c.moveTo(cx-q(0.52),cy-q(0.15));c.lineTo(cx-q(0.22),cy-q(0.15));c.lineTo(cx-q(0.22),cy+q(0.38));c.lineTo(cx-q(0.38),cy+q(0.62));c.lineTo(cx-q(0.52),cy+q(0.38));c.closePath();c.fill();
+c.strokeStyle=lit;c.lineWidth=s*0.1;c.stroke();
+c.strokeStyle=lit+'66';c.lineWidth=s*0.06;c.beginPath();c.moveTo(cx-q(0.37),cy-q(0.15));c.lineTo(cx-q(0.37),cy+q(0.5));c.moveTo(cx-q(0.52),cy+q(0.12));c.lineTo(cx-q(0.22),cy+q(0.12));c.stroke();
+// Sword — right side, raised diagonally
+c.strokeStyle=lit;c.lineWidth=s*0.14;c.lineCap='butt';
+c.beginPath();c.moveTo(cx+q(0.22),cy+q(0.42));c.lineTo(cx+q(0.62),cy-q(0.72));c.stroke();
+c.lineCap='round';
+c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx+q(0.62),cy-q(0.72));c.lineTo(cx+q(0.74),cy-q(0.55));c.lineTo(cx+q(0.5),cy-q(0.85));c.closePath();c.fill();
+c.strokeStyle=col+'cc';c.lineWidth=s*0.18;c.lineCap='butt';c.beginPath();c.moveTo(cx+q(0.08),cy+q(0.05));c.lineTo(cx+q(0.44),cy+q(0.05));c.stroke();c.lineCap='round';
 break;}
 case'ARCHER':{
-// Big curved bow
-c.strokeStyle=lit;c.lineWidth=s*0.16;
-c.beginPath();c.arc(cx-q(0.15),cy,q(0.8),Math.PI*0.2,Math.PI*1.8);c.stroke();
-// Bowstring
-const bx1=cx-q(0.15)+q(0.8)*Math.cos(Math.PI*0.2),by1=cy+q(0.8)*Math.sin(Math.PI*0.2);
-const bx2=cx-q(0.15)+q(0.8)*Math.cos(Math.PI*1.8),by2=cy+q(0.8)*Math.sin(Math.PI*1.8);
-c.strokeStyle=lit+'88';c.lineWidth=s*0.07;c.beginPath();c.moveTo(bx1,by1);c.lineTo(bx2,by2);c.stroke();
-// Arrow — bold horizontal
-c.strokeStyle=lit+'ee';c.lineWidth=s*0.13;c.beginPath();c.moveTo(cx-q(0.1),cy);c.lineTo(cx+q(0.85),cy);c.stroke();
-// Arrowhead
-c.fillStyle=lit;c.beginPath();c.moveTo(cx+q(0.85),cy);c.lineTo(cx+q(0.52),cy-q(0.26));c.lineTo(cx+q(0.52),cy+q(0.26));c.closePath();c.fill();
-// Fletching
-c.strokeStyle=col+'bb';c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx-q(0.1),cy);c.lineTo(cx-q(0.35),cy-q(0.2));c.moveTo(cx-q(0.1),cy);c.lineTo(cx-q(0.35),cy+q(0.2));c.stroke();
+// Archer: crouching figure, bow drawn
+c.fillStyle=lit+'cc';c.beginPath();c.arc(cx,cy-q(0.55),q(0.25),0,Math.PI*2);c.fill();// head with hood
+c.fillStyle=col+'44';c.beginPath();c.arc(cx,cy-q(0.55),q(0.32),Math.PI*1.1,Math.PI*1.9);c.fill();// hood
+c.fillStyle=col+'ee';c.beginPath();c.moveTo(cx-q(0.28),cy-q(0.28));c.lineTo(cx+q(0.22),cy-q(0.28));c.lineTo(cx+q(0.18),cy+q(0.45));c.lineTo(cx-q(0.24),cy+q(0.45));c.closePath();c.fill();
+// Big recurve bow — left
+c.strokeStyle=lit;c.lineWidth=s*0.14;
+c.beginPath();c.moveTo(cx-q(0.58),cy-q(0.62));c.quadraticCurveTo(cx-q(0.92),cy,cx-q(0.58),cy+q(0.62));c.stroke();
+c.strokeStyle=lit+'66';c.lineWidth=s*0.06;c.beginPath();c.moveTo(cx-q(0.58),cy-q(0.62));c.lineTo(cx-q(0.58),cy+q(0.62));c.stroke();// string
+// Arrow nocked and aimed right
+c.strokeStyle=lit+'ee';c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx-q(0.55),cy);c.lineTo(cx+q(0.82),cy-q(0.12));c.stroke();
+c.fillStyle=lit;c.beginPath();c.moveTo(cx+q(0.82),cy-q(0.12));c.lineTo(cx+q(0.58),cy-q(0.32));c.lineTo(cx+q(0.58),cy+q(0.08));c.closePath();c.fill();
 break;}
 case'KNIGHT':{
+// Mounted knight: horse + armored rider
 // Horse body
-c.fillStyle=col+'dd';c.beginPath();c.ellipse(cx-q(0.08),cy+q(0.32),q(0.6),q(0.32),0.15,0,Math.PI*2);c.fill();
-// Horse neck+head
-c.fillStyle=col+'ee';c.beginPath();c.moveTo(cx+q(0.1),cy+q(0.1));c.lineTo(cx+q(0.28),cy-q(0.55));c.lineTo(cx+q(0.6),cy-q(0.45));c.lineTo(cx+q(0.58),cy-q(0.08));c.closePath();c.fill();
-// Horse head circle
-c.fillStyle=col+'ee';c.beginPath();c.arc(cx+q(0.48),cy-q(0.62),q(0.24),0,Math.PI*2);c.fill();
-c.strokeStyle=lit+'88';c.lineWidth=s*0.08;c.stroke();
-// Mane
-c.strokeStyle=lit+'cc';c.lineWidth=s*0.12;c.beginPath();c.moveTo(cx+q(0.28),cy-q(0.55));c.lineTo(cx+q(0.12),cy-q(0.72));c.moveTo(cx+q(0.3),cy-q(0.4));c.lineTo(cx+q(0.1),cy-q(0.52));c.stroke();
-// Eye
-c.fillStyle=lit;c.beginPath();c.arc(cx+q(0.56),cy-q(0.68),q(0.07),0,Math.PI*2);c.fill();
+c.fillStyle='rgba(120,80,40,0.85)';c.beginPath();c.ellipse(cx+q(0.05),cy+q(0.28),q(0.58),q(0.28),Math.PI/16,0,Math.PI*2);c.fill();
+// Horse head/neck
+c.fillStyle='rgba(120,80,40,0.9)';c.beginPath();c.moveTo(cx+q(0.42),cy);c.lineTo(cx+q(0.78),cy-q(0.35));c.lineTo(cx+q(0.85),cy-q(0.12));c.lineTo(cx+q(0.52),cy+q(0.12));c.closePath();c.fill();
+c.fillStyle='rgba(80,50,20,0.7)';c.beginPath();c.ellipse(cx+q(0.82),cy-q(0.28),q(0.1),q(0.18),Math.PI/5,0,Math.PI*2);c.fill();// horse head
+// Legs
+c.strokeStyle='rgba(100,65,30,0.9)';c.lineWidth=s*0.14;
+[[-0.42,0.58],[-0.18,0.62],[0.18,0.58],[0.42,0.55]].forEach(([lx,ly])=>{c.beginPath();c.moveTo(cx+q(lx),cy+q(0.38));c.lineTo(cx+q(lx+0.02),cy+q(ly));c.stroke();});
+// Rider — armored
+c.fillStyle=col+'ee';c.beginPath();c.ellipse(cx-q(0.05),cy-q(0.32),q(0.28),q(0.32),0,0,Math.PI*2);c.fill();// torso
+c.fillStyle=lit+'cc';c.beginPath();c.arc(cx-q(0.05),cy-q(0.68),q(0.24),0,Math.PI*2);c.fill();// helm
+c.fillStyle=col+'44';c.beginPath();c.arc(cx-q(0.05),cy-q(0.65),q(0.28),Math.PI*1.05,Math.PI*1.95);c.fill();// visor
 // Lance diagonal
-c.strokeStyle=lit;c.lineWidth=s*0.13;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.72),cy+q(0.12));c.lineTo(cx+q(0.25),cy-q(0.85));c.stroke();c.lineCap='round';
-c.fillStyle=lit;c.beginPath();c.moveTo(cx+q(0.25),cy-q(0.85));c.lineTo(cx+q(0.08),cy-q(0.65));c.lineTo(cx+q(0.38),cy-q(0.68));c.closePath();c.fill();
+c.strokeStyle=lit+'cc';c.lineWidth=s*0.1;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.28),cy-q(0.12));c.lineTo(cx+q(1.05),cy-q(0.78));c.stroke();c.lineCap='round';
 break;}
 case'CATAPULT':{
-c.fillStyle=col+'cc';c.beginPath();c.rect(cx-q(0.7),cy+q(0.3),q(1.4),q(0.4));c.fill();
-[cx-q(0.5),cx+q(0.5)].forEach(wx=>{c.beginPath();c.arc(wx,cy+q(0.7),q(0.2),0,Math.PI*2);c.fillStyle='#7a5020';c.fill();c.strokeStyle=lit+'88';c.lineWidth=s*0.08;c.stroke();});
-c.strokeStyle=lit;c.lineWidth=s*0.18;c.beginPath();c.moveTo(cx-q(0.1),cy+q(0.28));c.lineTo(cx+q(0.2),cy-q(0.75));c.stroke();
-c.fillStyle=col+'cc';c.beginPath();c.arc(cx+q(0.28),cy-q(0.78),q(0.22),0,Math.PI*2);c.fill();
-c.fillStyle=lit;c.beginPath();c.arc(cx+q(0.28),cy-q(0.78),q(0.12),0,Math.PI*2);c.fill();
+// Medieval siege weapon: wooden frame + arm
+// Wheels
+c.fillStyle='rgba(120,80,30,0.9)';
+[[-0.38,0.5],[0.38,0.5]].forEach(([wx,wy])=>{c.beginPath();c.arc(cx+q(wx),cy+q(wy),q(0.22),0,Math.PI*2);c.fill();c.strokeStyle=lit+'66';c.lineWidth=s*0.06;c.stroke();c.strokeStyle=lit+'44';c.lineWidth=s*0.04;[[1,0],[0.7,0.7],[0,1],[-0.7,0.7]].forEach(([dx,dy])=>{c.beginPath();c.moveTo(cx+q(wx),cy+q(wy));c.lineTo(cx+q(wx+dx*0.18),cy+q(wy+dy*0.18));c.stroke();});});
+// Frame base
+c.fillStyle='rgba(140,90,35,0.95)';c.fillRect(cx-q(0.52),cy+q(0.12),q(1.04),q(0.2));
+// Throwing arm — diagonal left-up
+c.strokeStyle='rgba(160,100,40,1)';c.lineWidth=s*0.18;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.12),cy+q(0.18));c.lineTo(cx-q(0.68),cy-q(0.62));c.stroke();c.lineCap='round';
+// Sling/cup at arm tip
+c.fillStyle='rgba(80,50,20,0.9)';c.beginPath();c.arc(cx-q(0.72),cy-q(0.68),q(0.16),0,Math.PI*2);c.fill();
+// Boulder in sling
+c.fillStyle='rgba(160,160,160,0.9)';c.beginPath();c.arc(cx-q(0.72),cy-q(0.72),q(0.12),0,Math.PI*2);c.fill();
 break;}
 case'RIFLEMAN':{
-// Body
-c.fillStyle=col+'cc';rRect(c,cx-q(0.22),cy-q(0.1),q(0.44),q(0.65),q(0.08));c.fill();
-// Head with helmet
-c.fillStyle=lit+'cc';c.beginPath();c.arc(cx,cy-q(0.38),q(0.24),0,Math.PI*2);c.fill();
-c.fillStyle=col+'ee';c.beginPath();c.ellipse(cx,cy-q(0.52),q(0.32),q(0.13),0,0,Math.PI*2);c.fill();
-c.fillStyle=col+'aa';c.beginPath();c.ellipse(cx+q(0.04),cy-q(0.55),q(0.38),q(0.1),0.15,0,Math.PI*2);c.fill();
-// Rifle — prominent diagonal
-c.strokeStyle=lit;c.lineWidth=s*0.18;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.6),cy+q(0.05));c.lineTo(cx+q(0.55),cy-q(0.28));c.stroke();c.lineCap='round';
-// Barrel extension
-c.strokeStyle=lit+'cc';c.lineWidth=s*0.1;c.lineCap='butt';c.beginPath();c.moveTo(cx+q(0.55),cy-q(0.28));c.lineTo(cx+q(0.88),cy-q(0.42));c.stroke();c.lineCap='round';
-// Stock
-c.fillStyle=col+'bb';rRect(c,cx-q(0.62),cy,q(0.22),q(0.12),q(0.04));c.fill();
+// WW1/WW2 era soldier: helmet + rifle
+c.fillStyle=col+'dd';c.beginPath();c.ellipse(cx-q(0.05),cy-q(0.55),q(0.32),q(0.22),0,0,Math.PI*2);c.fill();// flat helmet
+c.fillStyle=col+'bb';c.beginPath();c.ellipse(cx-q(0.05),cy-q(0.5),q(0.36),q(0.1),0,0,Math.PI);c.fill();// helmet brim
+c.fillStyle=col+'ff';c.beginPath();c.moveTo(cx-q(0.3),cy-q(0.3));c.lineTo(cx+q(0.28),cy-q(0.3));c.lineTo(cx+q(0.24),cy+q(0.48));c.lineTo(cx-q(0.26),cy+q(0.48));c.closePath();c.fill();// body
+// Rifle — diagonal, prominent
+c.strokeStyle=lit+'ee';c.lineWidth=s*0.12;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.25),cy+q(0.15));c.lineTo(cx+q(0.88),cy-q(0.52));c.stroke();c.lineCap='round';
+c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx+q(0.88),cy-q(0.52));c.lineTo(cx+q(0.78),cy-q(0.68));c.lineTo(cx+q(0.98),cy-q(0.62));c.closePath();c.fill();// bayonet
+c.strokeStyle=lit+'66';c.lineWidth=s*0.2;c.lineCap='butt';c.beginPath();c.moveTo(cx+q(0.45),cy-q(0.15));c.lineTo(cx+q(0.62),cy-q(0.25));c.stroke();c.lineCap='round';// bolt
 break;}
 case'ARTILLERY':{
-// Carriage body — bolder
-c.fillStyle=col+'cc';rRect(c,cx-q(0.68),cy+q(0.02),q(1.12),q(0.38),q(0.06));c.fill();
-c.strokeStyle=lit+'55';c.lineWidth=s*0.07;rRect(c,cx-q(0.68),cy+q(0.02),q(1.12),q(0.38),q(0.06));c.stroke();
-// Two big spoked wheels
-[cx-q(0.52),cx+q(0.48)].forEach(wx=>{
-c.fillStyle='#6b4420';c.beginPath();c.arc(wx,cy+q(0.48),q(0.32),0,Math.PI*2);c.fill();
-c.strokeStyle=lit+'cc';c.lineWidth=s*0.12;c.stroke();
-// Spokes
-for(let sp=0;sp<6;sp++){const a2=sp*Math.PI/3;c.beginPath();c.moveTo(wx,cy+q(0.48));c.lineTo(wx+Math.cos(a2)*q(0.28),cy+q(0.48)+Math.sin(a2)*q(0.28));c.stroke();}
-c.fillStyle='#3a1a08';c.beginPath();c.arc(wx,cy+q(0.48),q(0.09),0,Math.PI*2);c.fill();
-});
-// Barrel — very bold, angled up-right
-c.strokeStyle=lit;c.lineWidth=s*0.32;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.3),cy+q(0.08));c.lineTo(cx+q(0.78),cy-q(0.52));c.stroke();c.lineCap='round';
-// Barrel highlight
-c.strokeStyle=lit+'44';c.lineWidth=s*0.14;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.22),cy+q(0.04));c.lineTo(cx+q(0.72),cy-q(0.48));c.stroke();c.lineCap='round';
+// Big cannon on wheels
+[[-0.5,0.55],[0.5,0.55]].forEach(([wx,wy])=>{c.fillStyle='rgba(60,60,60,0.9)';c.beginPath();c.arc(cx+q(wx),cy+q(wy),q(0.25),0,Math.PI*2);c.fill();c.strokeStyle=lit+'55';c.lineWidth=s*0.07;c.stroke();});
+c.fillStyle='rgba(80,80,80,0.95)';c.fillRect(cx-q(0.58),cy+q(0.18),q(1.16),q(0.18));// carriage
+// Cannon barrel — large, angled up-right
+c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx-q(0.32),cy-q(0.12));c.lineTo(cx-q(0.18),cy-q(0.32));c.lineTo(cx+q(0.78),cy-q(0.02));c.lineTo(cx+q(0.72),cy+q(0.18));c.closePath();c.fill();
+c.strokeStyle=lit+'88';c.lineWidth=s*0.06;c.stroke();
 // Muzzle
-c.fillStyle=lit+'88';c.beginPath();c.arc(cx+q(0.78),cy-q(0.52),q(0.16),0,Math.PI*2);c.fill();
+c.fillStyle=lit+'ee';c.beginPath();c.ellipse(cx+q(0.78),cy+q(0.08),q(0.14),q(0.2),Math.PI/12,0,Math.PI*2);c.fill();
+// Flash
+c.fillStyle='rgba(255,200,50,0.6)';c.beginPath();c.arc(cx+q(0.84),cy+q(0.06),q(0.12),0,Math.PI*2);c.fill();
 break;}
 case'ENGINEER':{
-const gr=q(0.42);c.strokeStyle=lit+'cc';c.lineWidth=s*0.22;c.beginPath();c.arc(cx-q(0.12),cy+q(0.1),gr,0,Math.PI*2);c.stroke();
-c.fillStyle=col+'cc';c.beginPath();c.arc(cx-q(0.12),cy+q(0.1),gr*0.55,0,Math.PI*2);c.fill();
-for(let i=0;i<8;i++){const a=i*Math.PI/4;c.fillStyle=lit+'cc';c.beginPath();c.rect(cx-q(0.12)+Math.cos(a)*gr-q(0.07),cy+q(0.1)+Math.sin(a)*gr-q(0.07),q(0.14),q(0.14));c.fill();}
-c.strokeStyle=lit;c.lineWidth=s*0.12;c.beginPath();c.moveTo(cx+q(0.25),cy-q(0.6));c.lineTo(cx+q(0.55),cy+q(0.3));c.stroke();
-break;}
-case'ICBM':{
-c.fillStyle=lit+'ee';c.beginPath();c.moveTo(cx,cy-q(0.9));c.lineTo(cx+q(0.18),cy+q(0.5));c.lineTo(cx-q(0.18),cy+q(0.5));c.closePath();c.fill();
-c.fillStyle='rgba(255,80,80,0.9)';c.beginPath();c.moveTo(cx,cy-q(0.9));c.lineTo(cx+q(0.12),cy-q(0.6));c.lineTo(cx-q(0.12),cy-q(0.6));c.closePath();c.fill();
-c.strokeStyle=lit+'66';c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx+q(0.18),cy+q(0.5));c.lineTo(cx+q(0.5),cy+q(0.85));c.moveTo(cx-q(0.18),cy+q(0.5));c.lineTo(cx-q(0.5),cy+q(0.85));c.stroke();
-const _fg=c.createRadialGradient(cx,cy+q(0.65),0,cx,cy+q(0.65),q(0.4));_fg.addColorStop(0,'rgba(255,220,80,0.9)');_fg.addColorStop(1,'rgba(255,40,0,0)');
-c.fillStyle=_fg;c.beginPath();c.ellipse(cx,cy+q(0.72),q(0.22),q(0.35),0,0,Math.PI*2);c.fill();
+// Construction worker: helmet + tool
+c.fillStyle='rgba(255,180,0,0.9)';c.beginPath();c.ellipse(cx,cy-q(0.52),q(0.3),q(0.2),0,0,Math.PI*2);c.fill();c.beginPath();c.ellipse(cx,cy-q(0.47),q(0.36),q(0.09),0,0,Math.PI);c.fill();
+c.fillStyle=col+'ee';c.beginPath();c.moveTo(cx-q(0.28),cy-q(0.28));c.lineTo(cx+q(0.28),cy-q(0.28));c.lineTo(cx+q(0.24),cy+q(0.44));c.lineTo(cx-q(0.24),cy+q(0.44));c.closePath();c.fill();
+// Wrench
+c.strokeStyle=lit+'cc';c.lineWidth=s*0.16;c.lineCap='round';c.beginPath();c.moveTo(cx+q(0.1),cy+q(0.25));c.lineTo(cx+q(0.68),cy-q(0.52));c.stroke();
+c.strokeStyle=lit+'88';c.lineWidth=s*0.22;c.lineCap='round';c.beginPath();c.moveTo(cx+q(0.6),cy-q(0.44));c.lineTo(cx+q(0.78),cy-q(0.28));c.stroke();
 break;}
 case'SETTLER':{
-// Tent body
-c.fillStyle=col+'dd';c.beginPath();c.moveTo(cx,cy-q(0.75));c.lineTo(cx+q(0.85),cy+q(0.45));c.lineTo(cx-q(0.85),cy+q(0.45));c.closePath();c.fill();
-c.strokeStyle=lit+'cc';c.lineWidth=s*0.1;c.stroke();
-// Tent door arch
-c.fillStyle='rgba(0,0,0,0.45)';c.beginPath();c.arc(cx,cy+q(0.45),q(0.26),Math.PI,0);c.lineTo(cx+q(0.26),cy+q(0.45));c.lineTo(cx-q(0.26),cy+q(0.45));c.closePath();c.fill();
-// Flag on top
-c.strokeStyle=lit;c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx,cy-q(0.75));c.lineTo(cx,cy-q(1.1));c.stroke();
-c.fillStyle=lit+'ee';c.beginPath();c.moveTo(cx,cy-q(1.1));c.lineTo(cx+q(0.35),cy-q(0.95));c.lineTo(cx,cy-q(0.8));c.closePath();c.fill();
+// Pioneer: wide hat + backpack + walking stick
+c.fillStyle=col+'bb';c.beginPath();c.arc(cx,cy-q(0.52),q(0.22),0,Math.PI*2);c.fill();// head
+c.fillStyle=col+'ee';c.beginPath();c.ellipse(cx,cy-q(0.62),q(0.38),q(0.1),0,0,Math.PI*2);c.fill();// wide brim hat
+c.fillStyle=col+'dd';c.beginPath();c.moveTo(cx-q(0.26),cy-q(0.28));c.lineTo(cx+q(0.22),cy-q(0.28));c.lineTo(cx+q(0.18),cy+q(0.42));c.lineTo(cx-q(0.22),cy+q(0.42));c.closePath();c.fill();// body
+// Backpack
+c.fillStyle=col+'aa';c.beginPath();c.roundRect(cx+q(0.2),cy-q(0.22),q(0.28),q(0.52),q(0.06));c.fill();c.strokeStyle=lit+'66';c.lineWidth=s*0.06;c.stroke();
+// Walking stick
+c.strokeStyle=lit+'cc';c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx-q(0.24),cy+q(0.18));c.lineTo(cx-q(0.42),cy+q(0.78));c.stroke();
 break;}
 case'TANK':{
-// Hull — boxy and solid
-const tg=c.createLinearGradient(cx,cy-q(0.05),cx,cy+q(0.45));
-tg.addColorStop(0,lit+'cc');tg.addColorStop(1,col+'99');
-c.fillStyle=tg;rRect(c,cx-q(0.72),cy-q(0.05),q(1.44),q(0.5),q(0.1));c.fill();
-// Tracks
-c.fillStyle='rgba(0,0,0,0.55)';rRect(c,cx-q(0.76),cy+q(0.32),q(1.52),q(0.3),q(0.12));c.fill();
-c.strokeStyle=lit+'33';c.lineWidth=s*0.06;rRect(c,cx-q(0.76),cy+q(0.32),q(1.52),q(0.3),q(0.12));c.stroke();
-// Track links
-for(let ti=-3;ti<=3;ti++){c.fillStyle=lit+'22';rRect(c,cx+ti*q(0.22)-q(0.08),cy+q(0.34),q(0.14),q(0.26),q(0.02));c.fill();}
-// Turret — prominent dome
-c.fillStyle=lit+'cc';c.beginPath();c.ellipse(cx-q(0.08),cy-q(0.08),q(0.35),q(0.28),0,0,Math.PI*2);c.fill();
-c.strokeStyle=col+'88';c.lineWidth=s*0.08;c.stroke();
-// Barrel — very wide and obvious
-c.strokeStyle=lit;c.lineWidth=s*0.22;c.lineCap='butt';c.beginPath();c.moveTo(cx+q(0.08),cy-q(0.1));c.lineTo(cx+q(0.9),cy-q(0.1));c.stroke();c.lineCap='round';
-// Muzzle brake
-c.fillStyle=lit+'88';c.beginPath();c.arc(cx+q(0.9),cy-q(0.1),q(0.12),0,Math.PI*2);c.fill();
+// WWII-style tank: hull + turret + long barrel
+// Tracks/hull base
+c.fillStyle=col+'dd';c.beginPath();c.roundRect(cx-q(0.72),cy+q(0.08),q(1.44),q(0.48),q(0.08));c.fill();
+c.fillStyle=col+'bb';c.beginPath();c.roundRect(cx-q(0.78),cy+q(0.15),q(1.56),q(0.38),q(0.04));c.fill();// track detail
+// Hull top
+c.fillStyle=col+'ee';c.beginPath();c.moveTo(cx-q(0.58),cy-q(0.08));c.lineTo(cx+q(0.52),cy-q(0.08));c.lineTo(cx+q(0.42),cy+q(0.18));c.lineTo(cx-q(0.48),cy+q(0.18));c.closePath();c.fill();
+// Turret — rounded box
+c.fillStyle=col+'ff';c.beginPath();c.roundRect(cx-q(0.32),cy-q(0.42),q(0.52),q(0.35),q(0.1));c.fill();
+c.strokeStyle=lit+'88';c.lineWidth=s*0.06;c.stroke();
+// Long barrel — prominent horizontal
+c.fillStyle=lit+'cc';c.beginPath();c.rect(cx+q(0.18),cy-q(0.3),q(0.82),q(0.12));c.fill();
+c.fillStyle=lit+'aa';c.beginPath();c.ellipse(cx+q(0.98),cy-q(0.24),q(0.06),q(0.12),0,0,Math.PI*2);c.fill();// muzzle
+// Track wheels
+c.fillStyle='rgba(0,0,0,0.5)';
+[-0.55,-0.28,0,0.28,0.55].forEach(wx=>{c.beginPath();c.arc(cx+q(wx),cy+q(0.38),q(0.12),0,Math.PI*2);c.fill();});
+// Vision slit
+c.fillStyle='rgba(0,0,0,0.7)';c.beginPath();c.rect(cx-q(0.28),cy-q(0.32),q(0.44),q(0.07));c.fill();
 break;}
 case'JET':{
-// Fuselage — sharper pointed nose
-c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx+q(0.92),cy);c.lineTo(cx+q(0.3),cy-q(0.18));c.lineTo(cx-q(0.75),cy-q(0.12));c.lineTo(cx-q(0.75),cy+q(0.12));c.lineTo(cx+q(0.3),cy+q(0.18));c.closePath();c.fill();
-// Main delta wings
-c.fillStyle=col+'ee';c.beginPath();c.moveTo(cx+q(0.12),cy-q(0.12));c.lineTo(cx-q(0.55),cy-q(0.88));c.lineTo(cx-q(0.68),cy-q(0.12));c.closePath();c.fill();
-c.beginPath();c.moveTo(cx+q(0.12),cy+q(0.12));c.lineTo(cx-q(0.55),cy+q(0.88));c.lineTo(cx-q(0.68),cy+q(0.12));c.closePath();c.fill();
-// Tail fins — smaller
-c.fillStyle=col+'cc';c.beginPath();c.moveTo(cx-q(0.55),cy-q(0.12));c.lineTo(cx-q(0.82),cy-q(0.48));c.lineTo(cx-q(0.82),cy-q(0.12));c.closePath();c.fill();
-c.beginPath();c.moveTo(cx-q(0.55),cy+q(0.12));c.lineTo(cx-q(0.82),cy+q(0.48));c.lineTo(cx-q(0.82),cy+q(0.12));c.closePath();c.fill();
-// Cockpit bubble
-c.fillStyle='rgba(80,200,255,0.7)';c.beginPath();c.ellipse(cx+q(0.52),cy,q(0.2),q(0.12),0,0,Math.PI*2);c.fill();
+// Fighter jet: delta wing top-down view
+const jang=Math.PI/8;
+// Main body — fuselage
+c.fillStyle=col+'ee';c.beginPath();c.moveTo(cx,cy-q(0.92));c.lineTo(cx+q(0.12),cy+q(0.42));c.lineTo(cx-q(0.12),cy+q(0.42));c.closePath();c.fill();
+// Delta wings sweep back
+c.fillStyle=col+'cc';c.beginPath();c.moveTo(cx,cy-q(0.18));c.lineTo(cx+q(0.88),cy+q(0.62));c.lineTo(cx+q(0.14),cy+q(0.42));c.closePath();c.fill();
+c.beginPath();c.moveTo(cx,cy-q(0.18));c.lineTo(cx-q(0.88),cy+q(0.62));c.lineTo(cx-q(0.14),cy+q(0.42));c.closePath();c.fill();
+// Canopy
+c.fillStyle='rgba(120,200,255,0.7)';c.beginPath();c.ellipse(cx,cy-q(0.38),q(0.1),q(0.22),0,0,Math.PI*2);c.fill();
+// Tail fins
+c.fillStyle=col+'bb';c.beginPath();c.moveTo(cx,cy+q(0.28));c.lineTo(cx+q(0.28),cy+q(0.58));c.lineTo(cx+q(0.04),cy+q(0.44));c.closePath();c.fill();
+c.beginPath();c.moveTo(cx,cy+q(0.28));c.lineTo(cx-q(0.28),cy+q(0.58));c.lineTo(cx-q(0.04),cy+q(0.44));c.closePath();c.fill();
 // Engine glow
-const eg3=c.createRadialGradient(cx-q(0.75),cy,0,cx-q(0.75),cy,q(0.3));
-eg3.addColorStop(0,'rgba(255,160,40,0.9)');eg3.addColorStop(1,'rgba(255,40,0,0)');
-c.fillStyle=eg3;c.beginPath();c.arc(cx-q(0.75),cy,q(0.25),0,Math.PI*2);c.fill();
+const eg=c.createRadialGradient(cx,cy+q(0.52),0,cx,cy+q(0.52),q(0.24));
+eg.addColorStop(0,'rgba(255,120,0,0.9)');eg.addColorStop(1,'rgba(255,60,0,0)');
+c.fillStyle=eg;c.beginPath();c.arc(cx,cy+q(0.52),q(0.24),0,Math.PI*2);c.fill();
+break;}
+case'ICBM':{
+// Ballistic missile: sleek rocket
+c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx,cy-q(0.92));c.lineTo(cx+q(0.18),cy-q(0.48));c.lineTo(cx+q(0.18),cy+q(0.48));c.lineTo(cx-q(0.18),cy+q(0.48));c.lineTo(cx-q(0.18),cy-q(0.48));c.closePath();c.fill();
+c.fillStyle='rgba(255,60,0,0.9)';c.beginPath();c.moveTo(cx,cy-q(0.92));c.lineTo(cx+q(0.12),cy-q(0.55));c.lineTo(cx-q(0.12),cy-q(0.55));c.closePath();c.fill();// warhead
+[[-0.32,0.28],[0.32,0.28]].forEach(([fx,fy])=>{c.fillStyle=col+'cc';c.beginPath();c.moveTo(cx+q(fx>0?0.18:-0.18),cy+q(fy-0.1));c.lineTo(cx+q(fx),cy+q(fy+0.28));c.lineTo(cx+q(fx>0?0.18:-0.18),cy+q(fy+0.18));c.closePath();c.fill();});// fins
+const fg=c.createRadialGradient(cx,cy+q(0.62),0,cx,cy+q(0.72),q(0.3));fg.addColorStop(0,'rgba(255,180,0,0.9)');fg.addColorStop(1,'rgba(255,60,0,0)');c.fillStyle=fg;c.beginPath();c.arc(cx,cy+q(0.68),q(0.28),0,Math.PI*2);c.fill();
 break;}
 case'PSYCHIC':{
-c.strokeStyle=lit+'88';c.lineWidth=s*0.1;c.beginPath();c.arc(cx,cy,q(0.8),0,Math.PI*2);c.stroke();
-c.strokeStyle=lit+'bb';c.lineWidth=s*0.1;c.beginPath();c.arc(cx,cy,q(0.52),0,Math.PI*2);c.stroke();
-c.fillStyle='rgba(255,255,255,0.9)';c.beginPath();c.ellipse(cx,cy,q(0.3),q(0.22),0,0,Math.PI*2);c.fill();
-c.fillStyle=lit;c.beginPath();c.arc(cx,cy,q(0.16),0,Math.PI*2);c.fill();
-c.fillStyle='rgba(0,0,0,0.8)';c.beginPath();c.arc(cx,cy,q(0.08),0,Math.PI*2);c.fill();
-c.fillStyle=lit+'44';c.beginPath();c.arc(cx,cy,q(0.32),0,Math.PI*2);c.fill();
+c.fillStyle=lit+'cc';c.beginPath();c.arc(cx,cy-q(0.52),q(0.28),0,Math.PI*2);c.fill();
+const pg=c.createRadialGradient(cx,cy-q(0.52),0,cx,cy-q(0.52),q(0.55));pg.addColorStop(0,'rgba(200,100,255,0.6)');pg.addColorStop(1,'rgba(200,100,255,0)');c.fillStyle=pg;c.beginPath();c.arc(cx,cy-q(0.52),q(0.55),0,Math.PI*2);c.fill();
+c.fillStyle='rgba(180,80,255,0.9)';c.beginPath();c.moveTo(cx-q(0.28),cy-q(0.18));c.lineTo(cx+q(0.28),cy-q(0.18));c.lineTo(cx+q(0.24),cy+q(0.44));c.lineTo(cx-q(0.24),cy+q(0.44));c.closePath();c.fill();
+for(let i=0;i<5;i++){const pa=i*Math.PI*2/5;const pr=q(0.62);c.fillStyle='rgba(220,150,255,0.8)';c.beginPath();c.arc(cx+Math.cos(pa)*pr,cy-q(0.52)+Math.sin(pa)*pr,q(0.07),0,Math.PI*2);c.fill();}
 break;}
 case'ASTRONAUT':{
-// Suit body — bulky and round
-c.fillStyle=col+'cc';c.beginPath();c.ellipse(cx,cy+q(0.3),q(0.42),q(0.48),0,0,Math.PI*2);c.fill();
-c.strokeStyle=lit+'44';c.lineWidth=s*0.07;c.stroke();
-// Helmet dome — big and clear
-c.fillStyle=lit+'dd';c.beginPath();c.arc(cx,cy-q(0.28),q(0.42),0,Math.PI*2);c.fill();
-// Visor — distinctive gold
-c.fillStyle='rgba(255,180,20,0.85)';c.beginPath();c.ellipse(cx,cy-q(0.28),q(0.32),q(0.24),0,0,Math.PI*2);c.fill();
-// Visor reflection
-c.fillStyle='rgba(255,255,255,0.35)';c.beginPath();c.ellipse(cx-q(0.12),cy-q(0.36),q(0.14),q(0.07),-0.5,0,Math.PI*2);c.fill();
-// Chest pack
-c.fillStyle=col+'ee';rRect(c,cx-q(0.22),cy+q(0.04),q(0.44),q(0.28),q(0.07));c.fill();
-c.fillStyle='rgba(64,216,255,0.8)';rRect(c,cx-q(0.12),cy+q(0.1),q(0.1),q(0.1),q(0.03));c.fill();
-// Arms/backpack
-c.fillStyle=col+'bb';rRect(c,cx-q(0.52),cy+q(0.0),q(0.16),q(0.36),q(0.06));c.fill();
-rRect(c,cx+q(0.36),cy+q(0.0),q(0.16),q(0.36),q(0.06));c.fill();
+c.fillStyle='rgba(240,240,255,0.95)';c.beginPath();c.arc(cx,cy-q(0.52),q(0.28),0,Math.PI*2);c.fill();// helmet
+c.fillStyle='rgba(160,200,255,0.6)';c.beginPath();c.ellipse(cx+q(0.06),cy-q(0.52),q(0.18),q(0.14),Math.PI/6,0,Math.PI*2);c.fill();// visor
+c.fillStyle='rgba(240,240,255,0.9)';c.beginPath();c.moveTo(cx-q(0.3),cy-q(0.22));c.lineTo(cx+q(0.3),cy-q(0.22));c.lineTo(cx+q(0.26),cy+q(0.44));c.lineTo(cx-q(0.26),cy+q(0.44));c.closePath();c.fill();
+c.fillStyle='rgba(200,220,255,0.7)';c.beginPath();c.rect(cx-q(0.08),cy-q(0.04),q(0.16),q(0.28));c.fill();// suit panel
 break;}
 case'LASER_TRP':{
-// Armoured body
-c.fillStyle=col+'cc';rRect(c,cx-q(0.32),cy-q(0.05),q(0.64),q(0.68),q(0.1));c.fill();
-// Shoulder cannon housing
-c.fillStyle=lit+'bb';c.beginPath();c.arc(cx-q(0.08),cy-q(0.12),q(0.36),0,Math.PI*2);c.fill();
-c.strokeStyle=lit+'55';c.lineWidth=s*0.08;c.stroke();
-// Big laser barrel — bold horizontal
-c.strokeStyle='#ff3333';c.lineWidth=s*0.2;c.lineCap='butt';c.beginPath();c.moveTo(cx-q(0.08),cy-q(0.12));c.lineTo(cx+q(0.92),cy-q(0.12));c.stroke();c.lineCap='round';
-// Laser glow at muzzle
-const lg3=c.createRadialGradient(cx+q(0.92),cy-q(0.12),0,cx+q(0.92),cy-q(0.12),q(0.22));
-lg3.addColorStop(0,'rgba(255,80,80,0.95)');lg3.addColorStop(0.5,'rgba(255,80,80,0.4)');lg3.addColorStop(1,'rgba(255,80,80,0)');
-c.fillStyle=lg3;c.beginPath();c.arc(cx+q(0.92),cy-q(0.12),q(0.22),0,Math.PI*2);c.fill();
-// Targeting eye — glowing red
-c.fillStyle='rgba(255,50,50,0.9)';c.beginPath();c.arc(cx+q(0.16),cy-q(0.12),q(0.12),0,Math.PI*2);c.fill();
-c.strokeStyle='rgba(255,200,200,0.8)';c.lineWidth=s*0.07;c.stroke();
-// Head/visor
-c.fillStyle=lit+'cc';c.beginPath();c.arc(cx-q(0.08),cy-q(0.58),q(0.26),0,Math.PI*2);c.fill();
-c.fillStyle='rgba(255,60,60,0.6)';c.beginPath();c.ellipse(cx-q(0.06),cy-q(0.58),q(0.18),q(0.12),0,0,Math.PI*2);c.fill();
+// Laser turret — tripod + emitter dish
+[[-q(0.42),q(0.62)],[0,q(0.68)],[q(0.42),q(0.62)]].forEach(([lx,ly])=>{c.strokeStyle=col+'cc';c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+lx,cy+ly);c.stroke();});// tripod legs
+c.fillStyle=col+'ee';c.beginPath();c.arc(cx,cy,q(0.28),0,Math.PI*2);c.fill();// base
+c.fillStyle=lit+'cc';c.beginPath();c.arc(cx,cy-q(0.18),q(0.22),0,Math.PI*2);c.fill();// emitter
+const lg=c.createLinearGradient(cx,cy-q(0.18),cx,cy-q(0.92));lg.addColorStop(0,'rgba(255,60,60,0.95)');lg.addColorStop(1,'rgba(255,60,60,0)');c.fillStyle=lg;c.beginPath();c.moveTo(cx-q(0.06),cy-q(0.18));c.lineTo(cx+q(0.06),cy-q(0.18));c.lineTo(cx+q(0.02),cy-q(0.92));c.lineTo(cx-q(0.02),cy-q(0.92));c.closePath();c.fill();// laser beam
 break;}
 case'AI_ROBOT':{
-// Torso — solid and mechanical
-const rg=c.createLinearGradient(cx,cy-q(0.15),cx,cy+q(0.45));
-rg.addColorStop(0,lit+'cc');rg.addColorStop(1,col+'aa');
-c.fillStyle=rg;rRect(c,cx-q(0.42),cy-q(0.15),q(0.84),q(0.62),q(0.1));c.fill();
-c.strokeStyle=lit+'55';c.lineWidth=s*0.07;rRect(c,cx-q(0.42),cy-q(0.15),q(0.84),q(0.62),q(0.1));c.stroke();
-// Head — square and robotic
-const rg2=c.createLinearGradient(cx,cy-q(0.72),cx,cy-q(0.15));
-rg2.addColorStop(0,lit+'dd');rg2.addColorStop(1,col+'bb');
-c.fillStyle=rg2;rRect(c,cx-q(0.3),cy-q(0.75),q(0.6),q(0.56),q(0.08));c.fill();
-c.strokeStyle=lit+'66';c.lineWidth=s*0.08;rRect(c,cx-q(0.3),cy-q(0.75),q(0.6),q(0.56),q(0.08));c.stroke();
-// Glowing eyes — cyan
-[[cx-q(0.14),cy-q(0.52)],[cx+q(0.14),cy-q(0.52)]].forEach(([ex,ey])=>{
-const eg4=c.createRadialGradient(ex,ey,0,ex,ey,q(0.14));
-eg4.addColorStop(0,'rgba(64,216,255,1)');eg4.addColorStop(1,'rgba(64,216,255,0)');
-c.fillStyle=eg4;c.beginPath();c.arc(ex,ey,q(0.14),0,Math.PI*2);c.fill();
-c.fillStyle='rgba(255,255,255,0.9)';c.beginPath();c.arc(ex,ey,q(0.07),0,Math.PI*2);c.fill();
-});
-// Antenna
-c.strokeStyle=lit+'cc';c.lineWidth=s*0.09;c.beginPath();c.moveTo(cx,cy-q(0.75));c.lineTo(cx,cy-q(1.05));c.stroke();
-const ag2=c.createRadialGradient(cx,cy-q(1.05),0,cx,cy-q(1.05),q(0.12));
-ag2.addColorStop(0,'rgba(64,216,255,0.9)');ag2.addColorStop(1,'rgba(64,216,255,0)');
-c.fillStyle=ag2;c.beginPath();c.arc(cx,cy-q(1.05),q(0.12),0,Math.PI*2);c.fill();
-// Chest core
-c.fillStyle='rgba(64,216,255,0.4)';rRect(c,cx-q(0.14),cy+q(0.0),q(0.28),q(0.2),q(0.05));c.fill();
+c.fillStyle=col+'dd';c.beginPath();c.roundRect(cx-q(0.28),cy-q(0.72),q(0.56),q(0.4),q(0.06));c.fill();// head
+c.fillStyle='rgba(0,220,255,0.9)';c.beginPath();c.arc(cx-q(0.1),cy-q(0.54),q(0.08),0,Math.PI*2);c.fill();c.beginPath();c.arc(cx+q(0.1),cy-q(0.54),q(0.08),0,Math.PI*2);c.fill();// eyes
+c.fillStyle=col+'ee';c.beginPath();c.roundRect(cx-q(0.32),cy-q(0.28),q(0.64),q(0.62),q(0.04));c.fill();// torso
+c.strokeStyle='rgba(0,220,255,0.5)';c.lineWidth=s*0.06;c.beginPath();c.rect(cx-q(0.18),cy-q(0.18),q(0.36),q(0.25));c.stroke();// chest panel
+[[-0.32,0.02],[0.32,0.02]].forEach(([ax,ay])=>{c.fillStyle=col+'cc';c.beginPath();c.roundRect(cx+q(ax>0?0.32:-0.52),cy+q(ay),q(0.2),q(0.42),q(0.04));c.fill();});// arms
 break;}
 case'COLONY_VEH':{
-const sg=c.createRadialGradient(cx,cy-q(0.1),0,cx,cy,q(0.8));
-sg.addColorStop(0,lit+'cc');sg.addColorStop(0.5,col+'cc');sg.addColorStop(1,col+'44');
-c.fillStyle=sg;c.beginPath();c.ellipse(cx,cy+q(0.1),q(0.75),q(0.28),0,0,Math.PI*2);c.fill();
-c.fillStyle=lit+'bb';c.beginPath();c.ellipse(cx,cy-q(0.08),q(0.38),q(0.32),0,Math.PI,0);c.closePath();c.fill();
-c.fillStyle='rgba(100,220,255,0.35)';c.beginPath();c.ellipse(cx,cy-q(0.08),q(0.38),q(0.32),0,Math.PI,0);c.closePath();c.fill();
-for(let i=0;i<5;i++){const a=i*Math.PI*2/5;c.fillStyle=i%2===0?'rgba(255,200,50,0.9)':'rgba(255,100,100,0.9)';c.beginPath();c.arc(cx+Math.cos(a)*q(0.6),cy+q(0.1)+Math.sin(a)*q(0.15),q(0.08),0,Math.PI*2);c.fill();}
+// Space colony ship — flat saucer
+const cg=c.createRadialGradient(cx,cy,0,cx,cy,q(0.82));cg.addColorStop(0,lit+'cc');cg.addColorStop(0.5,col+'ee');cg.addColorStop(1,col+'44');
+c.fillStyle=cg;c.beginPath();c.ellipse(cx,cy,q(0.82),q(0.38),0,0,Math.PI*2);c.fill();
+c.strokeStyle=lit+'88';c.lineWidth=s*0.08;c.stroke();
+c.fillStyle=lit+'cc';c.beginPath();c.ellipse(cx,cy-q(0.15),q(0.32),q(0.28),0,0,Math.PI*2);c.fill();// dome
+c.fillStyle='rgba(120,200,255,0.6)';c.beginPath();c.ellipse(cx,cy-q(0.18),q(0.2),q(0.18),0,0,Math.PI*2);c.fill();// dome glass
+for(let i=0;i<6;i++){const ia=i*Math.PI/3;c.fillStyle='rgba(255,200,100,0.8)';c.beginPath();c.arc(cx+Math.cos(ia)*q(0.62),cy+Math.sin(ia)*q(0.28),q(0.06),0,Math.PI*2);c.fill();}
 break;}
 case'EXODUS_SHIP':{
-const eg=c.createLinearGradient(cx-q(0.85),cy,cx+q(0.85),cy);
-eg.addColorStop(0,col+'aa');eg.addColorStop(0.4,lit+'ee');eg.addColorStop(1,col+'88');
-c.fillStyle=eg;c.beginPath();c.moveTo(cx-q(0.85),cy);c.lineTo(cx-q(0.6),cy-q(0.22));c.lineTo(cx+q(0.6),cy-q(0.22));c.lineTo(cx+q(0.85),cy);c.lineTo(cx+q(0.6),cy+q(0.22));c.lineTo(cx-q(0.6),cy+q(0.22));c.closePath();c.fill();
-[cy-q(0.38),cy+q(0.38)].forEach(ey=>{
-c.fillStyle=col+'cc';c.beginPath();c.ellipse(cx-q(0.5),ey,q(0.28),q(0.12),0,0,Math.PI*2);c.fill();
-const eg2=c.createRadialGradient(cx-q(0.7),ey,0,cx-q(0.7),ey,q(0.22));
-eg2.addColorStop(0,'rgba(100,200,255,0.9)');eg2.addColorStop(1,'rgba(0,100,255,0)');
-c.fillStyle=eg2;c.beginPath();c.arc(cx-q(0.7),ey,q(0.22),0,Math.PI*2);c.fill();
-});
-c.fillStyle=lit+'dd';c.beginPath();c.ellipse(cx+q(0.35),cy,q(0.22),q(0.18),0,0,Math.PI*2);c.fill();
-c.fillStyle='rgba(100,180,255,0.12)';c.beginPath();c.arc(cx,cy,q(1.0),0,Math.PI*2);c.fill();
+const eg2=c.createRadialGradient(cx,cy,0,cx,cy,q(1.0));eg2.addColorStop(0,lit+'88');eg2.addColorStop(0.5,col+'cc');eg2.addColorStop(1,'rgba(0,0,0,0)');
+c.fillStyle=eg2;c.beginPath();c.arc(cx,cy,q(1.0),0,Math.PI*2);c.fill();
+c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx,cy-q(0.88));c.lineTo(cx+q(0.62),cy+q(0.22));c.lineTo(cx-q(0.62),cy+q(0.22));c.closePath();c.fill();// hull
+c.fillStyle='rgba(100,200,255,0.7)';c.beginPath();c.ellipse(cx,cy-q(0.22),q(0.2),q(0.32),0,0,Math.PI*2);c.fill();// cockpit
 break;}
 case'LEVIATHAN':{
-const lg2=c.createRadialGradient(cx-q(0.2),cy-q(0.2),0,cx,cy,q(0.9));
-lg2.addColorStop(0,lit+'cc');lg2.addColorStop(0.5,col+'cc');lg2.addColorStop(1,col+'55');
-c.fillStyle=lg2;c.beginPath();c.ellipse(cx,cy,q(0.72),q(0.48),0,0,Math.PI*2);c.fill();
-[[-0.7,0.5,-0.9,0.85],[-0.5,0.65,-0.55,1.0],[0.55,0.6,0.7,0.95],[0.75,0.45,0.95,0.8]].forEach(([x1,y1,x2,y2])=>{
-c.strokeStyle=col+'cc';c.lineWidth=s*0.15;c.beginPath();c.moveTo(cx+q(x1*0.7),cy+q(y1*0.6));c.quadraticCurveTo(cx+q(x1),cy+q(y1),cx+q(x2),cy+q(y2));c.stroke();
-});
-c.fillStyle='rgba(255,255,255,0.9)';c.beginPath();c.arc(cx+q(0.28),cy-q(0.12),q(0.16),0,Math.PI*2);c.fill();
-c.fillStyle=lit;c.beginPath();c.arc(cx+q(0.3),cy-q(0.1),q(0.09),0,Math.PI*2);c.fill();
-[[0,-0.85],[-.35,-0.75],[.35,-0.75]].forEach(([ox,oy])=>{
-c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx+q(ox-0.07),cy+q(0));c.lineTo(cx+q(ox),cy+q(oy));c.lineTo(cx+q(ox+0.07),cy+q(0));c.closePath();c.fill();
-});
+c.fillStyle=col+'cc';c.beginPath();c.ellipse(cx,cy,q(0.78),q(0.52),0,0,Math.PI*2);c.fill();
+[[-0.7,0.4,-0.9,0.8],[-0.5,0.6,-0.55,1.0],[0.55,0.55,0.7,0.92],[0.75,0.4,0.95,0.75]].forEach(([x1,y1,x2,y2])=>{c.strokeStyle=col+'cc';c.lineWidth=s*0.14;c.beginPath();c.moveTo(cx+q(x1*0.7),cy+q(y1*0.6));c.quadraticCurveTo(cx+q(x1),cy+q(y1),cx+q(x2),cy+q(y2));c.stroke();});
+c.fillStyle='rgba(255,255,255,0.9)';c.beginPath();c.arc(cx+q(0.28),cy-q(0.12),q(0.16),0,Math.PI*2);c.fill();c.fillStyle=lit;c.beginPath();c.arc(cx+q(0.3),cy-q(0.1),q(0.09),0,Math.PI*2);c.fill();
+[[0,-0.85],[-.35,-0.75],[.35,-0.75]].forEach(([ox,oy])=>{c.fillStyle=lit+'cc';c.beginPath();c.moveTo(cx+q(ox-0.07),cy+q(0));c.lineTo(cx+q(ox),cy+q(oy));c.lineTo(cx+q(ox+0.07),cy+q(0));c.closePath();c.fill();});
+break;}
+case'DRONE':{
+// Quad-rotor drone
+for(let i=0;i<4;i++){const da=i*Math.PI/2+Math.PI/4;c.fillStyle=col+'cc';c.beginPath();c.ellipse(cx+Math.cos(da)*q(0.52),cy+Math.sin(da)*q(0.52),q(0.28),q(0.1),da,0,Math.PI*2);c.fill();c.strokeStyle=col+'88';c.lineWidth=s*0.07;c.stroke();c.strokeStyle=col+'66';c.lineWidth=s*0.06;c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+Math.cos(da)*q(0.42),cy+Math.sin(da)*q(0.42));c.stroke();}
+c.fillStyle=lit+'cc';c.beginPath();c.arc(cx,cy,q(0.2),0,Math.PI*2);c.fill();// body
+c.fillStyle='rgba(255,100,0,0.8)';c.beginPath();c.arc(cx,cy,q(0.1),0,Math.PI*2);c.fill();// camera
+break;}
+case'COMMISSAR':{
+c.fillStyle='rgba(180,20,20,0.9)';c.beginPath();c.arc(cx,cy-q(0.52),q(0.26),0,Math.PI*2);c.fill();
+c.fillStyle='rgba(200,30,30,0.9)';c.beginPath();c.moveTo(cx-q(0.25),cy-q(0.22));c.lineTo(cx+q(0.25),cy-q(0.22));c.lineTo(cx+q(0.22),cy+q(0.44));c.lineTo(cx-q(0.22),cy+q(0.44));c.closePath();c.fill();
+c.fillStyle='rgba(255,200,0,0.9)';c.beginPath();c.moveTo(cx+q(0.08),cy-q(0.68));c.lineTo(cx+q(0.22),cy-q(0.48));c.lineTo(cx,cy-q(0.38));c.closePath();c.fill();// star
+c.strokeStyle='rgba(255,150,0,0.8)';c.lineWidth=s*0.14;c.beginPath();c.moveTo(cx-q(0.08),cy+q(0.08));c.lineTo(cx-q(0.58),cy-q(0.42));c.stroke();// sword
+break;}
+case'MINDPROBE':{
+c.fillStyle=lit+'aa';c.beginPath();c.arc(cx,cy,q(0.68),0,Math.PI*2);c.fill();
+c.fillStyle=col+'cc';c.beginPath();c.ellipse(cx,cy,q(0.5),q(0.36),0,0,Math.PI*2);c.fill();
+c.fillStyle='rgba(255,255,255,0.9)';c.beginPath();c.arc(cx,cy,q(0.2),0,Math.PI*2);c.fill();
+c.fillStyle='rgba(0,50,150,0.9)';c.beginPath();c.arc(cx,cy,q(0.14),0,Math.PI*2);c.fill();
+for(let i=0;i<8;i++){const na=i*Math.PI/4;c.strokeStyle=lit+'66';c.lineWidth=s*0.05;c.beginPath();c.moveTo(cx+Math.cos(na)*q(0.2),cy+Math.sin(na)*q(0.2));c.lineTo(cx+Math.cos(na)*q(0.55),cy+Math.sin(na)*q(0.55));c.stroke();}
+break;}
+case'TIDECALLER':{
+c.fillStyle='rgba(0,150,220,0.85)';c.beginPath();c.arc(cx,cy-q(0.48),q(0.3),0,Math.PI*2);c.fill();
+c.fillStyle='rgba(0,180,255,0.9)';c.beginPath();c.moveTo(cx-q(0.3),cy-q(0.15));c.lineTo(cx+q(0.3),cy-q(0.15));c.lineTo(cx+q(0.26),cy+q(0.46));c.lineTo(cx-q(0.26),cy+q(0.46));c.closePath();c.fill();
+for(let wi=0;wi<3;wi++){const wy=cy+q(wi*0.28-0.05);const amp=q(0.32-wi*0.06);c.strokeStyle=`rgba(120,220,255,${0.8-wi*0.2})`;c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx-amp,wy);c.quadraticCurveTo(cx-amp*0.5,wy-q(0.14),cx,wy);c.quadraticCurveTo(cx+amp*0.5,wy+q(0.14),cx+amp,wy);c.stroke();}
+break;}
+case'GALLEY':{
+// Viking longship — side view
+c.fillStyle='rgba(140,80,30,0.9)';c.beginPath();c.moveTo(cx-q(0.88),cy+q(0.22));c.quadraticCurveTo(cx-q(0.78),cy+q(0.48),cx,cy+q(0.52));c.quadraticCurveTo(cx+q(0.78),cy+q(0.48),cx+q(0.9),cy+q(0.18));c.lineTo(cx+q(0.9),cy+q(0.06));c.lineTo(cx-q(0.88),cy+q(0.06));c.closePath();c.fill();
+c.strokeStyle=lit+'44';c.lineWidth=s*0.08;c.stroke();
+c.strokeStyle=lit+'88';c.lineWidth=s*0.12;c.beginPath();c.moveTo(cx-q(0.04),cy-q(0.62));c.lineTo(cx-q(0.04),cy+q(0.18));c.stroke();// mast
+c.fillStyle=col+'cc';c.beginPath();c.moveTo(cx-q(0.04),cy-q(0.62));c.lineTo(cx+q(0.52),cy-q(0.32));c.lineTo(cx+q(0.52),cy+q(0.02));c.lineTo(cx-q(0.04),cy+q(0.02));c.closePath();c.fill();// sail
+break;}
+case'IRONCLAD':{
+c.fillStyle='rgba(80,80,100,0.9)';c.beginPath();c.moveTo(cx-q(0.88),cy+q(0.12));c.lineTo(cx-q(0.72),cy+q(0.48));c.lineTo(cx+q(0.72),cy+q(0.48));c.lineTo(cx+q(0.92),cy+q(0.12));c.closePath();c.fill();// hull
+c.fillStyle='rgba(60,60,80,0.95)';c.beginPath();c.roundRect(cx-q(0.42),cy-q(0.22),q(0.56),q(0.38),q(0.06));c.fill();// armored deck
+c.fillStyle='rgba(120,120,140,0.9)';c.beginPath();c.ellipse(cx,cy-q(0.1),q(0.22),q(0.22),0,0,Math.PI*2);c.fill();// turret
+c.strokeStyle=lit+'cc';c.lineWidth=s*0.12;c.lineCap='butt';c.beginPath();c.moveTo(cx,cy-q(0.1));c.lineTo(cx+q(0.68),cy-q(0.1));c.stroke();c.lineCap='round';
+break;}
+case'DREADNOUGHT':{
+c.fillStyle='rgba(40,50,70,0.95)';c.beginPath();c.moveTo(cx-q(0.95),cy+q(0.15));c.lineTo(cx-q(0.72),cy+q(0.52));c.lineTo(cx+q(0.72),cy+q(0.52));c.lineTo(cx+q(0.98),cy+q(0.08));c.lineTo(cx+q(0.65),cy-q(0.18));c.lineTo(cx-q(0.65),cy-q(0.18));c.closePath();c.fill();// hull
+c.fillStyle='rgba(60,70,95,0.9)';c.beginPath();c.rect(cx-q(0.62),cy-q(0.18),q(1.24),q(0.28));c.fill();// deck
+// Two gun turrets
+[[-0.35,0.0],[0.3,0.0]].forEach(([tx,ty])=>{c.fillStyle='rgba(80,90,115,0.95)';c.beginPath();c.arc(cx+q(tx),cy+q(ty),q(0.2),0,Math.PI*2);c.fill();c.strokeStyle=lit+'88';c.lineWidth=s*0.12;c.lineCap='butt';c.beginPath();c.moveTo(cx+q(tx),cy+q(ty));c.lineTo(cx+q(tx+0.5),cy+q(ty-0.12));c.stroke();c.lineCap='round';});
 break;}
 case'WOLF_PACK':{
-// Fanged skull
-c.strokeStyle=lit;c.lineWidth=s*0.14;
-c.beginPath();c.arc(cx,cy-q(0.1),q(0.72),0,Math.PI*2);c.stroke();
-// Eyes
-c.fillStyle='#ff4444';
-c.beginPath();c.arc(cx-q(0.25),cy-q(0.2),q(0.18),0,Math.PI*2);c.fill();
-c.beginPath();c.arc(cx+q(0.25),cy-q(0.2),q(0.18),0,Math.PI*2);c.fill();
-// Fangs
-c.strokeStyle=lit+'cc';c.lineWidth=s*0.1;
-c.beginPath();c.moveTo(cx-q(0.22),cy+q(0.3));c.lineTo(cx-q(0.22),cy+q(0.65));c.stroke();
-c.beginPath();c.moveTo(cx+q(0.22),cy+q(0.3));c.lineTo(cx+q(0.22),cy+q(0.65));c.stroke();
+c.strokeStyle=lit;c.lineWidth=s*0.14;c.beginPath();c.arc(cx,cy-q(0.1),q(0.72),0,Math.PI*2);c.stroke();
+c.fillStyle='#ff4444';c.beginPath();c.arc(cx-q(0.25),cy-q(0.2),q(0.18),0,Math.PI*2);c.fill();c.beginPath();c.arc(cx+q(0.25),cy-q(0.2),q(0.18),0,Math.PI*2);c.fill();
+c.strokeStyle=lit+'cc';c.lineWidth=s*0.1;c.beginPath();c.moveTo(cx-q(0.22),cy+q(0.3));c.lineTo(cx-q(0.22),cy+q(0.65));c.stroke();c.beginPath();c.moveTo(cx+q(0.22),cy+q(0.3));c.lineTo(cx+q(0.22),cy+q(0.65));c.stroke();
 break;}
 case'TROLL':{
-// Hunched brute silhouette
-c.fillStyle=col+'cc';
-c.beginPath();c.arc(cx,cy-q(0.35),q(0.45),0,Math.PI*2);c.fill();// head
-c.beginPath();c.arc(cx,cy+q(0.25),q(0.62),0,Math.PI,true);c.lineTo(cx-q(0.62),cy+q(0.25));c.fill();// body
-// Glowing eyes
-c.fillStyle='#ff6600';
-c.beginPath();c.arc(cx-q(0.18),cy-q(0.38),q(0.13),0,Math.PI*2);c.fill();
-c.beginPath();c.arc(cx+q(0.18),cy-q(0.38),q(0.13),0,Math.PI*2);c.fill();
-// Club
-c.strokeStyle=lit;c.lineWidth=s*0.18;
-c.beginPath();c.moveTo(cx+q(0.55),cy+q(0.7));c.lineTo(cx+q(0.25),cy-q(0.3));c.stroke();
-c.beginPath();c.arc(cx+q(0.2),cy-q(0.38),q(0.28),0,Math.PI*2);c.strokeStyle=lit+'88';c.lineWidth=s*0.1;c.stroke();
+c.fillStyle=col+'cc';c.beginPath();c.arc(cx,cy-q(0.35),q(0.45),0,Math.PI*2);c.fill();c.beginPath();c.arc(cx,cy+q(0.25),q(0.62),0,Math.PI,true);c.lineTo(cx-q(0.62),cy+q(0.25));c.fill();
+c.fillStyle='#ff6600';c.beginPath();c.arc(cx-q(0.18),cy-q(0.38),q(0.13),0,Math.PI*2);c.fill();c.beginPath();c.arc(cx+q(0.18),cy-q(0.38),q(0.13),0,Math.PI*2);c.fill();
+c.strokeStyle=lit;c.lineWidth=s*0.18;c.beginPath();c.moveTo(cx+q(0.55),cy+q(0.7));c.lineTo(cx+q(0.25),cy-q(0.3));c.stroke();c.beginPath();c.arc(cx+q(0.2),cy-q(0.38),q(0.28),0,Math.PI*2);c.strokeStyle=lit+'88';c.lineWidth=s*0.1;c.stroke();
 break;}
 case'DRAGON':{
-// Dragon head with wings hint
-c.fillStyle=col+'cc';
-// Body
-c.beginPath();c.ellipse(cx,cy,q(0.5),q(0.7),0,0,Math.PI*2);c.fill();
-// Wing left
-c.strokeStyle=lit+'88';c.lineWidth=s*0.08;
-c.beginPath();c.moveTo(cx-q(0.5),cy-q(0.1));c.lineTo(cx-q(1.0),cy-q(0.7));c.lineTo(cx-q(0.5),cy+q(0.3));c.stroke();
-// Wing right
-c.beginPath();c.moveTo(cx+q(0.5),cy-q(0.1));c.lineTo(cx+q(1.0),cy-q(0.7));c.lineTo(cx+q(0.5),cy+q(0.3));c.stroke();
-// Eyes glow
-c.fillStyle='#ff2200';
-c.beginPath();c.arc(cx-q(0.2),cy-q(0.15),q(0.16),0,Math.PI*2);c.fill();
-c.beginPath();c.arc(cx+q(0.2),cy-q(0.15),q(0.16),0,Math.PI*2);c.fill();
-// Fire breath
-const fg=c.createLinearGradient(cx,cy+q(0.7),cx+q(0.4),cy+q(1.1));
-fg.addColorStop(0,'rgba(255,100,0,0.9)');fg.addColorStop(1,'rgba(255,200,0,0)');
-c.fillStyle=fg;c.beginPath();c.moveTo(cx-q(0.15),cy+q(0.65));c.lineTo(cx+q(0.5),cy+q(1.0));c.lineTo(cx+q(0.15),cy+q(0.65));c.closePath();c.fill();
+c.fillStyle=col+'cc';c.beginPath();c.ellipse(cx,cy,q(0.5),q(0.7),0,0,Math.PI*2);c.fill();
+c.strokeStyle=lit+'88';c.lineWidth=s*0.08;c.beginPath();c.moveTo(cx-q(0.5),cy-q(0.1));c.lineTo(cx-q(1.0),cy-q(0.7));c.lineTo(cx-q(0.5),cy+q(0.3));c.stroke();c.beginPath();c.moveTo(cx+q(0.5),cy-q(0.1));c.lineTo(cx+q(1.0),cy-q(0.7));c.lineTo(cx+q(0.5),cy+q(0.3));c.stroke();
+c.fillStyle='#ff2200';c.beginPath();c.arc(cx-q(0.2),cy-q(0.15),q(0.16),0,Math.PI*2);c.fill();c.beginPath();c.arc(cx+q(0.2),cy-q(0.15),q(0.16),0,Math.PI*2);c.fill();
+const fg=c.createLinearGradient(cx,cy+q(0.7),cx+q(0.4),cy+q(1.1));fg.addColorStop(0,'rgba(255,100,0,0.9)');fg.addColorStop(1,'rgba(255,200,0,0)');c.fillStyle=fg;c.beginPath();c.moveTo(cx-q(0.15),cy+q(0.65));c.lineTo(cx+q(0.5),cy+q(1.0));c.lineTo(cx+q(0.15),cy+q(0.65));c.closePath();c.fill();
 break;}
 case'VOID_BEAST':{
-// Cosmic horror — tentacles + eye
-const vg=c.createRadialGradient(cx,cy,0,cx,cy,q(0.8));
-vg.addColorStop(0,'rgba(180,0,255,0.9)');vg.addColorStop(1,'rgba(60,0,120,0.2)');
-c.fillStyle=vg;c.beginPath();c.arc(cx,cy,q(0.72),0,Math.PI*2);c.fill();
-// Tentacles
-c.strokeStyle='rgba(140,0,200,0.8)';c.lineWidth=s*0.1;
-for(let ti=0;ti<6;ti++){
-  const ta=ti*Math.PI/3;
-  c.beginPath();c.moveTo(cx+Math.cos(ta)*q(0.6),cy+Math.sin(ta)*q(0.6));
-  c.lineTo(cx+Math.cos(ta)*q(1.05),cy+Math.sin(ta)*q(1.05));c.stroke();
-}
-// Central eye
-c.fillStyle='rgba(255,255,255,0.95)';c.beginPath();c.arc(cx,cy,q(0.28),0,Math.PI*2);c.fill();
-c.fillStyle='rgba(0,0,0,0.9)';c.beginPath();c.arc(cx+q(0.06),cy,q(0.16),0,Math.PI*2);c.fill();
-c.fillStyle='rgba(255,0,100,0.8)';c.beginPath();c.arc(cx+q(0.08),cy-q(0.04),q(0.07),0,Math.PI*2);c.fill();
+const vg=c.createRadialGradient(cx,cy,0,cx,cy,q(0.8));vg.addColorStop(0,'rgba(180,0,255,0.9)');vg.addColorStop(1,'rgba(60,0,120,0.2)');c.fillStyle=vg;c.beginPath();c.arc(cx,cy,q(0.72),0,Math.PI*2);c.fill();
+c.strokeStyle='rgba(140,0,200,0.8)';c.lineWidth=s*0.1;for(let ti=0;ti<6;ti++){const ta=ti*Math.PI/3;c.beginPath();c.moveTo(cx+Math.cos(ta)*q(0.6),cy+Math.sin(ta)*q(0.6));c.lineTo(cx+Math.cos(ta)*q(1.05),cy+Math.sin(ta)*q(1.05));c.stroke();}
+c.fillStyle='rgba(255,255,255,0.95)';c.beginPath();c.arc(cx,cy,q(0.28),0,Math.PI*2);c.fill();c.fillStyle='rgba(0,0,0,0.9)';c.beginPath();c.arc(cx+q(0.06),cy,q(0.16),0,Math.PI*2);c.fill();c.fillStyle='rgba(255,0,100,0.8)';c.beginPath();c.arc(cx+q(0.08),cy-q(0.04),q(0.07),0,Math.PI*2);c.fill();
 break;}
-default:{
-c.strokeStyle=lit;c.lineWidth=s*0.2;c.beginPath();c.moveTo(cx-q(0.6),cy);c.lineTo(cx+q(0.6),cy);c.moveTo(cx,cy-q(0.6));c.lineTo(cx,cy+q(0.6));c.stroke();
-}
+default:{c.strokeStyle=lit;c.lineWidth=s*0.2;c.beginPath();c.moveTo(cx-q(0.6),cy);c.lineTo(cx+q(0.6),cy);c.moveTo(cx,cy-q(0.6));c.lineTo(cx,cy+q(0.6));c.stroke();}
 }
 c.restore();
 }
@@ -2334,177 +2319,234 @@ c2.fillStyle=hpG;rRect(c2,sx-hbw/2,hby,hbw*hpPct,5,2.5);c2.fill();
 c2.fillStyle='rgba(255,255,255,0.15)';rRect(c2,sx-hbw/2,hby,hbw*hpPct,2.5,1.5);c2.fill();
 }
 function _drawCityStatic(c2,sx,sy,city,fac,era,lv,r){
-// Outpost: small tent + flag + shield glow
+// ── OUTPOST ─────────────────────────────────────────────────────────────
 if(city.isOutpost){
-c2.fillStyle='rgba(0,0,0,0.25)';c2.beginPath();c2.ellipse(sx+2,sy+r*0.5,r*0.42,r*0.1,0,0,Math.PI*2);c2.fill();
-const og=c2.createRadialGradient(sx,sy+r*0.05,0,sx,sy+r*0.05,r*0.8);
-og.addColorStop(0,fac.cityColor+'40');og.addColorStop(1,'transparent');
-c2.fillStyle=og;c2.beginPath();c2.arc(sx,sy+r*0.05,r*0.8,0,Math.PI*2);c2.fill();
-// Tent
-c2.fillStyle=fac.cityColor+'cc';c2.beginPath();c2.moveTo(sx,sy-r*0.55);c2.lineTo(sx+r*0.62,sy+r*0.35);c2.lineTo(sx-r*0.62,sy+r*0.35);c2.closePath();c2.fill();
-c2.strokeStyle=fac.cityLight+'bb';c2.lineWidth=1.5;c2.stroke();
-c2.fillStyle='rgba(0,0,0,0.4)';c2.beginPath();c2.arc(sx,sy+r*0.35,r*0.18,Math.PI,0);c2.lineTo(sx+r*0.18,sy+r*0.35);c2.lineTo(sx-r*0.18,sy+r*0.35);c2.closePath();c2.fill();
-// Flag pole + flag
-c2.strokeStyle=fac.cityLight;c2.lineWidth=1.5;c2.beginPath();c2.moveTo(sx,sy-r*0.55);c2.lineTo(sx,sy-r*0.95);c2.stroke();
-c2.fillStyle=fac.cityLight+'ee';c2.beginPath();c2.moveTo(sx,sy-r*0.95);c2.lineTo(sx+r*0.28,sy-r*0.82);c2.lineTo(sx,sy-r*0.68);c2.closePath();c2.fill();
-// Defence shield icon
-c2.strokeStyle=fac.cityLight+'66';c2.lineWidth=1;
-c2.beginPath();c2.moveTo(sx-r*0.14,sy-r*0.18);c2.lineTo(sx+r*0.14,sy-r*0.18);c2.lineTo(sx+r*0.14,sy+r*0.05);c2.quadraticCurveTo(sx,sy+r*0.2,sx-r*0.14,sy+r*0.05);c2.closePath();c2.stroke();
-return;
+  // Ground shadow
+  c2.fillStyle='rgba(0,0,0,0.3)';c2.beginPath();c2.ellipse(sx+2,sy+r*0.55,r*0.45,r*0.12,0,0,Math.PI*2);c2.fill();
+  // Road approach lines
+  c2.strokeStyle=fac.cityColor+'55';c2.lineWidth=2;c2.setLineDash([3,4]);
+  c2.beginPath();c2.moveTo(sx-r*0.7,sy+r*0.3);c2.lineTo(sx+r*0.7,sy+r*0.3);c2.stroke();c2.setLineDash([]);
+  // Palisade wall — log fence arc
+  c2.strokeStyle='rgba(140,90,40,0.85)';c2.lineWidth=3.5;
+  for(let pi=0;pi<7;pi++){const pa=-Math.PI*0.7+pi*Math.PI*0.23;const pw=r*0.62;
+    c2.beginPath();c2.moveTo(sx+Math.cos(pa)*pw,sy+Math.sin(pa)*pw*0.5-r*0.05);
+    c2.lineTo(sx+Math.cos(pa)*pw,sy+Math.sin(pa)*pw*0.5-r*0.28);c2.stroke();}
+  // Main watchtower — wooden
+  c2.fillStyle='rgba(160,100,45,0.95)';
+  c2.beginPath();c2.rect(sx-r*0.22,sy-r*0.62,r*0.44,r*0.52);c2.fill();
+  c2.fillStyle='rgba(130,80,30,0.9)';
+  c2.beginPath();c2.rect(sx-r*0.28,sy-r*0.65,r*0.56,r*0.1);c2.fill();// floor overhang
+  // Roof — pointed A-frame
+  c2.fillStyle='rgba(100,60,20,0.95)';c2.beginPath();
+  c2.moveTo(sx,sy-r*0.98);c2.lineTo(sx+r*0.36,sy-r*0.62);c2.lineTo(sx-r*0.36,sy-r*0.62);c2.closePath();c2.fill();
+  // Window slit
+  c2.fillStyle='rgba(0,0,0,0.7)';c2.beginPath();c2.rect(sx-r*0.06,sy-r*0.5,r*0.12,r*0.22);c2.fill();
+  c2.fillStyle='rgba(255,200,80,0.4)';c2.beginPath();c2.rect(sx-r*0.04,sy-r*0.48,r*0.08,r*0.18);c2.fill();// torch glow
+  // Flag
+  c2.strokeStyle=fac.cityLight;c2.lineWidth=1.5;
+  c2.beginPath();c2.moveTo(sx,sy-r*0.98);c2.lineTo(sx,sy-r*1.32);c2.stroke();
+  c2.fillStyle=fac.cityLight+'ee';c2.beginPath();
+  c2.moveTo(sx,sy-r*1.32);c2.lineTo(sx+r*0.28,sy-r*1.2);c2.lineTo(sx,sy-r*1.08);c2.closePath();c2.fill();
+  // Road indicator dot
+  c2.fillStyle=fac.cityColor+'88';c2.beginPath();c2.arc(sx,sy+r*0.42,r*0.1,0,Math.PI*2);c2.fill();
+  return;
 }
-const isFuture=era==='SPACE'||era==='INTERSTELLAR';
-const isGrowing=era==='ATOMIC'||era==='INDUSTRIAL';
-const hbw=r*0.88;
-c2.fillStyle='rgba(0,0,0,0.32)';c2.beginPath();c2.ellipse(sx+3,sy+r*0.52,r*0.52,r*0.14,0,0,Math.PI*2);c2.fill();
-if(isFuture){
-const scale=0.58+lv*0.06;
-const halo=c2.createRadialGradient(sx,sy-r*0.1,0,sx,sy-r*0.05,r*(scale+0.3)*lv*0.45);
-halo.addColorStop(0,fac.cityLight+(lv>2?'30':'18'));halo.addColorStop(1,'transparent');
-c2.fillStyle=halo;c2.beginPath();c2.arc(sx,sy-r*0.05,r*(scale+0.3)*lv*0.45,0,Math.PI*2);c2.fill();
-c2.fillStyle='rgba(0,0,0,0.28)';c2.beginPath();c2.ellipse(sx+2,sy-r*0.03,r*scale*0.85,r*0.12,0,0,Math.PI*2);c2.fill();
-const dg=c2.createRadialGradient(sx-r*scale*0.3,sy-r*0.25,0,sx,sy-r*0.05,r*scale*1.4);
-dg.addColorStop(0,fac.cityLight+'70');dg.addColorStop(0.4,fac.cityColor+'cc');dg.addColorStop(1,fac.cityColor+'28');
-c2.fillStyle=dg;c2.beginPath();c2.arc(sx,sy-r*0.05,r*scale,Math.PI,0);c2.closePath();c2.fill();
-const spec=c2.createRadialGradient(sx-r*scale*0.35,sy-r*0.2,0,sx-r*scale*0.2,sy-r*0.12,r*scale*0.65);
-spec.addColorStop(0,'rgba(255,255,255,0.22)');spec.addColorStop(1,'rgba(255,255,255,0)');
-c2.fillStyle=spec;c2.beginPath();c2.arc(sx,sy-r*0.05,r*scale,Math.PI,0);c2.closePath();c2.fill();
-c2.strokeStyle=fac.cityLight;c2.lineWidth=1.8+lv*0.2;c2.beginPath();c2.arc(sx,sy-r*0.05,r*scale,Math.PI,0);c2.closePath();c2.stroke();
-c2.strokeStyle=fac.cityColor+'70';c2.lineWidth=0.8;
-for(let i=1;i<=lv+1;i++){const xp=sx-r*scale+i*r*scale*2/(lv+2);const yp=sy-r*0.05-Math.sqrt(Math.max(0,r*scale*r*scale-(xp-sx)*(xp-sx)));c2.beginPath();c2.moveTo(sx-r*scale,sy-r*0.05);c2.lineTo(xp,yp);c2.stroke();}
-const platG=c2.createLinearGradient(sx,sy-r*0.1,sx,sy+r*0.12);
-platG.addColorStop(0,fac.cityColor+'cc');platG.addColorStop(1,fac.cityColor+'55');
-c2.fillStyle=platG;rRect(c2,sx-r*(scale+0.04),sy-r*0.05,r*(scale+0.04)*2,r*0.16,3);c2.fill();
-c2.strokeStyle=fac.cityLight+'50';c2.lineWidth=1;rRect(c2,sx-r*(scale+0.04),sy-r*0.05,r*(scale+0.04)*2,r*0.16,3);c2.stroke();
-for(let i=0;i<Math.min(lv,3);i++){
-const ox=(i-Math.floor(lv/2))*r*0.18;
-c2.strokeStyle='#9a8a60';c2.lineWidth=1.5;c2.beginPath();c2.moveTo(sx+ox,sy-r*0.05-r*scale*0.9);c2.lineTo(sx+ox,sy-r*0.05-r*scale*1.3);c2.stroke();
-const ag=c2.createRadialGradient(sx+ox,sy-r*0.05-r*scale*1.3,0,sx+ox,sy-r*0.05-r*scale*1.3,3+i*0.5);
-ag.addColorStop(0,fac.light);ag.addColorStop(1,'transparent');
-c2.fillStyle=ag;c2.beginPath();c2.arc(sx+ox,sy-r*0.05-r*scale*1.3,3.5+i*0.5,0,Math.PI*2);c2.fill();
-}
-} else if(isGrowing){
-const bw=r*(0.7+lv*0.08),bh=r*(0.28+lv*0.06),by=sy+r*0.22;
-const rg=c2.createLinearGradient(sx+bw*0.3,by,sx+bw*0.5,by+bh);
-rg.addColorStop(0,'rgba(0,0,0,0.25)');rg.addColorStop(1,'rgba(0,0,0,0.45)');
-c2.fillStyle=rg;rRect(c2,sx+bw*0.08,by+2,bw*0.45,bh,2);c2.fill();
-const lg=c2.createLinearGradient(sx-bw/2,by,sx+bw/2,by);
-lg.addColorStop(0,fac.cityLight+'cc');lg.addColorStop(0.45,fac.cityColor+'dd');lg.addColorStop(1,fac.cityColor+'88');
-c2.fillStyle=lg;rRect(c2,sx-bw/2,by,bw,bh,3);c2.fill();
-c2.strokeStyle=fac.cityLight+'45';c2.lineWidth=1;rRect(c2,sx-bw/2,by,bw,bh,3);c2.stroke();
-const nChim=Math.min(lv+1,4);
-for(let i=0;i<nChim;i++){
-const cx2=sx-bw*0.38+i*(bw*0.76/(Math.max(nChim-1,1)));
-const ch=r*(0.28+i*0.04+lv*0.02);
-c2.fillStyle='rgba(0,0,0,0.3)';rRect(c2,cx2-r*0.04+2,by-ch+2,r*0.1,ch,2);c2.fill();
-const cg=c2.createLinearGradient(cx2-r*0.07,0,cx2+r*0.07,0);
-cg.addColorStop(0,fac.cityLight+'aa');cg.addColorStop(1,fac.cityColor+'99');
-c2.fillStyle=cg;rRect(c2,cx2-r*0.07,by-ch,r*0.14,ch,2);c2.fill();
-c2.strokeStyle=fac.cityLight+'30';c2.lineWidth=0.8;rRect(c2,cx2-r*0.07,by-ch,r*0.14,ch,2);c2.stroke();
-c2.fillStyle='rgba(200,200,200,0.18)';c2.beginPath();c2.arc(cx2,by-ch-r*0.1,r*0.1,0,Math.PI*2);c2.fill();
-}
-c2.fillStyle=fac.light+'88';
-for(let i=0;i<Math.min(lv*2,6);i++){
-const wx=sx-bw*0.36+i*(bw*0.72/(Math.max(lv*2-1,1)));
-const wg2=c2.createRadialGradient(wx,by+bh*0.35,0,wx,by+bh*0.35,3.5);
-wg2.addColorStop(0,fac.light+'ee');wg2.addColorStop(1,'transparent');
-c2.fillStyle=wg2;c2.fillRect(wx-2,by+bh*0.25,4,4);
-}
-} else {
-// ── MEDIEVAL / RENAISSANCE city — Civ-inspired stone settlement ──────────
-const by=sy+r*0.26;
-const groundW=r*(0.82+lv*0.05);
+
+// ── CITY — era-based evolving Civ V style ────────────────────────────────
+const isMed=era==='MEDIEVAL';
+const isInd=era==='INDUSTRIAL';
+const isAtom=era==='ATOMIC';
+const isSpace=era==='SPACE'||era==='INTERSTELLAR';
+const fc=fac.cityColor,fl=fac.cityLight;
+
 // Ground shadow
-c2.fillStyle='rgba(0,0,0,0.22)';c2.beginPath();c2.ellipse(sx+2,by+r*0.08,groundW*0.82,r*0.1,0,0,Math.PI*2);c2.fill();
-// Stone colour palette (earthy)
-const stoneLight=fac.cityLight,stoneMid=fac.cityColor,stoneDark=fac.cityColor+'88';
-// CURTAIN WALL — spans full width at lv>=2
-if(lv>=2){
-  const wallW=groundW,wallH=r*(0.18+lv*0.02),wallY=by-wallH;
-  c2.fillStyle='rgba(0,0,0,0.2)';rRect(c2,sx-wallW/2+1,wallY+1,wallW,wallH+r*0.06,2);c2.fill();
-  const wg=c2.createLinearGradient(sx-wallW/2,wallY,sx+wallW/2,wallY+wallH);
-  wg.addColorStop(0,stoneMid+'bb');wg.addColorStop(1,stoneDark);
-  c2.fillStyle=wg;rRect(c2,sx-wallW/2,wallY,wallW,wallH+r*0.06,2);c2.fill();
-  // Merlons (battlements)
-  const nM=Math.ceil(wallW/7);
-  for(let mi=0;mi<nM;mi++){
-    const mx2=sx-wallW/2+mi*(wallW/(nM-1))-3;
-    if(mi%2===0){
-      c2.fillStyle='rgba(0,0,0,0.25)';c2.fillRect(mx2+1,wallY-6,7,7);
-      const mg=c2.createLinearGradient(mx2,wallY-6,mx2+7,wallY);
-      mg.addColorStop(0,stoneLight+'cc');mg.addColorStop(1,stoneMid+'99');
-      c2.fillStyle=mg;c2.fillRect(mx2,wallY-6,7,7);
+c2.fillStyle='rgba(0,0,0,0.28)';c2.beginPath();
+c2.ellipse(sx+3,sy+r*0.58,r*(0.55+lv*0.06),r*0.13,0,0,Math.PI*2);c2.fill();
+
+if(isMed){
+  // ── MEDIEVAL: castle walls + towers + keep ─────────────────────────
+  const wallW=r*(0.72+lv*0.1),wallH=r*(0.55+lv*0.06);
+  // City glow
+  const mg=c2.createRadialGradient(sx,sy,0,sx,sy,r*(0.9+lv*0.15));
+  mg.addColorStop(0,fc+'22');mg.addColorStop(1,'transparent');
+  c2.fillStyle=mg;c2.beginPath();c2.arc(sx,sy,r*(0.9+lv*0.15),0,Math.PI*2);c2.fill();
+  // Lower buildings / town behind walls
+  if(lv>=2){
+    for(let bi=0;bi<3+lv;bi++){
+      const bx=sx-r*0.38+bi*r*0.22;const bh=r*(0.25+Math.sin(bi*2.3)*0.1);
+      c2.fillStyle=`rgba(${180+bi*8},${140+bi*6},${90+bi*4},0.75)`;
+      c2.beginPath();c2.rect(bx-r*0.08,sy-bh,r*0.16,bh);c2.fill();
+      if(bi%2===0){c2.fillStyle='rgba(150,80,30,0.85)';c2.beginPath();
+        c2.moveTo(bx-r*0.12,sy-bh);c2.lineTo(bx,sy-bh-r*0.14);c2.lineTo(bx+r*0.12,sy-bh);c2.closePath();c2.fill();}
     }
   }
-  c2.strokeStyle=stoneLight+'30';c2.lineWidth=0.8;rRect(c2,sx-wallW/2,wallY,wallW,wallH+r*0.06,2);c2.stroke();
-}
-// KEEP / CENTRAL TOWER — always present, grows with level
-const keepW=r*(0.30+lv*0.04),keepH=r*(0.48+lv*0.06),keepY=by-keepH;
-c2.fillStyle='rgba(0,0,0,0.25)';rRect(c2,sx-keepW/2+2,keepY+2,keepW,keepH,2);c2.fill();
-const kg=c2.createLinearGradient(sx-keepW/2,keepY,sx+keepW/2,keepY+keepH);
-kg.addColorStop(0,stoneLight+'dd');kg.addColorStop(0.5,stoneMid+'cc');kg.addColorStop(1,stoneDark);
-c2.fillStyle=kg;rRect(c2,sx-keepW/2,keepY,keepW,keepH,2);c2.fill();
-// Keep battlements
-for(let mi=0;mi<4;mi++){
-  const kbx=sx-keepW/2+mi*(keepW/3)-2.5;
-  if(mi%2===0){
-    c2.fillStyle='rgba(0,0,0,0.2)';c2.fillRect(kbx+1,keepY-5.5,7,6);
-    c2.fillStyle=stoneLight+'bb';c2.fillRect(kbx,keepY-6,7,6);
+  // Main curtain wall
+  c2.fillStyle=`rgba(200,185,155,0.95)`;
+  c2.beginPath();c2.rect(sx-wallW,sy-wallH*0.35,wallW*2,wallH*0.35+r*0.18);c2.fill();
+  c2.strokeStyle=`rgba(160,145,115,0.8)`;c2.lineWidth=1.5;c2.stroke();
+  // Battlements (merlons)
+  c2.fillStyle=`rgba(210,195,162,0.98)`;
+  const mCount=Math.floor(wallW/r*5)+2;
+  for(let mi=0;mi<mCount;mi++){
+    const mx=sx-wallW+mi*(wallW*2/mCount)+r*0.04;
+    if(mi%2===0)c2.beginPath(),c2.rect(mx,sy-wallH*0.35-r*0.12,wallW*2/mCount*0.55,r*0.12),c2.fill();
   }
-}
-c2.strokeStyle=stoneLight+'40';c2.lineWidth=1;rRect(c2,sx-keepW/2,keepY,keepW,keepH,2);c2.stroke();
-// FLANKING TOWERS (lv>=2) — round towers each side
-if(lv>=2){
-  const tR=r*(0.13+lv*0.01);
-  [sx-keepW/2-tR*0.7, sx+keepW/2+tR*0.7].forEach((tx,ti)=>{
-    const th=keepH*(0.7+ti*0.08);const ty=by-th;
-    const tg2=c2.createRadialGradient(tx-tR*0.3,ty,0,tx,ty+th*0.5,tR*2.5);
-    tg2.addColorStop(0,stoneLight+'cc');tg2.addColorStop(1,stoneDark);
-    c2.fillStyle='rgba(0,0,0,0.2)';c2.beginPath();c2.rect(tx-tR,ty+1,tR*2,th+1);c2.fill();
-    c2.fillStyle=tg2;c2.beginPath();c2.rect(tx-tR,ty,tR*2,th);c2.fill();
-    // Conical roof
-    c2.fillStyle='rgba(0,0,0,0.2)';c2.beginPath();c2.moveTo(tx+1,ty-tR*1.5+1);c2.lineTo(tx+tR+1,ty+1);c2.lineTo(tx-tR+1,ty+1);c2.closePath();c2.fill();
-    c2.fillStyle=fac.color+'cc';c2.beginPath();c2.moveTo(tx,ty-tR*1.5);c2.lineTo(tx+tR,ty);c2.lineTo(tx-tR,ty);c2.closePath();c2.fill();
-    c2.strokeStyle=stoneLight+'44';c2.lineWidth=0.8;c2.stroke();
+  // Corner towers
+  [[-wallW,0],[wallW,0]].forEach(([tx])=>{
+    c2.fillStyle=`rgba(195,180,148,0.98)`;
+    c2.beginPath();c2.arc(sx+tx,sy-r*0.08,r*(0.22+lv*0.025),0,Math.PI*2);c2.fill();
+    c2.strokeStyle='rgba(150,135,105,0.7)';c2.lineWidth=1.2;c2.stroke();
+    // Tower battlements
+    for(let ti=0;ti<5;ti++){const ta=ti*Math.PI*2/5;const tr2=r*(0.22+lv*0.025);
+      c2.fillStyle='rgba(210,195,162,0.9)';c2.beginPath();
+      c2.rect(sx+tx+Math.cos(ta)*tr2-r*0.05,sy-r*0.08+Math.sin(ta)*tr2-r*0.22-r*0.08,r*0.1,r*0.1);c2.fill();}
   });
+  // Central keep — taller
+  const kh=r*(0.62+lv*0.12);const kw=r*(0.28+lv*0.04);
+  c2.fillStyle=`rgba(185,170,138,0.98)`;
+  c2.beginPath();c2.rect(sx-kw,sy-kh-r*0.08,kw*2,kh);c2.fill();
+  c2.strokeStyle='rgba(140,125,98,0.6)';c2.lineWidth=1;c2.stroke();
+  // Keep windows
+  for(let wi=0;wi<2+lv;wi++){
+    const wy=sy-kh*0.25-wi*kh*0.28;
+    c2.fillStyle='rgba(255,200,80,0.45)';c2.beginPath();c2.arc(sx,wy,r*0.07,0,Math.PI*2);c2.fill();
+  }
+  // Keep battlements
+  c2.fillStyle=`rgba(195,180,148,0.98)`;
+  for(let ki=0;ki<5;ki++){const kx=sx-kw+ki*kw*0.48;c2.beginPath();c2.rect(kx,sy-kh-r*0.08-r*0.12,kw*0.38,r*0.12);c2.fill();}
+  // Flag on keep
+  c2.strokeStyle=fl;c2.lineWidth=2;c2.beginPath();c2.moveTo(sx,sy-kh-r*0.08-r*0.12);c2.lineTo(sx,sy-kh-r*0.42);c2.stroke();
+  c2.fillStyle=fl+'ee';c2.beginPath();c2.moveTo(sx,sy-kh-r*0.42);c2.lineTo(sx+r*0.32,sy-kh-r*0.28);c2.lineTo(sx,sy-kh-r*0.14);c2.closePath();c2.fill();
+  // Gate arch
+  c2.fillStyle='rgba(80,65,40,0.8)';
+  c2.beginPath();c2.rect(sx-r*0.14,sy-wallH*0.35+r*0.01,r*0.28,wallH*0.35+r*0.12);c2.fill();
+  c2.strokeStyle='rgba(60,45,20,0.7)';c2.lineWidth=1;c2.stroke();
+  c2.fillStyle='rgba(50,35,15,0.9)';c2.beginPath();c2.arc(sx,sy-wallH*0.35+r*0.01,r*0.14,Math.PI,0);c2.fill();// arch top
+
+} else if(isInd){
+  // ── INDUSTRIAL: brick factories + smokestacks ─────────────────────
+  const ig=c2.createRadialGradient(sx,sy-r*0.2,0,sx,sy-r*0.2,r*(1.1+lv*0.12));
+  ig.addColorStop(0,fc+'18');ig.addColorStop(0.6,fc+'08');ig.addColorStop(1,'transparent');
+  c2.fillStyle=ig;c2.beginPath();c2.arc(sx,sy-r*0.2,r*(1.1+lv*0.12),0,Math.PI*2);c2.fill();
+  // Background row of buildings
+  const bldgs=[[-0.72,0.52,0.28],[-0.42,0.68,0.24],[-0.08,0.78,0.3],[0.26,0.62,0.22],[0.56,0.48,0.26]];
+  bldgs.forEach(([bx,bh,bw],i)=>{
+    const shade=160+i*8;
+    c2.fillStyle=`rgba(${shade},${shade-20},${shade-35},0.9)`;
+    c2.beginPath();c2.rect(sx+bx*r-bw*r*0.5,sy-bh*r,bw*r,bh*r);c2.fill();
+    // Brick lines
+    c2.strokeStyle='rgba(100,70,50,0.3)';c2.lineWidth=0.8;
+    for(let bli=1;bli<3;bli++){c2.beginPath();c2.moveTo(sx+bx*r-bw*r*0.5,sy-bh*r*bli/3);c2.lineTo(sx+bx*r+bw*r*0.5,sy-bh*r*bli/3);c2.stroke();}
+    // Window rows
+    for(let wri=0;wri<2;wri++)for(let wci=0;wci<2;wci++){
+      c2.fillStyle='rgba(255,220,120,0.4)';c2.beginPath();
+      c2.rect(sx+bx*r-bw*r*0.25+wci*bw*r*0.38,sy-bh*r*0.72+wri*bh*r*0.32,bw*r*0.2,bh*r*0.18);c2.fill();
+    }
+  });
+  // Central factory — main building
+  c2.fillStyle='rgba(140,90,60,0.95)';
+  c2.beginPath();c2.rect(sx-r*0.42,sy-r*0.68,r*0.84,r*0.68);c2.fill();
+  c2.strokeStyle='rgba(100,60,35,0.6)';c2.lineWidth=1.2;c2.stroke();
+  // Factory windows — illuminated
+  for(let fwi=0;fwi<3;fwi++){for(let fwj=0;fwj<2;fwj++){
+    c2.fillStyle='rgba(255,180,60,0.55)';c2.beginPath();
+    c2.rect(sx-r*0.33+fwi*r*0.32,sy-r*0.58+fwj*r*0.25,r*0.2,r*0.18);c2.fill();
+  }}
+  // Smokestacks — 2 or 3 depending on level
+  const stacks=lv>=3?3:2;
+  const stackPositions=stacks===3?[-0.28,0,0.28]:[-0.18,0.18];
+  stackPositions.forEach(spx=>{
+    c2.fillStyle='rgba(100,65,45,0.95)';
+    c2.beginPath();c2.rect(sx+spx*r-r*0.1,sy-r*(1.2+lv*0.08),r*0.2,r*(0.62+lv*0.06));c2.fill();
+    c2.strokeStyle='rgba(80,50,30,0.6)';c2.lineWidth=0.8;c2.stroke();
+    // Smoke puff
+    c2.fillStyle='rgba(180,175,170,0.38)';c2.beginPath();
+    c2.arc(sx+spx*r,sy-r*(1.2+lv*0.08),r*0.18,0,Math.PI*2);c2.fill();
+    c2.fillStyle='rgba(190,185,180,0.28)';c2.beginPath();
+    c2.arc(sx+spx*r+r*0.08,sy-r*(1.38+lv*0.08),r*0.14,0,Math.PI*2);c2.fill();
+  });
+  // Large arched factory gate
+  c2.fillStyle='rgba(60,40,25,0.85)';c2.beginPath();c2.rect(sx-r*0.16,sy-r*0.38,r*0.32,r*0.38);c2.fill();
+  c2.beginPath();c2.arc(sx,sy-r*0.38,r*0.16,Math.PI,0);c2.fill();
+
+} else if(isAtom){
+  // ── ATOMIC/COLD WAR: modern city skyline ─────────────────────────
+  const ag=c2.createRadialGradient(sx,sy-r*0.3,0,sx,sy-r*0.3,r*(1.2+lv*0.1));
+  ag.addColorStop(0,fc+'20');ag.addColorStop(0.7,fc+'08');ag.addColorStop(1,'transparent');
+  c2.fillStyle=ag;c2.beginPath();c2.arc(sx,sy-r*0.3,r*(1.2+lv*0.1),0,Math.PI*2);c2.fill();
+  // Background skyline
+  const skyline=[[-0.85,0.55,0.18],[-0.62,0.72,0.22],[-0.34,0.88,0.26],[-0.04,1.0,0.3],[0.28,0.82,0.24],[0.56,0.65,0.2],[0.78,0.48,0.16]];
+  skyline.forEach(([bx,bh,bw],i)=>{
+    const br=160+i*6,bg=165+i*5,bb=175+i*4;
+    c2.fillStyle=`rgba(${br},${bg},${bb},0.85)`;
+    c2.beginPath();c2.rect(sx+bx*r-bw*r*0.5,sy-bh*r,bw*r,bh*r);c2.fill();
+    // Grid windows
+    const wcols=Math.max(2,Math.floor(bw*8));const wrows=Math.max(3,Math.floor(bh*5));
+    for(let wr=0;wr<wrows;wr++)for(let wc=0;wc<wcols;wc++){
+      const wlit=(wr*wcols+wc+i*7)%3!==0;
+      c2.fillStyle=wlit?`rgba(255,230,160,0.6)`:'rgba(0,0,0,0.2)';
+      c2.beginPath();c2.rect(sx+bx*r-bw*r*0.45+wc*(bw*r*0.9/wcols),sy-bh*r*0.9+wr*(bh*r*0.85/wrows),bw*r*0.9/wcols*0.65,bh*r*0.85/wrows*0.55);c2.fill();
+    }
+  });
+  // Central iconic skyscraper
+  c2.fillStyle=fc+'dd';c2.beginPath();c2.rect(sx-r*0.24,sy-r*(1.05+lv*0.1),r*0.48,r*(1.05+lv*0.1));c2.fill();
+  c2.strokeStyle=fl+'55';c2.lineWidth=1;c2.stroke();
+  // Spire
+  c2.fillStyle=fl+'cc';c2.beginPath();c2.moveTo(sx,sy-r*(1.45+lv*0.12));c2.lineTo(sx+r*0.12,sy-r*(1.05+lv*0.1));c2.lineTo(sx-r*0.12,sy-r*(1.05+lv*0.1));c2.closePath();c2.fill();
+  // Window grid on skyscraper
+  for(let wr=0;wr<5+lv;wr++)for(let wc=0;wc<3;wc++){
+    c2.fillStyle=`rgba(255,235,180,0.55)`;c2.beginPath();
+    c2.rect(sx-r*0.2+wc*r*0.16,sy-r*(1.0+lv*0.1)+wr*r*0.18,r*0.12,r*0.1);c2.fill();
+  }
+  // Antenna blink
+  c2.fillStyle='rgba(255,80,80,0.9)';c2.beginPath();c2.arc(sx,sy-r*(1.45+lv*0.12),r*0.06,0,Math.PI*2);c2.fill();
+
+} else {
+  // ── SPACE/INTERSTELLAR: futuristic megacity with domes ─────────────
+  const scale=0.62+lv*0.06;
+  const sg=c2.createRadialGradient(sx,sy-r*0.15,0,sx,sy-r*0.15,r*(scale+0.5)*lv*0.4+r*0.8);
+  sg.addColorStop(0,fl+'28');sg.addColorStop(0.5,fc+'12');sg.addColorStop(1,'transparent');
+  c2.fillStyle=sg;c2.beginPath();c2.arc(sx,sy-r*0.15,r*(scale+0.5)*lv*0.4+r*0.8,0,Math.PI*2);c2.fill();
+  // Platform base
+  c2.fillStyle=fc+'88';c2.beginPath();
+  c2.ellipse(sx,sy+r*0.12,r*(0.88+lv*0.08),r*0.16,0,0,Math.PI*2);c2.fill();
+  // Grid lines on platform
+  c2.strokeStyle=fl+'33';c2.lineWidth=0.8;
+  for(let gi=-3;gi<=3;gi++){c2.beginPath();c2.moveTo(sx+gi*r*0.22,sy+r*0.02);c2.lineTo(sx+gi*r*0.22,sy+r*0.22);c2.stroke();}
+  // Background spires
+  for(let si2=0;si2<4+lv;si2++){
+    const spx=sx-r*(0.72-si2*0.38);const spy=sy-r*(0.42+si2*0.08);const sph=r*(0.38+si2*0.12);
+    c2.fillStyle=fc+'cc';c2.beginPath();c2.rect(spx-r*0.06,spy-sph,r*0.12,sph);c2.fill();
+    c2.fillStyle=fl+'cc';c2.beginPath();c2.moveTo(spx,spy-sph-r*0.18);c2.lineTo(spx+r*0.08,spy-sph);c2.lineTo(spx-r*0.08,spy-sph);c2.closePath();c2.fill();
+    c2.fillStyle='rgba(255,200,100,0.8)';c2.beginPath();c2.arc(spx,spy-sph-r*0.18,r*0.04,0,Math.PI*2);c2.fill();
+  }
+  // Main dome
+  const dg=c2.createRadialGradient(sx-r*scale*0.3,sy-r*0.28,0,sx,sy-r*0.08,r*scale*1.3);
+  dg.addColorStop(0,fl+'60');dg.addColorStop(0.4,fc+'bb');dg.addColorStop(1,fc+'22');
+  c2.fillStyle=dg;c2.beginPath();c2.arc(sx,sy-r*0.08,r*scale,Math.PI,0);c2.closePath();c2.fill();
+  c2.strokeStyle=fl;c2.lineWidth=1.8+lv*0.2;c2.beginPath();c2.arc(sx,sy-r*0.08,r*scale,Math.PI,0);c2.closePath();c2.stroke();
+  // Dome specular
+  const spec=c2.createRadialGradient(sx-r*scale*0.38,sy-r*0.25,0,sx-r*scale*0.22,sy-r*0.18,r*scale*0.6);
+  spec.addColorStop(0,'rgba(255,255,255,0.28)');spec.addColorStop(1,'rgba(255,255,255,0)');
+  c2.fillStyle=spec;c2.beginPath();c2.arc(sx,sy-r*0.08,r*scale,Math.PI,0);c2.closePath();c2.fill();
+  // Dome ribs
+  c2.strokeStyle=fl+'44';c2.lineWidth=0.9;
+  for(let ri2=1;ri2<=lv+1;ri2++){const xa=sx-r*scale+ri2*r*scale*2/(lv+2);
+    const ya=sy-r*0.08-Math.sqrt(Math.max(0,(r*scale)**2-(xa-sx)**2));
+    c2.beginPath();c2.moveTo(xa,sy-r*0.08);c2.lineTo(xa,ya);c2.stroke();}
+  // Energy ring
+  if(lv>=3){c2.strokeStyle=fl+'66';c2.lineWidth=1.5;c2.beginPath();c2.ellipse(sx,sy-r*0.08,r*scale*1.08,r*0.18,0,0,Math.PI*2);c2.stroke();}
 }
-// CATHEDRAL SPIRE (lv>=3) — tall gothic spire above keep
-if(lv>=3){
-  const sH=r*(0.55+lv*0.04);
-  c2.fillStyle='rgba(0,0,0,0.2)';c2.beginPath();c2.moveTo(sx+1,keepY-sH+1);c2.lineTo(sx+r*0.14+1,keepY+1);c2.lineTo(sx-r*0.14+1,keepY+1);c2.closePath();c2.fill();
-  const sg2=c2.createLinearGradient(sx-r*0.14,keepY,sx+r*0.14,keepY-sH);
-  sg2.addColorStop(0,stoneMid+'ee');sg2.addColorStop(1,stoneLight+'ff');
-  c2.fillStyle=sg2;c2.beginPath();c2.moveTo(sx,keepY-sH);c2.lineTo(sx+r*0.14,keepY);c2.lineTo(sx-r*0.14,keepY);c2.closePath();c2.fill();
-  c2.strokeStyle=stoneLight+'55';c2.lineWidth=0.9;c2.stroke();
-  // Spire tip glow
-  const spg=c2.createRadialGradient(sx,keepY-sH,0,sx,keepY-sH,r*0.12);
-  spg.addColorStop(0,'rgba(255,220,120,0.9)');spg.addColorStop(1,'rgba(255,180,60,0)');
-  c2.fillStyle=spg;c2.beginPath();c2.arc(sx,keepY-sH,r*0.1,0,Math.PI*2);c2.fill();
-}
-// Keep windows (light spots)
-[[sx,keepY+keepH*0.35],[sx-keepW*0.22,keepY+keepH*0.55],[sx+keepW*0.22,keepY+keepH*0.55]].forEach(([wx,wy2])=>{
-  const wgWin=c2.createRadialGradient(wx,wy2,0,wx,wy2,4);
-  wgWin.addColorStop(0,'rgba(255,210,80,0.9)');wgWin.addColorStop(1,'rgba(255,180,40,0)');
-  c2.fillStyle=wgWin;c2.beginPath();c2.arc(wx,wy2,3.5,0,Math.PI*2);c2.fill();
-});
-// Faction banner on keep
-c2.strokeStyle='#9a8a60';c2.lineWidth=1.5;c2.beginPath();c2.moveTo(sx+keepW*0.3,keepY+keepH*0.1);c2.lineTo(sx+keepW*0.3,keepY-r*0.24);c2.stroke();
-c2.fillStyle=fac.color+'ee';c2.beginPath();c2.moveTo(sx+keepW*0.3,keepY-r*0.24);c2.lineTo(sx+keepW*0.3+r*0.22,keepY-r*0.15);c2.lineTo(sx+keepW*0.3,keepY-r*0.06);c2.closePath();c2.fill();
-c2.strokeStyle=fac.cityLight+'60';c2.lineWidth=0.7;c2.stroke();
-}
-c2.font='bold 7px Orbitron,monospace';c2.textAlign='center';c2.textBaseline='top';
-c2.fillStyle='rgba(0,0,0,0.6)';c2.fillText(city.name,sx+1,sy+r*0.44+1);
-c2.fillStyle=fac.light;c2.fillText(city.name,sx,sy+r*0.44);
-const hby=sy+r*0.56;
-if(lv>1){
-c2.fillStyle='rgba(0,0,0,0.65)';rRect(c2,sx+r*0.46,sy+r*0.42,r*0.36,r*0.2,2);c2.fill();
-c2.strokeStyle=fac.color+'50';c2.lineWidth=0.8;rRect(c2,sx+r*0.46,sy+r*0.42,r*0.36,r*0.2,2);c2.stroke();
-c2.font='bold 7px Orbitron,monospace';c2.fillStyle=fac.light;c2.textAlign='center';c2.textBaseline='middle';c2.fillText('Lv'+lv,sx+r*0.64,sy+r*0.52);
-}
-if(city.role&&CITY_ROLES[city.role]){
-c2.font='9px serif';c2.textAlign='center';c2.textBaseline='middle';
-c2.fillText(CITY_ROLES[city.role].icon,sx-r*0.62,sy+r*0.52);
+
+// ── CITY LABEL glow / HQ crown ───────────────────────────────────────
+if(city.isHQ){
+  c2.fillStyle=fl+'cc';c2.font=`bold ${Math.round(r*0.28)}px Orbitron,monospace`;
+  c2.textAlign='center';c2.textBaseline='bottom';
+  c2.fillText('★',sx,sy-r*(isMed?1.55:isInd?1.45:isAtom?1.65:1.55+(lv*0.06)));
 }
 }
+
+
 const _unitCache={};
 function _getCachedUnit(type,owner,hpLevel,moved){
 const key=`${type}-${owner}-${hpLevel}-${moved?1:0}`;
@@ -2842,7 +2884,10 @@ for(let vi=0;vi<villageCount;vi++){
   while((usedMPos.has(vq+','+vr)||G.grid[vq]?.[vr]?.terrain===T.OCEAN||G.grid[vq]?.[vr]?.terrain===T.MOUNTAIN)&&vt<40);
   if(vt<40){usedMPos.add(vq+','+vr);G.villages.push({q:vq,r:vr,pillaged:false});}
 }
+if(!G.roads)G.roads=new Set();
+buildRoads();
 revealFog(starts[0].q,starts[0].r,3);
+setTimeout(maybeShowTutorial,800);
 const mc=hxy(GW/2,GH/2),pc=hxy(starts[0].q,starts[0].r);
 G.cam.x=-(pc.x-mc.x);G.cam.y=-(pc.y-mc.y);
 const fb=document.getElementById('faction-badge');
@@ -2996,6 +3041,36 @@ ctx.fillText(label,dest.x,dest.y-14);
 }
 ctx.restore();
 });
+// ── ROAD RENDERING ────────────────────────────────────────────────────────
+if(G.roads&&G.roads.size>0){
+  // Draw road as a dirt path connecting road hexes
+  ctx.save();
+  G.roads.forEach(key=>{
+    const [rq,rr]=key.split(',').map(Number);
+    if(G.fog&&G.fog[rq]&&G.fog[rq][rr]==='hidden')return;
+    const{x,y}=hxy(rq,rr);
+    const rx=x+ox,ry=y+oy;
+    // Road hex base — sandy dirt color
+    ctx.globalAlpha=0.55;
+    ctx.fillStyle='rgba(180,140,80,0.45)';
+    hPath(ctx,rx,ry,HS*0.55);ctx.fill();
+    // Road center line
+    ctx.strokeStyle='rgba(200,160,90,0.7)';
+    ctx.lineWidth=2.5;
+    ctx.setLineDash([4,3]);
+    // Draw lines to each road neighbor
+    const nbrs=hN(rq,rr);
+    nbrs.forEach(([nq,nr])=>{
+      if(!G.roads.has(nq+','+nr))return;
+      const{x:nx,y:ny}=hxy(nq,nr);
+      const nrx=nx+ox,nry=ny+oy;
+      ctx.beginPath();ctx.moveTo(rx,ry);ctx.lineTo((rx+nrx)/2,(ry+nry)/2);ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    ctx.globalAlpha=1;
+  });
+  ctx.restore();
+}
 // ── VILLAGE OVERLAYS ────────────────────────────────────────────────────────
 if(G.villages){
   G.villages.forEach(v=>{
@@ -3303,7 +3378,7 @@ compRanges(G.selU);G.sel={q,r};updateHUD();showUnit(G.selU);
 notify('Unit moved');return;
 }
 }
-if(cu&&cu.owner==='player'){G.selU=cu;G.sel={q,r};compRanges(cu);showUnit(cu);return;}
+if(cu&&cu.owner==='player'){G.selU=cu;G.sel={q,r};compRanges(cu);SFX.select&&SFX.select();showUnit(cu);return;}
 if(cc&&cc.owner==='player'){desel();G.sel={q,r};showCity(cc);return;}
 desel();G.sel={q,r};showTile(q,r);
 }
@@ -3404,7 +3479,7 @@ return PASS[terr]!==false;
 function isHostile(owner){return isEnemy(owner)&&!inPeace(owner)&&!isOpenBorders(owner);}
 if(!unit.moved){
 const vis=new Set([`${unit.q},${unit.r}`]),queue=[{q:unit.q,r:unit.r,m:ut.move}];
-while(queue.length){const{q,r,m}=queue.shift();if(m<=0)continue;for(const[nq,nr]of hN(q,r)){const k=`${nq},${nr}`;if(vis.has(k))continue;if(!passable(nq,nr))continue;const ou=gUnit(nq,nr),oc=gCity(nq,nr);if(ou&&ou.owner==='player')continue;vis.add(k);if((ou&&isHostile(ou.owner))||(oc&&isHostile(oc.owner)))G.aRange.add(k);else{G.mRange.add(k);queue.push({q:nq,r:nr,m:m-1});}}}
+while(queue.length){const{q,r,m}=queue.shift();if(m<=0)continue;for(const[nq,nr]of hN(q,r)){const k=`${nq},${nr}`;if(vis.has(k))continue;if(!passable(nq,nr))continue;const ou=gUnit(nq,nr),oc=gCity(nq,nr);if(ou&&ou.owner==='player')continue;vis.add(k);if((ou&&isHostile(ou.owner))||(oc&&isHostile(oc.owner)))G.aRange.add(k);else{G.mRange.add(k);const onRoad=G.roads&&G.roads.has(k);queue.push({q:nq,r:nr,m:onRoad?m-0.5:m-1});}}}
 }
 if(!unit.attacked&&ut.isICBM){
 const _hq=G.cities.find(c=>c.owner==='player'&&c.isHQ);
@@ -3449,6 +3524,31 @@ spawnHeal(p.sx,p.sy,0);
 notify('🛡 '+ut.name+' fortified — +'+Math.ceil(ut.def*0.5)+' DEF & +2 HP/turn. Persists until unit moves.','gold');
 updateHUD();showUnit(unit);
 }
+
+function buildRoads(){
+  if(!G||!G.cities||!G.roads)return;
+  G.roads.clear();
+  const hq=G.cities.find(c=>c.owner==='player'&&c.isHQ);
+  if(!hq)return;
+  const outposts=G.cities.filter(c=>c.owner==='player'&&c.isOutpost);
+  outposts.forEach(op=>{
+    // Bresenham-like hex line from HQ to outpost
+    let q=hq.q,r=hq.r;
+    const tq=op.q,tr=op.r;
+    const steps=Math.max(Math.abs(tq-q),Math.abs(tr-r),Math.abs((tq-q)+(tr-r) > 0 ? (tq-q)+(tr-r) : -((tq-q)+(tr-r))));
+    for(let i=0;i<=steps;i++){
+      const t=steps===0?0:i/steps;
+      const lq=Math.round(q+(tq-q)*t);
+      const lr=Math.round(r+(tr-r)*t);
+      if(lq>=0&&lq<GW&&lr>=0&&lr<GH){
+        const terr=G.grid[lq]&&G.grid[lq][lr]&&G.grid[lq][lr].terrain;
+        if(terr!==undefined&&terr!==T.OCEAN&&terr!==T.MOUNTAIN&&terr!==T.M_LAVA&&terr!==T.R_CANYON)
+          G.roads.add(lq+','+lr);
+      }
+    }
+  });
+}
+
 function buildOutpost(unit){
 if(!unit||unit.owner!=='player')return;
 const ut=UNITS[unit.type];if(!ut.isSettler)return;
@@ -3469,6 +3569,7 @@ SFX.capture();
 const p=uPos({q:unit.q,r:unit.r});
 RETRO.captureSparkle(p.sx,p.sy);
 notify('🏕️ Outpost founded! +3 DEF bonus to defending units.','gold');
+buildRoads();
 desel();updateHUD();checkEnd();
 }
 function upgradeUnit(unit){
@@ -3913,7 +4014,12 @@ grantXP(atk,1);
 notify(`Hit for ${ad} damage`);
 }
 // Attacking someone hurts relations
-if(atk.owner==='player'&&def.owner!=='player')changeRelation(def.owner,-2,'attacked');
+if(atk.owner==='player'&&def.owner!=='player'){
+  changeRelation(def.owner,-2,'attacked');
+  // Set rally point so AI prioritises sending units to defend this city
+  const _defAI=G.aiPlayers&&G.aiPlayers.find(a=>a.id===def.owner);
+  if(_defAI)_defAI._rallyCity={q:def.q,r:def.r,turns:4};
+}
 if(atk.hp<=0){G.units=G.units.filter(u=>u!==atk);G.unitsLost++;SFX.unitLost&&SFX.unitLost();notify('Unit lost!','warn');}
 if(G.wrath!==null)G.wrath=Math.min(15,G.wrath+1);
 if(G.wrath===15&&atk.owner==='player')SFX.wrath();
@@ -4401,6 +4507,7 @@ if(!G.aiPlayers||ai>=G.aiPlayers.length){_run(pi+1,0);return;}
 const _ai=G.aiPlayers[ai];
 const alive=G.cities.some(c=>c.owner===_ai.id)||G.units.some(u=>u.owner===_ai.id);
 if(!alive){_run(pi,ai+1);return;}
+if(_ai._rallyCity){_ai._rallyCity.turns--;if(_ai._rallyCity.turns<=0)_ai._rallyCity=null;}
 doSingleAI(_ai);
 setTimeout(()=>_run(pi,ai+1),120);
 }
@@ -4717,6 +4824,15 @@ const step=aiBFS(unit.q,unit.r,nearest.q,nearest.r,ut.move||1);
 if(step&&!gUnit(step.q,step.r)){unit.q=step.q;unit.r=step.r;unit.moved=true;return;}
 }
 }
+// ── RALLY: move to defend attacked city ──────────────────────────────
+if(ai._rallyCity&&ai._rallyCity.turns>0){
+  const rc=ai._rallyCity;
+  const dist=hDist(unit.q,unit.r,rc.q,rc.r);
+  if(dist>1&&dist<12&&Math.random()<0.72){
+    const step=aiBFS(unit.q,unit.r,rc.q,rc.r,ut.move||1);
+    if(step&&!gUnit(step.q,step.r)){unit.q=step.q;unit.r=step.r;unit.moved=true;return;}
+  }
+}
 // ── EXPANSION: if no player targets visible, move toward uncaptured/neutral city ──
 if(!playerTargets.length){
 // Look for uncaptured city or explore toward centre
@@ -4866,7 +4982,7 @@ if(G.blackHole&&!exLost){const ae=G.units.find(u=>isAI(u.owner)&&u.type==='EXODU
 });
 G.planet=_sp;
 if(exLost){endScreen(false,exMsg);return;}
-if(!allAiC.length&&!allAiU.length){RETRO.victoryFlash();const _achD=checkAchievements(true);endScreen(true,'Total Domination across all worlds!',_achD);_achD.forEach((a,i)=>setTimeout(()=>flashAchievement(a),i*600+200));return;}
+if(!allAiC.length&&!allAiU.length&&!G._extraTime){RETRO.victoryFlash();const _achD=checkAchievements(true);endScreen(true,'Total Domination across all worlds!',_achD);_achD.forEach((a,i)=>setTimeout(()=>flashAchievement(a),i*600+200));return;}
 if(!allPC.length&&!allPU.length){endScreen(false,'Your empire has been overwhelmed across all worlds.');return;}
 G.aiPlayers&&G.aiPlayers.forEach(ai=>{
 const hc=_ap.some(pl=>{G.planet=pl;return G.cities.some(c=>c.owner===ai.id);});
@@ -4924,7 +5040,17 @@ const done=G.techs.has(t.id),avail=!done&&!G.noTechTurn&&t.req.every(r=>G.techs.
 const disc2=playerFaction&&playerFaction.techDiscount?Math.ceil(t.cost*playerFaction.techDiscount):t.cost;
 const disc3=G.cities&&G.cities.some(c=>c.owner==='player'&&c.role==='ACADEMY')?Math.max(1,disc2-2):disc2;
 const disc=G.wonders&&G.wonders.has('GREAT_LIBRARY')?Math.max(1,disc3-3):disc3;
-html+=`<div class="trow"><div class="tpip ${done?'done':avail?'avail':''}"></div><span style="font-size:9px;color:${done?'var(--cyan)':avail?'var(--parchment)':'${_RPC}0.25)'}">${t.icon} ${t.name}${done?' ✓':''}</span>${avail?`<button class="abtn hi" style="padding:1px 5px;font-size:8px;margin:0 0 0 auto;width:auto" onclick="doResearch('${t.id}')">${disc}💎</button>`:''}</div>`;
+const isQueued=G._researching&&G._researching.id===t.id;
+const _pct=isQueued?Math.round((1-G._researching.turnsLeft/G._researching.totalTurns)*100):0;
+const _tLabel=avail&&!isQueued?' · '+( t.turns||2)+'T':'';
+html+=`<div class="trow" style="position:relative;${isQueued?'background:rgba(0,200,180,0.07);border-radius:4px;padding:2px 4px;':''}"><div class="tpip ${done?'done':avail||isQueued?'avail':''}"></div>`
++`<span style="font-size:9px;color:${done?'var(--cyan)':avail||isQueued?'var(--parchment)':'${_RPC}0.22)'}">` 
++t.icon+' '+t.name+(done?' ✓':'')+_tLabel+'</span>'
++(isQueued?`<span style="font-size:8px;color:var(--cyan);margin-left:auto;white-space:nowrap">${G._researching.turnsLeft}T⏳</span>`:'')
++(avail&&!isQueued?`<button class="abtn hi" style="padding:1px 5px;font-size:8px;margin:0 0 0 auto;width:auto" onclick="doResearch('${t.id}')">${disc}💎</button>`
+:(!done&&!isQueued&&t.req.length>0?'<span style="font-size:7px;color:rgba(216,232,248,0.2);margin-left:auto;white-space:nowrap">needs: '+t.req.map(r=>{const rt=TECHS.find(x=>x.id===r);return(rt?rt.icon:r)+(G.techs.has(r)?'✓':'');}).join(' ')+'</span>':''))
++'</div>'
++(isQueued?`<div style="height:2px;background:rgba(0,200,180,0.18);border-radius:1px;margin:0 4px 3px 18px"><div style="height:100%;width:${_pct}%;background:var(--cyan);border-radius:1px;transition:width 0.4s"></div></div>`:'');
 });
 });
 el.innerHTML=html;
@@ -4939,7 +5065,17 @@ html+=`<div class="era-hdr">${ERA_NAMES[era]}</div>`;
 eraTs.forEach(t=>{
 const done=G.techs.has(t.id),avail=!done&&!G.noTechTurn&&t.req.every(r=>G.techs.has(r));
 const disc=playerFaction&&playerFaction.techDiscount?Math.ceil(t.cost*playerFaction.techDiscount):t.cost;
-html+=`<div class="trow"><div class="tpip ${done?'done':avail?'avail':''}"></div><span style="font-size:10px;color:${done?'var(--cyan)':avail?'var(--parchment)':'${_RPC}0.25)'}">${t.icon} ${t.name}${done?' ✓':''}</span>${avail?`<button class="abtn hi" style="padding:5px 8px;font-size:10px;margin-left:auto;width:auto" onclick="doResearch('${t.id}')">${disc}💎</button>`:''}</div>`;
+const isQueued2=G._researching&&G._researching.id===t.id;
+const _pct2=isQueued2?Math.round((1-G._researching.turnsLeft/G._researching.totalTurns)*100):0;
+const _tLabel2=avail&&!isQueued2?' · '+(t.turns||2)+'T':'';
+html+=`<div class="trow" style="position:relative;${isQueued2?'background:rgba(0,200,180,0.07);border-radius:4px;padding:3px 5px;':''}"><div class="tpip ${done?'done':avail||isQueued2?'avail':''}"></div>`
++`<span style="font-size:10px;color:${done?'var(--cyan)':avail||isQueued2?'var(--parchment)':'${_RPC}0.22)'}">` 
++t.icon+' '+t.name+(done?' ✓':'')+_tLabel2+'</span>'
++(isQueued2?`<span style="font-size:9px;color:var(--cyan);margin-left:auto;white-space:nowrap">${G._researching.turnsLeft}T⏳</span>`:'')
++(avail&&!isQueued2?`<button class="abtn hi" style="padding:5px 8px;font-size:10px;margin-left:auto;width:auto" onclick="doResearch('${t.id}')">${disc}💎</button>`
+:(!done&&!isQueued2&&t.req.length>0?'<span style="font-size:8px;color:rgba(216,232,248,0.2);margin-left:auto;white-space:nowrap">needs: '+t.req.map(r=>{const rt=TECHS.find(x=>x.id===r);return(rt?rt.icon:r)+(G.techs.has(r)?'✓':'');}).join(' ')+'</span>':''));
++'</div>'
++(isQueued2?`<div style="height:2px;background:rgba(0,200,180,0.18);border-radius:1px;margin:0 5px 4px 20px"><div style="height:100%;width:${_pct2}%;background:var(--cyan);border-radius:1px;transition:width 0.4s"></div></div>`:'');
 });
 });
 el.innerHTML=html;
@@ -4958,22 +5094,32 @@ if(wondersFab)wondersFab.style.borderColor=wonderAvail?'var(--gold)':'';}
 function doResearch(id){
 if(G.noTechTurn){notify('Solar flare disrupts research this turn!','warn');return;}
 const t=TECHS.find(x=>x.id===id);if(!t||G.techs.has(id))return;
+if(G._researching){notify('Already researching '+G._researching.name+'! Wait '+G._researching.turnsLeft+' turn(s).','warn');return;}
 let disc=playerFaction&&playerFaction.techDiscount?Math.ceil(t.cost*playerFaction.techDiscount):t.cost;
 if(G.cities.some(c=>c.owner==='player'&&c.role==='ACADEMY'))disc=Math.max(1,disc-2);
 if(G.wonders&&G.wonders.has('GREAT_LIBRARY'))disc=Math.max(1,disc-3);
 if(G.stars<disc){notify('Not enough credits! Need '+disc+'💎','warn');return;}
 const actualCost=G._nextTechFree?0:disc;
 G._nextTechFree=false;
-G.stars-=actualCost;G.techs.add(id);SFX.research();
-G.score+=50;
+G.stars-=actualCost;SFX.research();
+let turns=t.turns||2;
+if(G.cities.some(c=>c.owner==='player'&&c.role==='ACADEMY'))turns=Math.max(1,turns-1);
+if(G.wonders&&G.wonders.has('GREAT_LIBRARY'))turns=Math.max(1,turns-1);
+G._researching={id,name:t.name,icon:t.icon,turnsLeft:turns,totalTurns:turns};
+notify(t.icon+' '+t.name+' research started — '+turns+' turn(s) to complete.');
+RETRO.researchFlash();
+renderTechs();updateHUD();
+}
+function _completeResearch(id){
+const t=TECHS.find(x=>x.id===id);if(!t)return;
+G.techs.add(id);G.score+=50;
 const newEra=getCurrentEra();
 if(newEra!==G.era){
 SFX.era&&SFX.era();notify('⚡ NEW ERA: '+ERA_NAMES[newEra]+'!','gold');G.era=newEra;setTimeout(()=>narrateMsg(cmdVoice('eraAdvance',newEra)||('A new era dawns: '+ERA_NAMES[newEra]+'.')),1200);
 MUSIC.setPlanet(G.era==='INTERSTELLAR'?'space':G.planet.toLowerCase());
 setTimeout(()=>RETRO.eraFanfare(ERA_NAMES[newEra]),200);
 }
-notify(t.icon+' '+t.name+' researched!');
-RETRO.researchFlash();
+notify('⚗️ '+t.icon+' '+t.name+' research complete!','gold');
 renderTechs();updateHUD();updateSel();
 if(id==='MOONBASE')notify('🌕 Moon Base tech — you can now colonise the Moon!','gold');
 if(id==='MARS_BASE')notify('🔴 Mars Base tech — Mars awaits!','gold');
@@ -5519,10 +5665,34 @@ const html=`
   </div>
   <div class="p-sect">
     <div class="inf active">🛡 Units defending here gain +${city._defBonus||3} DEF. Upgrade to a full city by building a Wonder.</div>
-    <div class="inf">Outposts cannot train units or level up. They provide a forward defensive position.</div>
+    <div class="inf">Outposts can train basic units. Upgrade to a city by building a Wonder.</div>
+  </div>
+  <div class="p-sect" style="margin-top:6px">
+    <div style="font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;color:rgba(216,232,248,0.4);margin-bottom:8px;">TRAIN UNIT</div>
+    <div id="op-train-btns" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
   </div>`;
 setPanel(html);
 if(isMobile())openMobSheet(html);
+// Populate train buttons after panel render
+const _opTrainEl=document.getElementById('op-train-btns');
+if(_opTrainEl){
+  ['WARRIOR','ARCHER','KNIGHT','RIFLEMAN'].forEach(key=>{
+    const ut=UNITS[key];if(!ut)return;
+    const reqOk=!ut.req||G.techs.has(ut.req);
+    let cost=ut.cost;
+    if(playerFaction.id==='COLLECTIVE')cost=Math.max(1,cost-1);
+    const canAfford=G.stars>=cost;
+    const occupied=!!gUnit(city.q,city.r);
+    const canTrain=reqOk&&canAfford&&!occupied;
+    const btn=document.createElement('button');
+    btn.className='tbtn'+(canTrain?'':' dim');
+    btn.disabled=!canTrain;
+    btn.style.cssText='font-size:8px;padding:5px 8px;';
+    btn.innerHTML=ut.icon+' '+ut.name+'<br><small>'+cost+'💎</small>';
+    if(canTrain)btn.onclick=()=>doTrain(city.q,city.r,key);
+    _opTrainEl.appendChild(btn);
+  });
+}
 return;
 }
 const techReq={SETTLER:null,ICBM:'ROCKETRY',ARCHER:'ARCHERY',KNIGHT:'RIDING',CATAPULT:'SIEGE',RIFLEMAN:'GUNPOWDER',ARTILLERY:'STEEL',ENGINEER:'STEAM',TANK:'STEEL',JET:'AVIATION',PSYCHIC:'COMPUTING',ASTRONAUT:'ORBIT',LASER_TRP:'LASERS',AI_ROBOT:'AI_WEAPONS',COLONY_VEH:'COLONY_SHIP',EXODUS_SHIP:'EXODUS',LEVIATHAN:'DARK_ENERGY'};
@@ -5669,6 +5839,17 @@ if(cmBadge){
     cmBadge.style.display='none';
   }
 }
+  // Research queue indicator in HUD
+  const _rhud=document.getElementById('h-research');
+  if(_rhud){
+    if(G._researching){
+      const _rpct=Math.round((1-G._researching.turnsLeft/G._researching.totalTurns)*100);
+      _rhud.style.display='flex';
+      _rhud.innerHTML=G._researching.icon+' <span style="font-family:Orbitron,monospace;font-size:7px;letter-spacing:1px;color:rgba(64,216,255,0.8);margin:0 3px">'+G._researching.name+'</span><span style="font-size:8px;color:var(--gold)">'+G._researching.turnsLeft+'T</span>';
+    } else {
+      _rhud.style.display='none';
+    }
+  }
 }
 let _nt2;
 function notify(msg,type){
@@ -5985,9 +6166,17 @@ document.getElementById('ov-content').innerHTML=`
 
     <div class="end-btns">
       <button class="sbtn" onclick="showPickScreen()">New Game</button>
+      <button class="sbtn" onclick="onMoreTurn()" style="background:rgba(64,216,255,0.06);border-color:rgba(64,216,255,0.3);">One More Turn</button>
       <button class="sbtn gbtn" onclick="hideOv()">View Board</button>
     </div>`;
 }
+
+function onMoreTurn(){
+  hideOv();
+  G._extraTime=true;
+  notify('⏰ One More Turn — the galaxy waits for no one.','gold');
+}
+
 function switchEndTab(tab){
 ['score','speed','ach'].forEach(t=>{
 const btn=document.getElementById('tab-'+t);
@@ -7490,7 +7679,7 @@ openBorders:G.openBorders||{},
 tradeDeals:G.tradeDeals||{},
 wonders:[...(G.wonders||[])],tidalEngine:G._tidalEngine||false,genesisLab:G._genesisLab||false,warpGate:G._warpGate||false,
 crisisHistory:G.crisisHistory?[...G.crisisHistory]:[],
-_alienTurnsLeft:G._alienTurnsLeft||0,_plagueLeft:G._plagueLeft||0,_solarStorm:G._solarStorm||0,villages:(G.villages||[]).map(v=>({q:v.q,r:v.r,pillaged:v.pillaged})),
+_alienTurnsLeft:G._alienTurnsLeft||0,roads:[...(G.roads||new Set())],_researching:G._researching||null,_plagueLeft:G._plagueLeft||0,_solarStorm:G._solarStorm||0,villages:(G.villages||[]).map(v=>({q:v.q,r:v.r,pillaged:v.pillaged})),
 savedAt:new Date().toLocaleTimeString(),
 }
 localStorage.setItem(SAVE_KEY,JSON.stringify(save));
@@ -7543,8 +7732,10 @@ openBorders:save.openBorders||{},
 tradeDeals:save.tradeDeals||{},
 wonders:new Set(save.wonders||[]),
 crisisHistory:new Set(save.crisisHistory||[]),
+roads:new Set(save.roads||[]),
 _alienTurnsLeft:save._alienTurnsLeft||0,
 villages:(save.villages||[]),
+_researching:save._researching||null,
 _plagueLeft:save._plagueLeft||0,
 _solarStorm:save._solarStorm||0,_tidalEngine:save.tidalEngine||false,_genesisLab:save.genesisLab||false,_warpGate:save.warpGate||false,_warpUsed:false,
 }
@@ -7918,5 +8109,21 @@ document.addEventListener('mousemove',onMove);
 document.addEventListener('mouseup',onUp);
 }
 (function loop(){if(G.grid){try{render();}catch(e){console.error("render error:",e);document.title="RENDER ERR: "+e.message.slice(0,40);}}requestAnimationFrame(loop);})();</script>
+
+<!-- Tutorial overlay -->
+<div id="tut-overlay" style="display:none;position:fixed;inset:0;z-index:600;pointer-events:none;">
+  <div id="tut-box" style="position:absolute;background:rgba(4,10,28,0.97);border:1px solid rgba(64,216,255,0.5);border-radius:8px;padding:16px 20px;max-width:280px;box-shadow:0 0 30px rgba(64,216,255,0.18);pointer-events:all;">
+    <div style="font-family:Orbitron,monospace;font-size:8px;letter-spacing:3px;color:rgba(64,216,255,0.5);margin-bottom:6px;">TUTORIAL</div>
+    <div id="tut-step" style="font-size:8px;color:rgba(64,216,255,0.5);margin-top:2px"></div>
+    <div id="tut-title" style="font-family:Orbitron,monospace;font-size:13px;color:var(--cyan);margin-bottom:8px;"></div>
+    <div id="tut-body" style="font-size:11px;color:rgba(216,232,248,0.85);line-height:1.6;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="skipTutorial()" style="background:none;border:1px solid rgba(64,216,255,0.2);color:rgba(64,216,255,0.4);font-size:9px;padding:5px 10px;cursor:pointer;border-radius:3px;font-family:Orbitron,monospace;letter-spacing:1px;">SKIP</button>
+      <button id="tut-next" onclick="nextTutStep()" style="background:rgba(64,216,255,0.1);border:1px solid rgba(64,216,255,0.5);color:var(--cyan);font-size:9px;padding:5px 14px;cursor:pointer;border-radius:3px;font-family:Orbitron,monospace;letter-spacing:1px;">NEXT →</button>
+    </div>
+  </div>
+  <div id="tut-arrow" style="position:absolute;width:0;height:0;border:8px solid transparent;display:none;"></div>
+</div>
+
 </body>
 </html>
