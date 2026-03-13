@@ -65,6 +65,10 @@
 @keyframes drift{0%{transform:translate(0,0)}100%{transform:translate(var(--dx,20px),-110px)}}}#hdr{position:relative;z-index:10;background:linear-gradient(180deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-bottom:1px solid var(--bord);padding:6px 14px;padding-top:calc(6px+var(--safe-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 24px rgba(0,0,0,0.9),0 0 40px rgba(0,30,80,0.3)}#logo{display:none}.hstats{display:flex;align-items:stretch;gap:0;flex:1;justify-content:center;}.hs{display:flex;align-items:center;gap:6px;padding:4px 14px;border-left:1px solid rgba(60,140,255,0.12);font-size:9px}.hs:first-child{border-left:none}.hs-icon{font-size:14px;line-height:1;flex-shrink:0}.hs-block{display:flex;flex-direction:column;line-height:1}.hs-v{font-family:'Orbitron',monospace;color:var(--cyan);font-size:14px;font-weight:700;min-width:20px;line-height:1.1}.hs-l{color:rgba(216,232,248,0.32);font-size:7px;text-transform:uppercase;letter-spacing:1px;margin-top:1px}#campaign-badge{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1px;color:var(--gold);border:1px solid rgba(240,192,64,0.2);padding:2px 7px;background:rgba(240,192,64,0.04);border-radius:2px;}
 #tbadge{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--cyan);border:1px solid var(--bord);padding:3px 8px;background:rgba(64,216,255,0.04);border-radius:2px}#era-badge{font-size:8px;color:var(--gold);letter-spacing:1px;border:1px solid rgba(240,192,64,0.22);padding:3px 8px;background:rgba(240,192,64,0.04);border-radius:2px;display:inline-block;}#music-btn,#planet-btn{background:none;border:1px solid var(--bord);color:var(--cyan);font-size:13px;padding:4px 8px;cursor:pointer;border-radius:3px;transition:all 0.2s;margin-left:3px;min-width:32px;min-height:32px}#music-btn:hover,#planet-btn:hover{background:rgba(64,216,255,0.1);border-color:var(--cyan)}#wrap{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;min-height:0}#cvs-wrap{flex:1;position:relative;overflow:hidden}canvas{position:absolute;top:0;left:0;cursor:crosshair;touch-action:none}#side{width:260px;min-width:200px;max-width:420px;background:var(--panel);border-left:1px solid var(--bord);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative;resize:horizontal;}#side-drag{position:absolute;left:0;top:0;bottom:0;width:5px;cursor:ew-resize;background:transparent;z-index:20;transition:background 0.2s;}#side-drag:hover{background:rgba(64,216,255,0.18);}.ss{border-bottom:1px solid rgba(60,140,255,0.1);padding:8px 10px}.st{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:3px;color:var(--cyan);margin-bottom:5px}#sel-panel{flex:1;overflow-y:auto;padding:9px;scrollbar-width:thin;scrollbar-color:var(--bord) transparent}.igrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.ic{background:rgba(64,216,255,0.04);border:1px solid rgba(64,216,255,0.1);padding:5px 6px;border-radius:3px}.icl{font-size:7px;color:rgba(216,232,248,0.3);letter-spacing:1px;text-transform:uppercase}.icv{font-family:'Orbitron',monospace;font-size:12px;color:var(--cyan)}.hpw{margin:5px 0}.hpb{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden}.hpf{height:100%;border-radius:3px;transition:width 0.3s}.abtn{width:100%;margin-top:4px;padding:6px 8px;background:rgba(64,216,255,0.03);border:1px solid rgba(64,216,255,0.15);color:var(--parchment);font-family:'Exo 2',sans-serif;font-size:10px;cursor:pointer;text-align:left;transition:all 0.12s;border-radius:3px;min-height:36px}.abtn:hover:not(:disabled){background:rgba(64,216,255,0.1);border-color:var(--cyan);color:var(--cyan)}.abtn:disabled{opacity:0.2;cursor:not-allowed}.abtn.hi{border-color:var(--gold);color:var(--gold-lt);background:rgba(240,192,64,0.05)}.trow{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:9px}.tpip{width:7px;height:7px;border-radius:50%;border:1px solid rgba(64,216,255,0.2);flex-shrink:0}.tpip.done{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 5px rgba(64,216,255,0.5)}.tpip.avail{border-color:var(--gold)}.era-hdr{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;color:var(--gold);padding:5px 0 2px;opacity:0.65}#ftr{position:relative;z-index:10;background:linear-gradient(0deg,rgba(2,4,12,0.99),rgba(4,8,24,0.97));border-top:1px solid var(--bord);padding:7px 14px;padding-bottom:calc(7px+var(--safe-bot));display:flex;align-items:center;gap:10px;flex-shrink:0}#fullscreen-btn{position:fixed;bottom:14px;left:14px;z-index:400;background:rgba(4,8,20,0.85);border:1px solid rgba(64,216,255,0.3);color:var(--cyan);width:38px;height:38px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:all 0.2s;}#fullscreen-btn:hover{background:rgba(64,216,255,0.12);border-color:var(--cyan);box-shadow:0 0 12px rgba(64,216,255,0.3);}#endbtn{padding:10px 20px;background:linear-gradient(135deg,rgba(0,30,80,0.8),rgba(0,50,120,0.6));border:1px solid rgba(64,216,255,0.5);color:var(--cyan);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;border-radius:3px;text-transform:uppercase;transition:all 0.2s;min-height:44px;box-shadow:0 0 12px rgba(64,216,255,0.1) inset}#endbtn:hover{box-shadow:0 0 20px rgba(64,216,255,0.35);border-color:var(--cyan)}#endbtn:active{transform:scale(0.97)}#msgbar{flex:1;font-size:9px;color:rgba(216,232,248,0.35);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fdmg{position:absolute;font-family:'Orbitron',monospace;font-weight:700;pointer-events:none;z-index:300;text-shadow:0 1px 8px rgba(0,0,0,0.9);animation:fdmg-anim 1.1s ease-out forwards}@keyframes fdmg-anim{0%{opacity:1;transform:translateY(0) scale(1.2)}80%{opacity:1}100%{opacity:0;transform:translateY(-42px) scale(0.7)}}.retro-burst{position:absolute;pointer-events:none;z-index:350}@keyframes burst-ring{0%{transform:translate(-50%,-50%) scale(0);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}@keyframes burst-star{0%{transform:translate(-50%,-50%) scale(0) rotate(0deg);opacity:1}60%{opacity:1}100%{transform:translate(-50%,-50%) scale(1.4) rotate(180deg);opacity:0}}@keyframes retro-flash{0%{opacity:0.9}50%{opacity:0.2}100%{opacity:0}}@keyframes pixel-explode{0%{transform:translate(-50%,-50%) scale(0);opacity:1}40%{transform:translate(-50%,-50%) scale(1.1);opacity:1}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}@keyframes level-up-badge{0%{transform:translateX(-50%) translateY(10px) scale(0.5);opacity:0}20%{transform:translateX(-50%) translateY(0) scale(1.15);opacity:1}80%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(-20px) scale(0.8);opacity:0}}@keyframes era-fanfare{0%{transform:translateX(-50%) scale(0.2);opacity:0}25%{transform:translateX(-50%) scale(1.1);opacity:1}75%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) scale(1.05);opacity:0}}@keyframes comet-fly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--cx),var(--cy)) scale(0);opacity:0}}@keyframes scanline{0%{top:-4px}100%{top:100%}}
 @keyframes lore-fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse-hint{0%,100%{opacity:0.7;}50%{opacity:1;}}
+@keyframes float-up{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-36px);}}
+@keyframes arrow-pulse{0%,100%{transform:translateY(0) scale(1);opacity:1;}50%{transform:translateY(-8px) scale(1.15);opacity:0.75;}}
+@keyframes turn-summary-in{from{opacity:0;transform:translateX(-50%) translateY(14px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
 @keyframes hero-pulse{0%,100%{text-shadow:0 0 60px rgba(64,216,255,0.8),0 0 120px rgba(64,216,255,0.3),0 4px 0 rgba(0,0,0,0.9)}50%{text-shadow:0 0 80px rgba(64,216,255,1),0 0 160px rgba(64,216,255,0.45),0 4px 0 rgba(0,0,0,0.9)}}
 @keyframes line-breathe{0%,100%{opacity:0.6;width:min(220px,60%)}50%{opacity:1;width:min(300px,80%)}}
 @keyframes tagline-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -108,7 +112,11 @@ canvas{touch-action:none}
 
 /* ── Action buttons — finger-friendly ── */
 .abtn{-webkit-appearance:none;appearance:none;min-height:48px;font-size:12px;padding:10px 10px;}
-.abtn2{-webkit-appearance:none;appearance:none;min-height:48px;font-size:8px;padding:10px 4px;}
+.abtn2{-webkit-appearance:none;appearance:none;min-height:48px;font-size:8px;padding:10px 4px;background:rgba(4,8,24,0.6);border:1px solid rgba(64,216,255,0.18);color:var(--parchment);}
+.abtn2.cyan{-webkit-appearance:none;appearance:none;background:rgba(64,216,255,0.08);border-color:rgba(64,216,255,0.35);color:var(--cyan);}
+.abtn2.dim{-webkit-appearance:none;appearance:none;background:rgba(4,8,24,0.4);border-color:rgba(216,232,248,0.1);color:rgba(216,232,248,0.28);}
+.abtn2.gold{-webkit-appearance:none;appearance:none;background:rgba(240,192,64,0.07);border-color:rgba(240,192,64,0.35);color:var(--gold);}
+.abtn2.red{-webkit-appearance:none;appearance:none;background:rgba(255,80,80,0.07);border-color:rgba(255,80,80,0.3);color:#ff9090;}
 
 /* ── Mobile sheet ── */
 #mob-sheet{position:fixed;bottom:0;left:0;right:0;z-index:500;background:transparent;pointer-events:none;padding-bottom:var(--safe-bot);}
@@ -2963,6 +2971,20 @@ MONSTER_TYPES.forEach(mType=>{
 });
 // ── Spawn villages ─────────────────────────────────────────────────
 G.villages=[];
+// Guarantee 2 starter villages near player start (2-4 hexes, no ocean/mountain)
+{const _sv=starts[0];const _svDirs=[];
+for(let _dq=-4;_dq<=4;_dq++){for(let _dr=-4;_dr<=4;_dr++){
+  const _vdist=Math.abs(_dq)+Math.abs(_dr)+Math.abs(-_dq-_dr);
+  const _vq=_sv.q+_dq,_vr=_sv.r+_dr;
+  if(_vdist<2||_vdist>4)continue;
+  if(_vq<1||_vr<1||_vq>=GW-1||_vr>=GH-1)continue;
+  const _vt=G.grid[_vq]?.[_vr]?.terrain;
+  if(_vt===T.OCEAN||_vt===T.MOUNTAIN||_vt===T.M_CRATER||_vt===T.R_VOLCANO)continue;
+  if(usedMPos.has(_vq+','+_vr))continue;
+  _svDirs.push({q:_vq,r:_vr,d:_vdist});
+}}
+_svDirs.sort((a,b)=>a.d-b.d);
+_svDirs.slice(0,2).forEach(sv=>{usedMPos.add(sv.q+','+sv.r);G.villages.push({q:sv.q,r:sv.r,pillaged:false,starter:true});});}
 const villageCount=Math.floor((GW*GH)/28);
 for(let vi=0;vi<villageCount;vi++){
   let vq,vr,vt=0;
@@ -3550,16 +3572,41 @@ const _animFromQ=G.selU.q,_animFromR=G.selU.r;
 G.selU.q=q;G.selU.r=r;G.selU.moved=true;G.selU.fortified=false;
 startUnitAnim(G.selU,_animFromQ,_animFromR);
 revealFog(q,r,2);SFX.move();
+tutCheckTrigger('move');
 // Village pillage
 if(G.villages){
   const vill=G.villages.find(v=>v.q===q&&v.r===r&&!v.pillaged);
   if(vill){
     vill.pillaged=true;
     const loot=4+Math.floor(Math.random()*5);
+    // First plunder bonus
+    const _isFirst=!G._hasPlundered;
+    if(_isFirst){G._hasPlundered=true;const _bonus=25+Math.floor(Math.random()*11);loot+=_bonus;}
     G.stars+=loot;
     G.score+=40;
-    notify(icon('village')+' Village pillaged! +'+loot+' credits','gold');
-    screenShake(5,0.25);SFX.capture&&SFX.capture();
+    tutCheckTrigger('pillage');
+    if(_isFirst){
+      notify(icon('village')+' ⚡ FIRST PLUNDER! +'+loot+' credits — nice work!','gold');
+      screenShake(8,0.4);
+      // Confetti burst
+      if(typeof RETRO!=='undefined'&&RETRO.burst){
+        RETRO.burst(cvW/2,cvH/2,'#f0c040',100);
+        setTimeout(()=>RETRO.burst(cvW/3,cvH/3,'#40d8ff',60),150);
+        setTimeout(()=>RETRO.burst(cvW*2/3,cvH/3,'#ffffff',60),300);
+      }
+      // Big floating text
+      {const _vp2=hxy(q,r);const _mc3=hxy(GW/2,GH/2);const _z2=G.cam&&G.cam.zoom||1;
+      const _fsx=cvW/2+(_vp2.x+_mc3.x+(G.cam&&G.cam.x||0))*_z2-(cvW/2);
+      const _fsy=cvH/2+(_vp2.y+_mc3.y+(G.cam&&G.cam.y||0))*_z2-(cvH/2);
+      const _fel=document.createElement('div');
+      _fel.style.cssText=`position:fixed;left:${cvW/2-60}px;top:${cvH/2-60}px;width:120px;text-align:center;font-family:Orbitron,monospace;font-size:18px;font-weight:900;color:#f0c040;text-shadow:0 0 20px rgba(240,192,64,0.9);pointer-events:none;z-index:9999;animation:float-up 2s ease-out forwards;`;
+      _fel.textContent='⚡ +'+loot+' CR!';
+      document.body.appendChild(_fel);setTimeout(()=>_fel.remove(),2000);}
+      SFX.capture&&SFX.capture();haptic(40);
+    } else {
+      notify(icon('village')+' Village pillaged! +'+loot+' credits','gold');
+      screenShake(5,0.25);SFX.capture&&SFX.capture();haptic(30);
+    }
     {const _vp=hxy(q,r);const _mc=hxy(GW/2,GH/2);const _z=G.cam&&G.cam.zoom||1;
     const _vsx=(cvW/2+G.cam.x+_vp.x-_mc.x);const _vsy=(cvH/2+G.cam.y+_vp.y-_mc.y);
     floatStars(loot,_vsx,_vsy-20);}
@@ -3724,6 +3771,7 @@ function buildRoads(){
 
 
 function foundHQ(unit){
+  setTimeout(()=>tutCheckTrigger('found_city'),400);
   if(!unit||unit.owner!=='player')return;
   const ut=UNITS[unit.type];if(!ut||!ut.isSettler)return;
   const terr=G.grid[unit.q][unit.r].terrain;
@@ -4257,7 +4305,7 @@ const at=UNITS[atk.type],dt=UNITS[def.type];
 const isFuture=at.era==='SPACE'||at.era==='INTERSTELLAR'||at.era==='ATOMIC';
 const isLaser=at.era==='SPACE'||at.era==='INTERSTELLAR';
 const isRanged=at.ranged;
-if(isFuture)SFX.laser();else SFX.attack();
+if(isFuture)SFX.laser();else SFX.attack();haptic(15);
 let bonus=0;
 if(playerFaction.id==='BENEVOLENT'&&G.wrath>8)bonus=Math.floor(G.wrath/3);
 const _commissarNear=G.units.some(u=>u.type==='COMMISSAR'&&u.owner===atk.owner&&hDist(u.q,u.r,atk.q,atk.r)<=1);
@@ -4646,6 +4694,7 @@ function fuseUnits(a, bId){
 }
 function endTurn(){
 if(G.phase!=='player')return;
+tutCheckTrigger('end_turn');
 
 
 G.phase='ai';SFX.endturn&&SFX.endturn();
@@ -4778,6 +4827,7 @@ notify(c.name+' ('+pl+') grew to Lv'+c.lv+'!','gold');}
 G.planet=_curPl;
 if(G.wrath!==null&&G.wrath>0){const nearEnemy=G.units.filter(u=>isAI(u.owner)).some(e=>G.units.filter(u=>u.owner==='player').some(p=>hDist(p.q,p.r,e.q,e.r)<=4));if(!nearEnemy)G.wrath=Math.max(0,G.wrath-1);}
 let _totCities=0;_allPl.forEach(pl=>{G.planet=pl;_totCities+=G.cities.filter(c=>c.owner==='player').length;});G.planet=_curPl;
+G._lastTurnIncome=Math.floor(income);
 G.stars+=Math.floor(income);
 // Float income over player HQ
 {const _hq=G.cities.find(c=>c.owner==='player'&&c.isHQ);
@@ -4790,10 +4840,40 @@ if(G._tradeBonusThisTurn){G.stars+=G._tradeBonusThisTurn;G._tradeBonusThisTurn=0
 G.score+=_totCities*10;
 // Float score delta at top of screen
 if(income>0)floatScoreDelta(Math.floor(income));
+// Float +CR above each player city
+{const _incomeCities=G.cities.filter(c=>c.owner==='player');
+_incomeCities.forEach((c,_ci)=>{
+  const _cInc=c.lv+(c.districts?c.districts.length:0);
+  if(_cInc>0){const _cp=hxy(c.q,c.r);const _z=G.cam&&G.cam.zoom||1;
+    const _cx=cvW/2+(_cp.x+(G.cam&&G.cam.x||0))*_z;
+    const _cy=cvH/2+(_cp.y+(G.cam&&G.cam.y||0))*_z;
+    if(_cx>20&&_cx<cvW-20&&_cy>20&&_cy<cvH-20){
+      setTimeout(()=>{const _ce=document.createElement('div');
+        _ce.style.cssText=`position:fixed;left:${_cx-14}px;top:${_cy-28}px;font-family:Orbitron,monospace;font-size:10px;font-weight:700;color:rgba(240,192,64,0.9);text-shadow:0 0 6px rgba(240,192,64,0.5);pointer-events:none;z-index:7000;animation:float-up 1.4s ease-out forwards;`;
+        _ce.textContent='+'+_cInc;
+        document.body.appendChild(_ce);setTimeout(()=>_ce.remove(),1400);
+      },_ci*80);}
+  }
+});}
 // Float income over player HQ if any
 
 G.turn++;
 document.getElementById('tbadge').textContent='TURN '+G.turn;
+// End-turn summary popup
+{const _eti=G._lastTurnIncome||0;const _etr=G._researching?G._researching.name:null;
+const _etts=G._lastTechCompleted||null;G._lastTechCompleted=null;
+const _parts=[];
+if(_eti>0)_parts.push(`<span style="color:var(--gold)">+${_eti} CR</span>`);
+if(_etr)_parts.push(`<span style="color:rgba(64,216,255,0.8)">Researching ${_etr}</span>`);
+if(_etts)_parts.push(`<span style="color:#a0ff80">✓ ${_etts} unlocked!</span>`);
+if(_parts.length>0){
+  const _es=document.createElement('div');
+  _es.style.cssText=`position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(4,8,24,0.92);border:1px solid rgba(64,216,255,0.18);border-radius:8px;padding:8px 16px;font-family:Orbitron,monospace;font-size:9px;letter-spacing:1px;color:rgba(216,232,248,0.7);z-index:8000;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity 0.3s,transform 0.3s;`;
+  _es.innerHTML='TURN '+(G.turn-1)+' · '+_parts.join(' · ');
+  document.body.appendChild(_es);
+  requestAnimationFrame(()=>{_es.style.opacity='1';_es.style.transform='translateX(-50%) translateY(0)';});
+  setTimeout(()=>{_es.style.opacity='0';_es.style.transform='translateX(-50%) translateY(-10px)';setTimeout(()=>_es.remove(),400);},3500);
+}}
 if(G._orbitalCooldown>0){G._orbitalCooldown--;if(G._orbitalCooldown===0){G._orbitalReady=true;notify('Orbital Cannon recharged!','gold');}}
 // Process city build queues
 G.cities.filter(c=>c.owner==='player'&&c.queue&&c.queue.length>0).forEach(city=>{
@@ -4828,10 +4908,32 @@ if(pi>=_pl.length){
 G.planet=G._playerPlanet;
 _pl.forEach(p=>{G.planet=p;G.units.filter(u=>u.owner==='player').forEach(u=>revealFog(u.q,u.r,2));});
 G.planet=G._playerPlanet;
+advanceAutoAttack();
 advanceAutoExplore();
 advanceWaypoints();
 doMonsterTurn();
 G.phase='player';setMsg('Your move, Commander');updateHUD();checkEnd();updatePlanetSwitcher();
+// Turn 1: pulse arrow pointing at nearest starter village
+if(G.turn===1&&!G._hasPlundered){
+  const _punit=G.units.find(u=>u.owner==='player'&&!UNITS[u.type]?.isSettler);
+  const _svill=G.villages&&G.villages.filter(v=>!v.pillaged).sort((a,b)=>{
+    const da=Math.abs(a.q-(_punit?_punit.q:0))+Math.abs(a.r-(_punit?_punit.r:0));
+    const db=Math.abs(b.q-(_punit?_punit.q:0))+Math.abs(b.r-(_punit?_punit.r:0));
+    return da-db;
+  })[0];
+  if(_svill&&_punit){
+    const _tp=hxy(_svill.q,_svill.r);const _mc=hxy(GW/2,GH/2);const _z=G.cam&&G.cam.zoom||1;
+    const _tsx=cvW/2+(_tp.x+(G.cam&&G.cam.x||0))*_z;
+    const _tsy=cvH/2+(_tp.y+(G.cam&&G.cam.y||0))*_z;
+    const _arr=document.createElement('div');
+    _arr.id='village-arrow';
+    _arr.style.cssText=`position:fixed;left:${_tsx-24}px;top:${_tsy-56}px;width:48px;text-align:center;font-size:28px;pointer-events:none;z-index:8000;animation:arrow-pulse 0.8s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(240,192,64,0.9));`;
+    _arr.innerHTML='⬇️';
+    document.body.appendChild(_arr);
+    notify(icon('village')+' A village is nearby — move your unit to raid it!','gold');
+    setTimeout(()=>{const _e=document.getElementById('village-arrow');if(_e)_e.remove();},12000);
+  }
+}
 return;
 }
 G.planet=_pl[pi];
@@ -5083,7 +5185,24 @@ const cost=ut.cost-(fac.unitDiscount||0);
 ai.stars-=cost;
 G.units.push({id:G.nextId++,q:c.q,r:c.r,owner:myId,type:key,hp:ut.hp,moved:false,attacked:false,xp:0,rank:0});
 });
-// ── HARD/ELON: ICBM LAUNCH at player HQ ──
+// -- NAVAL UNITS --
+G.cities.filter(c=>c.owner===myId&&!gUnit(c.q,c.r)).forEach(c=>{
+const isCoastal=hN(c.q,c.r).some(([nq,nr])=>G.grid[nq]&&G.grid[nq][nr]&&G.grid[nq][nr].terrain===T.OCEAN);
+if(!isCoastal)return;
+const myNaval=G.units.filter(u=>u.owner===myId&&(u.type==='GALLEY'||u.type==='IRONCLAD'||u.type==='DREADNOUGHT'));
+if(myNaval.length>=2)return;
+if(Math.random()>0.3)return;
+const navalPool=[['DREADNOUGHT',UNITS.DREADNOUGHT],['IRONCLAD',UNITS.IRONCLAD],['GALLEY',UNITS.GALLEY]];
+const affordable=navalPool.filter(([,ut])=>(!ut.req||ai.techs.has(ut.req))&&ai.stars>=(ut.cost-(fac.unitDiscount||0)));
+if(!affordable.length)return;
+const[nKey,nUt]=affordable[0];
+const nCost=nUt.cost-(fac.unitDiscount||0);
+const oceanSpawn=hN(c.q,c.r).find(([nq,nr])=>G.grid[nq]&&G.grid[nq][nr]&&G.grid[nq][nr].terrain===T.OCEAN&&!gUnit(nq,nr));
+if(!oceanSpawn)return;
+ai.stars-=nCost;
+G.units.push({id:G.nextId++,q:oceanSpawn[0],r:oceanSpawn[1],owner:myId,type:nKey,hp:nUt.hp,moved:false,attacked:false,xp:0,rank:0});
+});
+// -- HARD/ELON: ICBM LAUNCH at player HQ --
 if(diff.useICBM&&ai.techs.has('ROCKETRY')){
 const aiICBMs=G.units.filter(u=>u.owner===myId&&u.type==='ICBM'&&!u.moved);
 const playerHQ=G.cities.find(c=>c.owner==='player'&&c.isHQ);
@@ -5300,6 +5419,7 @@ G.units=G.units.filter(u=>u.hp>0);
 }
 function checkEnd(){
 // Campaign: enforce turn limit
+if(G.campaignMission&&G.turnLimit&&G.turn===G.turnLimit-4){notify(icon('warning')+' 5 turns remaining in this mission!','warn');}
 if(G.campaignMission&&G.turn>G.turnLimit){
 endScreen(false,'You ran out of turns. Try again — you have '+G.turnLimit+' turns to complete this mission.',[]);
 return;
@@ -5361,9 +5481,17 @@ function renderTechs(){
 if(!G||!G.techs)return;
 renderMobTechs();
 const el=document.getElementById('techlist');if(!el)return;
-let html='';
-// Campaign gate: only show techs for current era if fullTech not unlocked
+// Campaign gate: show locked notice if tech not unlocked yet
 const campaignFeatures=G&&G.campaignFeatures;
+if(campaignFeatures&&campaignFeatures.tech===false){
+  el.innerHTML=`<div style="padding:24px 12px;text-align:center;opacity:0.5;">
+    <div style="font-size:18px;margin-bottom:8px;">${icon('tech_tab')}</div>
+    <div style="font-family:Orbitron,monospace;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;">LOCKED</div>
+    <div style="font-size:8px;color:rgba(216,232,248,0.5);line-height:1.6;">Technology research unlocks<br>in Mission 3: Age of Invention.</div>
+  </div>`;
+  return;
+}
+let html='';
 const showEras=campaignFeatures&&!campaignFeatures.fullTech
   ?ERA_ORDER.slice(0,Math.max(1,ERA_ORDER.indexOf(G.era||'MEDIEVAL')+2))
   :ERA_ORDER;
@@ -5441,6 +5569,7 @@ let turns=t.turns||2;
 if(G.cities.some(c=>c.owner==='player'&&c.role==='ACADEMY'))turns=Math.max(1,turns-1);
 if(G.wonders&&G.wonders.has('GREAT_LIBRARY'))turns=Math.max(1,turns-1);
 G._researching={id,name:t.name,icon:t.icon,turnsLeft:turns,totalTurns:turns};
+tutCheckTrigger('research');
 notify(t.icon+' '+t.name+' research started — '+turns+' turn(s) to complete.');
 RETRO.researchFlash();
 renderTechs();updateHUD();
@@ -5448,6 +5577,16 @@ renderTechs();updateHUD();
 function _completeResearch(id){
 const t=TECHS.find(x=>x.id===id);if(!t)return;
 G.techs.add(id);G.score+=50;
+G._lastTechCompleted=t.name;
+// Float "Tech Unlocked!" over HQ
+{const _hq3=G.cities.find(c=>c.owner==='player'&&c.isHQ);
+if(_hq3){const _tp3=hxy(_hq3.q,_hq3.r);const _z3=G.cam&&G.cam.zoom||1;
+  const _tx3=cvW/2+(_tp3.x+(G.cam&&G.cam.x||0))*_z3;
+  const _ty3=cvH/2+(_tp3.y+(G.cam&&G.cam.y||0))*_z3;
+  const _te=document.createElement('div');
+  _te.style.cssText=`position:fixed;left:${_tx3-60}px;top:${_ty3-40}px;width:120px;text-align:center;font-family:Orbitron,monospace;font-size:10px;font-weight:700;color:#a0ff80;text-shadow:0 0 10px rgba(160,255,128,0.7);pointer-events:none;z-index:7500;animation:float-up 2s ease-out forwards;`;
+  _te.textContent='✓ '+t.name+'!';
+  document.body.appendChild(_te);setTimeout(()=>_te.remove(),2000);}}
 // Apex Disruption: +2CR on each tech researched
 if(playerFaction&&playerFaction.id==='APEX'){G.stars+=2;notify(icon('apex')+' Apex R&D: +2CR','gold');}
 if(G.techs.size===1){const _hq2=G.cities.find(c=>c.owner==='player'&&c.isHQ);if(_hq2){const _hp2=hxy(_hq2.q,_hq2.r);RETRO.burst(_hp2.sx,_hp2.sy,playerFaction.color,40);}}
@@ -5892,6 +6031,38 @@ function toggleAutoExplore(unit){
   notify(unit.autoExplore?icon('compass')+' Auto-explore ON — unit will seek fog each turn.':icon('compass')+' Auto-explore OFF.', unit.autoExplore?'gold':'dim');
   showUnit(unit);
 }
+function toggleAutoAttack(unit){
+  if(!unit||unit.owner!=='player')return;
+  unit.autoAttack=!unit.autoAttack;
+  notify(unit.autoAttack?icon('sword')+' Auto-attack ON — unit will attack nearest enemy each turn.':icon('sword')+' Auto-attack OFF.','dim');
+  showUnit(unit);
+}
+function advanceAutoAttack(){
+  G.units.filter(u=>u.owner==='player'&&u.autoAttack&&!u.attacked&&!u.moved).forEach(unit=>{
+    const ut=UNITS[unit.type];
+    if(!ut||ut.isSettler||ut.isICBM||ut.isExodus)return;
+    // Find nearest attackable enemy in range
+    const rng=ut.rng||1;
+    let target=null,bestDist=999;
+    G.units.forEach(u=>{
+      if(!isEnemy(u.owner))return;
+      const d=hDist(unit.q,unit.r,u.q,u.r);
+      if(d<=rng&&d<bestDist){bestDist=d;target=u;}
+    });
+    if(!target){
+      // No adjacent enemy — move toward nearest enemy
+      let nearestEnemy=null,nearDist=999;
+      G.units.forEach(u=>{if(!isEnemy(u.owner))return;const d=hDist(unit.q,unit.r,u.q,u.r);if(d<nearDist){nearDist=d;nearestEnemy=u;}});
+      G.cities.filter(c=>isEnemy(c.owner)).forEach(c=>{const d=hDist(unit.q,unit.r,c.q,c.r);if(d<nearDist){nearDist=d;nearestEnemy={q:c.q,r:c.r};}});
+      if(nearestEnemy&&!unit.moved){
+        const step=bfsPath(unit,nearestEnemy.q,nearestEnemy.r);
+        if(step){const _afq=unit.q,_afr=unit.r;unit.q=step.q;unit.r=step.r;unit.moved=true;startUnitAnim(unit,_afq,_afr);revealFog(unit.q,unit.r,2);SFX.move&&SFX.move();}
+      }
+      return;
+    }
+    doAttack(unit,target);
+  });
+}
 function showUnit(unit){
 const ut=UNITS[unit.type],hp=Math.max(0,unit.hp),hpPct=hp/ut.hp;
 const hpBar=hpPct>0.6?'bar-hp-hi':hpPct>0.3?'bar-hp-mid':'bar-hp-lo';
@@ -5931,6 +6102,8 @@ const warpBtn=G._warpGate?`<button class="abtn2 ${canWarp?'':'dim'}" style="${ca
 const canSettle=ut.isSettler&&!gCity(unit.q,unit.r);
 const canAutoExplore=!ut.isSettler&&!ut.isICBM&&!ut.isExodus;
 const autoBtn=canAutoExplore?`<button class="abtn2 ${unit.autoExplore?'cyan':'dim'}" onclick="toggleAutoExplore(G.selU)">${unit.autoExplore?icon('compass')+' AUTO ON':icon('compass')+' AUTO'}<small>${unit.autoExplore?'Exploring':'Explore'}</small></button>`:'';
+const canAutoAtk=!ut.isSettler&&!ut.isICBM&&!ut.isExodus&&!ut.isNaval;
+const autoAtkBtn=canAutoAtk?`<button class="abtn2 ${unit.autoAttack?'red':'dim'}" onclick="toggleAutoAttack(G.selU)">${unit.autoAttack?icon('sword')+' ATK ON':icon('sword')+' AUTO ATK'}<small>${unit.autoAttack?'Auto-attacking':'Attack mode'}</small></button>`:'';
 const settleBtn=ut.isSettler?`<button class="abtn2 ${canSettle?'gold':'dim'}" onclick="G.cities.some(c=>c.owner==='player')?buildOutpost(G.selU):foundHQ(G.selU)" ${canSettle?'':'disabled'}>${G.cities.some(c=>c.owner==='player')?icon('outpost')+' BUILD<small>Outpost</small>':icon('city_found')+' FOUND CITY<small>Establish HQ</small>'}</button>`:'';
 const refund=Math.max(1,Math.floor(ut.cost*0.2));
 const disbBtn=`<button class="abtn2 red" onclick="disbandUnit(G.selU)">✕ DISBAND<small>+${refund}CR</small></button>`;
@@ -5982,7 +6155,7 @@ const html=`
         <div class="sc-val">${ut.ranged?2:1}</div>
       </div>
     </div>
-    <div class="act-row">${upgBtn}${fortBtn}${fuseBtn}${warpBtn}${autoBtn}${settleBtn}${disbBtn}</div>
+    <div class="act-row">${upgBtn}${fortBtn}${fuseBtn}${warpBtn}${autoBtn}${autoAtkBtn}${settleBtn}${disbBtn}</div>
     ${notes}
   </div>`;
 setPanel(html);
@@ -6887,7 +7060,7 @@ const sl=document.getElementById('ai-slots');
 if(sl){sl.style.transition='opacity 0.15s';sl.style.opacity='0';setTimeout(()=>{sl.style.opacity='1';},160);}
 }
 function showOpponentSetup(){
-if(!pickedFaction)return;
+if(!pickedFaction){pickedFaction=Object.keys(FACTIONS)[0];}
 const pf=FACTIONS[pickedFaction];
 const others=Object.values(FACTIONS).filter(f=>f.id!==pickedFaction);
 const pnames=Object.keys(AI_PERSONALITIES);
@@ -6896,6 +7069,14 @@ const diff=AI_DIFFICULTY[globalDifficulty];
 document.getElementById('ov-content').innerHTML=`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:16px;box-sizing:border-box;"><div style="width:100%;max-width:560px;">
     <h1 style="font-size:22px;letter-spacing:4px">MISSION SETUP</h1>
     <div class="ov-sub" style="color:${pf.light}">${icon(pf.icon)} COMMANDING ${pf.name.toUpperCase()}</div>
+
+    <!-- Faction picker row -->
+    <div style="margin-bottom:14px;padding:10px 12px;border:1px solid rgba(64,216,255,0.12);border-radius:6px;background:rgba(64,216,255,0.02);">
+      <div style="font-family:Orbitron,monospace;font-size:7px;letter-spacing:3px;color:var(--cyan);margin-bottom:8px;text-align:center;">CHANGE FACTION</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        ${Object.values(FACTIONS).filter(f=>!f.aiOnly).map(f=>`<button onclick="pickedFaction='${f.id}';showOpponentSetup();" style="-webkit-appearance:none;appearance:none;padding:7px 10px;border:2px solid ${pickedFaction===f.id?f.color:f.color+'33'};border-radius:5px;background:${pickedFaction===f.id?f.color+'22':'transparent'};color:${pickedFaction===f.id?f.light:'rgba(216,232,248,0.45)'};font-family:Orbitron,monospace;font-size:7px;cursor:pointer;min-height:36px;transition:all 0.15s;">${icon(f.icon)} ${f.name}</button>`).join('')}
+      </div>
+    </div>
 
     <!-- Difficulty -->
     <div style="margin-bottom:16px;padding:12px 14px;border:1px solid rgba(60,140,255,0.14);border-radius:6px;background:rgba(60,140,255,0.03)">
@@ -6929,6 +7110,7 @@ style="padding:8px 12px;${_F};font-size:8px;letter-spacing:1px;border:1px solid 
     </div></div>
     <div style="margin-top:18px;padding-top:12px;border-top:1px solid rgba(64,216,255,0.08);text-align:center;">
       <div style="font-family:Orbitron,monospace;font-size:7px;letter-spacing:2px;color:rgba(64,216,255,0.2);">FAR REACH v${VERSION}</div>
+      <div style="font-size:7px;color:rgba(216,232,248,0.12);margin-top:6px;line-height:1.8;letter-spacing:0.5px;">Enter / Space · End Turn &nbsp;·&nbsp; M · Menu &nbsp;·&nbsp; F · Fullscreen &nbsp;·&nbsp; Esc · Close</div>
       <div style="font-size:7px;color:rgba(216,232,248,0.15);margin-top:5px;line-height:1.7;">No accounts · No ads · All data stored locally on your device only<br><span style="color:rgba(216,232,248,0.1);">Far Reach collects no personal data and makes no network requests after load.</span></div>
     </div>
     </div>`;
@@ -7657,7 +7839,7 @@ document.getElementById('ov-content').innerHTML=`
   </div>`:``}
   <!-- Skirmish options -->
   <div style="display:flex;flex-direction:column;gap:8px;width:min(320px,90%);">
-    <button onclick="hideOv();showOpponentSetup()" style="width:100%;padding:13px;font-family:Orbitron,monospace;font-size:10px;letter-spacing:2px;border:1px solid rgba(64,216,255,0.3);background:rgba(64,216,255,0.06);color:var(--cyan);cursor:pointer;border-radius:5px;min-height:48px;">Choose Opponents →</button>
+    <button onclick="showOpponentSetup()" style="width:100%;padding:13px;font-family:Orbitron,monospace;font-size:10px;letter-spacing:2px;border:1px solid rgba(64,216,255,0.3);background:rgba(64,216,255,0.06);color:var(--cyan);cursor:pointer;border-radius:5px;min-height:48px;">Choose Opponents →</button>
     <button onclick="quickStart()" style="width:100%;padding:11px;font-family:Orbitron,monospace;font-size:9px;letter-spacing:2px;border:1px solid rgba(64,216,255,0.15);background:rgba(64,216,255,0.03);color:rgba(64,216,255,0.6);cursor:pointer;border-radius:5px;min-height:44px;>Quick Start</button>
     <button onclick="showScenariosScreen()" style="width:100%;padding:11px;font-family:Orbitron,monospace;font-size:9px;letter-spacing:2px;border:1px solid rgba(64,216,255,0.12);background:transparent;color:rgba(64,216,255,0.45);cursor:pointer;border-radius:5px;min-height:40px;>Scenarios</button>
   </div>
@@ -7921,7 +8103,8 @@ function showLoreCinema(factionId, onComplete) {
 
 
 function openGameMenu(){
-  if(!G||!G.grid){showPickScreen();return;}
+  const _hasGame=G&&G.planets&&G.planet&&G.planets[G.planet]&&G.planets[G.planet].grid;
+  if(!_hasGame){showPickScreen();return;}
   const isCamp=!!(G&&G.campaignMission);
   showOv();
   document.getElementById('ov-content').innerHTML=`
@@ -7931,13 +8114,15 @@ function openGameMenu(){
     <button class="sbtn" onclick="hideOv()" style="width:220px;">Resume</button>
     ${isCamp?`
     <button class="sbtn" onclick="showCampaignScreen()" style="width:220px;background:rgba(240,192,64,0.06);border-color:rgba(240,192,64,0.3);">${icon('map')} Mission Select</button>
-    <button class="sbtn" onclick="showPickScreen()" style="width:220px;background:rgba(255,60,60,0.05);border-color:rgba(255,60,60,0.25);color:rgba(255,120,120,0.8);font-size:9px;">${icon('warning')} Abandon Mission</button>
+    <button class="sbtn" onclick="confirmAbandon()" style="width:220px;background:rgba(255,60,60,0.05);border-color:rgba(255,60,60,0.25);color:rgba(255,120,120,0.8);font-size:9px;">${icon('warning')} Abandon Mission</button>
     `:`
     <button class="sbtn" onclick="showPickScreen()" style="width:220px;background:rgba(64,216,255,0.06);border-color:rgba(64,216,255,0.3);">New Game</button>
     <button class="sbtn" onclick="saveGame()" style="width:220px;background:rgba(64,216,255,0.06);border-color:rgba(64,216,255,0.3);">${icon('save')} Save Game</button>
     <button class="sbtn" onclick="loadGame()" style="width:220px;background:rgba(64,216,255,0.06);border-color:rgba(64,216,255,0.3);">${icon('load')} Load Game</button>
     `}
-    <button class="sbtn" onclick="showPrivacyPolicy()" style="width:220px;background:rgba(64,216,255,0.04);border-color:rgba(64,216,255,0.2);font-size:8px;opacity:0.7;">Privacy Policy</button>
+    <button class="sbtn" onclick="showPickScreen();closeGameMenu();" style="width:220px;background:rgba(64,216,255,0.04);border-color:rgba(64,216,255,0.2);font-size:9px;opacity:0.8;">${icon('back')} Return to Main Menu</button>
+    <button class="sbtn" onclick="showPrivacyPolicy()" style="width:220px;background:transparent;border-color:rgba(64,216,255,0.12);font-size:8px;opacity:0.5;">Privacy Policy</button>
+    <div style="font-size:7px;color:rgba(216,232,248,0.12);margin-top:4px;line-height:1.8;text-align:center;letter-spacing:0.5px;">Enter/Space · End Turn  ·  M · Menu  ·  F · Fullscreen</div>
     <div style="position:absolute;bottom:14px;font-family:Orbitron,monospace;font-size:8px;opacity:0.3;letter-spacing:1px;">FAR REACH v${VERSION}</div>
   </div>`;
 }
@@ -8027,9 +8212,9 @@ function applyCampaignGates(features){
 const diploTab=document.querySelector('.stab[data-tab="diplo"]');
 const wondersTab=document.querySelector('.stab[data-tab="wonders"]');
 const techTab=document.querySelector('.stab[data-tab="tech"]');
-if(diploTab)diploTab.style.display=features.diplo?'':'none';
-if(wondersTab)wondersTab.style.display=features.wonders?'':'none';
-if(techTab)techTab.style.display=features.tech?'':'none';
+if(diploTab){diploTab.style.display='';diploTab.style.opacity=features.diplo?'':'0.3';diploTab.style.pointerEvents=features.diplo?'':'none';diploTab.title=features.diplo?'':'Unlocks in Mission 5';}
+if(wondersTab){wondersTab.style.display='';wondersTab.style.opacity=features.wonders?'':'0.3';wondersTab.style.pointerEvents=features.wonders?'':'none';wondersTab.title=features.wonders?'':'Unlocks in Mission 4';}
+if(techTab){techTab.style.display='';techTab.style.opacity=features.tech?'':'0.3';techTab.style.pointerEvents=features.tech?'':'none';techTab.title=features.tech?'':'Unlocks in Mission 3';}
 // Mobile FABs
 const diploFab=document.getElementById('mob-diplo-btn');
 const wondersFab=document.getElementById('mob-wonders-btn');
@@ -8044,6 +8229,21 @@ if(diploBtn)diploBtn.style.display=features.diplo?'':'none';
 if(planetBtn)planetBtn.style.display=features.multiplanet?'':'none';
 }
 const SAVE_KEY='farreach_save';
+function confirmAbandon(){
+const overlay=document.createElement('div');
+overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
+overlay.innerHTML=`<div style="background:linear-gradient(135deg,rgba(4,8,24,0.98),rgba(8,16,40,0.98));border:1px solid rgba(255,80,80,0.4);border-radius:12px;padding:28px 24px;max-width:300px;text-align:center;font-family:Orbitron,monospace;">
+  <div style="font-size:20px;margin-bottom:10px;">${icon('warning')}</div>
+  <div style="color:rgba(255,120,120,0.9);font-size:10px;letter-spacing:2px;margin-bottom:8px;">ABANDON MISSION?</div>
+  <div style="color:rgba(216,232,248,0.5);font-size:9px;margin-bottom:20px;">All progress will be lost.</div>
+  <div style="display:flex;gap:10px;justify-content:center;">
+    <button onclick="this.closest('div[style]').remove()" style="-webkit-appearance:none;appearance:none;padding:10px 20px;border-radius:6px;border:1px solid rgba(64,216,255,0.3);background:rgba(64,216,255,0.05);color:var(--cyan);font-family:Orbitron,monospace;font-size:8px;cursor:pointer;">CANCEL</button>
+    <button onclick="document.body.removeChild(this.closest('[style*=fixed]'));closeGameMenu();showPickScreen();" style="-webkit-appearance:none;appearance:none;padding:10px 20px;border-radius:6px;border:1px solid rgba(255,80,80,0.4);background:rgba(255,60,60,0.1);color:rgba(255,120,120,0.9);font-family:Orbitron,monospace;font-size:8px;cursor:pointer;">ABANDON</button>
+  </div>
+</div>`;
+document.body.appendChild(overlay);
+}
+function haptic(ms){if(navigator.vibrate)navigator.vibrate(ms||12);}
 function closeGameMenu(){
 const el=document.getElementById('game-menu');
 if(el)el.classList.remove('open');
@@ -8174,7 +8374,13 @@ function hideOv(){
   const kb=document.getElementById('kofi-btn');
   if(kb&&G&&G.grid)kb.style.display='flex';
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('game-menu');if(m&&m.classList.contains('open'))closeGameMenu();}});
+document.addEventListener('keydown',e=>{
+if(e.key==='Escape'){const m=document.getElementById('game-menu');if(m&&m.classList.contains('open'))closeGameMenu();return;}
+if(!G||G.phase!=='player')return;
+if(e.key==='Enter'||e.key===' '){e.preventDefault();endTurn();haptic(10);return;}
+if(e.key==='m'||e.key==='M'){const menu=document.getElementById('game-menu');if(menu){if(menu.classList.contains('open'))closeGameMenu();else openGameMenu();}return;}
+if(e.key==='f'||e.key==='F'){toggleFullscreen();return;}
+});
 function renderMobWonders(container){
 if(!G||!G.grid){container.innerHTML='<p style="color:rgba(216,232,248,0.3);font-size:9px;">Start a game to build Wonders.</p>';return;}
 const html2=Object.values(WONDERS).map(w=>{
@@ -8377,15 +8583,41 @@ function startSideDrag(e){
 }
 (function loop(){if(G.grid){try{render();}catch(e){console.error("render error:",e);document.title="RENDER ERR: "+e.message.slice(0,40);}}requestAnimationFrame(loop);})();
 // ── TUTORIAL SYSTEM ─────────────────────────────────────────────────
+// Action-gated tutorial — each step waits for the player to DO something
+// trigger: what action completes this step (checked in tutCheckTrigger)
+// 'move'       = player moves any unit
+// 'found_city' = player founds their HQ
+// 'end_turn'   = player presses End Turn
+// 'research'   = player starts any research
+// 'pillage'    = player pillages a village
 const TUT_STEPS=[
-  {title:'Welcome to Far Reach',body:'A 4X strategy game across three planets. Advance through 5 tech eras — Medieval to Interstellar — and eliminate all rival factions to win.',anchor:'center',nextLabel:"Let's go →"},
-  {title:'Your Settler',body:'You start with a Settler unit. Move it to a good spot and tap FOUND CITY to establish your HQ. Plains near resources are ideal.',anchor:'canvas-left',nextLabel:'Got it →'},
-  {title:'Moving Units',body:'Tap a unit to select it. Green hexes show movement range — tap one to move there. Units can\'t move again until the next turn.',anchor:'canvas-left',nextLabel:'Nice →'},
-  {title:'Your City',body:'Tap your city to open its panel. Train units, research tech, and build districts here. Credits (CR) are your main resource.',anchor:'canvas-right',nextLabel:'OK →'},
-  {title:'Research',body:'Open the TECH tab in your city panel. Research unlocks new units and abilities. Prioritise FARMING for income, then MINING for production.',anchor:'canvas-right',nextLabel:'Got it →'},
-  {title:'Credits & Income',body:'The star icon in the top bar shows your credits. Each city earns credits per turn based on its level. Capture villages for bonus CR.',anchor:'center',nextLabel:'Makes sense →'},
-  {title:'Fog of War',body:'Dark hexes are unexplored. Move units into fog to reveal the map. Hidden ruins and villages reward early exploration.',anchor:'canvas-left',nextLabel:'Nice →'},
-  {title:'End Turn',body:'Press END TURN when you\'re done. Rivals take their turn and research advances. Eliminate all enemy HQs to win. Good luck!',anchor:'bottom-right',nextLabel:'Play!'},
+  {title:'Welcome to Far Reach',
+   body:'A 4X strategy game. Build a city, research technology, and eliminate all rivals to win. Let\'s walk you through the first few turns.',
+   anchor:'center',nextLabel:'Start →',trigger:null},
+
+  {title:'Step 1 — Move Your Settler',
+   body:'Tap your Settler (the glowing badge), then tap a green hex to move it. Plains near resources make the best city sites.',
+   anchor:'canvas-left',nextLabel:null,trigger:'move',
+   hint:'Tap your Settler, then tap a green hex to move it.'},
+
+  {title:'Step 2 — Found Your City',
+   body:'Tap your Settler and press FOUND CITY. This becomes your HQ — the heart of your empire. Don\'t lose it!',
+   anchor:'canvas-left',nextLabel:null,trigger:'found_city',
+   hint:'Select your Settler and tap FOUND CITY.'},
+
+  {title:'Step 3 — Start Research',
+   body:'Tap your city, open the TECH tab, and start researching something. FARMING is great first — it boosts income every turn.',
+   anchor:'canvas-right',nextLabel:null,trigger:'research',
+   hint:'Tap your city → TECH tab → pick a technology.'},
+
+  {title:'Step 4 — Plunder a Village',
+   body:'Move your Warrior onto the glowing village nearby. You\'ll plunder it for bonus credits — easy early income!',
+   anchor:'canvas-left',nextLabel:null,trigger:'pillage',
+   hint:'Move your Warrior onto the nearby village to raid it.'},
+
+  {title:'Step 5 — End Your Turn',
+   body:'Press END TURN when you\'re done each turn. Your income ticks, research advances, and rivals move. Capture all enemy HQs to win. Good luck!',
+   anchor:'bottom-right',nextLabel:'Got it — let\'s play!',trigger:'end_turn'},
 ];
 let _tutStep=0;
 function showTutStep(i){
@@ -8394,17 +8626,47 @@ function showTutStep(i){
   if(!ov||!box)return;
   const step=TUT_STEPS[i];
   if(!step){skipTutorial();return;}
-  document.getElementById('tut-step').textContent=(i+1)+' / '+TUT_STEPS.length;
+  // Step counter shows only action steps (not step 0 intro)
+  document.getElementById('tut-step').textContent=i===0?'TUTORIAL':'TUTORIAL · STEP '+i+' OF '+(TUT_STEPS.length-1);
   document.getElementById('tut-title').textContent=step.title;
   document.getElementById('tut-body').textContent=step.body;
-  document.getElementById('tut-next').textContent=step.nextLabel||'Next →';
+  const nextBtn=document.getElementById('tut-next');
+  if(step.trigger&&!step.nextLabel){
+    // Action-gated: hide Next, show waiting hint
+    nextBtn.style.display='none';
+    let hintEl=document.getElementById('tut-hint');
+    if(!hintEl){hintEl=document.createElement('div');hintEl.id='tut-hint';
+      hintEl.style.cssText='font-size:9px;color:rgba(240,192,64,0.7);margin-top:4px;font-style:italic;animation:pulse-hint 1.4s ease-in-out infinite;';
+      nextBtn.parentNode.insertBefore(hintEl,nextBtn);}
+    hintEl.textContent='⬆ '+step.hint;
+    hintEl.style.display='block';
+  } else {
+    nextBtn.style.display='';
+    nextBtn.textContent=step.nextLabel||'Next →';
+    const hintEl=document.getElementById('tut-hint');
+    if(hintEl)hintEl.style.display='none';
+  }
   ov.style.display='block';
   box.style.removeProperty('top');box.style.removeProperty('bottom');
   box.style.removeProperty('left');box.style.removeProperty('right');
   if(step.anchor==='center'){box.style.top='50%';box.style.left='50%';box.style.transform='translate(-50%,-50%)';}
-  else if(step.anchor==='canvas-left'){box.style.top='35%';box.style.left='18px';box.style.transform='none';}
-  else if(step.anchor==='canvas-right'){box.style.top='35%';box.style.right='270px';box.style.left='auto';box.style.transform='none';}
+  else if(step.anchor==='canvas-left'){box.style.top='30%';box.style.left='18px';box.style.transform='none';}
+  else if(step.anchor==='canvas-right'){box.style.top='30%';box.style.right='270px';box.style.left='auto';box.style.transform='none';}
   else if(step.anchor==='bottom-right'){box.style.bottom='70px';box.style.right='14px';box.style.top='auto';box.style.transform='none';}
+}
+
+// Call this whenever a player action happens — advances tutorial if it matches current trigger
+function tutCheckTrigger(action){
+  const ov=document.getElementById('tut-overlay');
+  if(!ov||ov.style.display==='none')return;
+  const step=TUT_STEPS[_tutStep];
+  if(!step||step.trigger!==action)return;
+  // Flash the box green briefly as positive feedback
+  const box=document.getElementById('tut-box');
+  if(box){box.style.borderColor='rgba(160,255,128,0.8)';box.style.boxShadow='0 0 20px rgba(160,255,128,0.3)';
+    setTimeout(()=>{box.style.borderColor='';box.style.boxShadow='';},600);}
+  _tutStep++;
+  setTimeout(()=>showTutStep(_tutStep),700);
 }
 function skipTutorial(){const ov=document.getElementById('tut-overlay');if(ov)ov.style.display='none';try{localStorage.setItem('farreach_tut_done','1');}catch(e){}}
 function maybeShowTutorial(){
@@ -8418,15 +8680,7 @@ function maybeShowTutorial(){
     notify(icon('settler')+' Move your Settler and tap FOUND CITY to establish your HQ!','gold');
   }
   _tutStep=0;showTutStep(0);
-  // Pulse nearest village for first-turn hook
-  setTimeout(()=>{
-    if(!G||!G.villages)return;
-    const hq=G.cities.find(c=>c.owner==='player'&&c.isHQ);
-    if(!hq)return;
-    const near=G.villages.filter(v=>!v.pillaged).sort((a,b)=>hDist(a.q,a.r,hq.q,hq.r)-hDist(b.q,b.r,hq.q,hq.r))[0];
-    if(near){G._tutPulse={q:near.q,r:near.r,turns:6};notify(icon('recommend')+' Move a unit to the nearest village to plunder it for credits!','gold');}
-    else {const u=G.units.find(u=>u.owner==='player');if(u){notify(icon('recommend')+' Click your unit (the glowing badge) to start moving!','gold');}}
-  },1200);
+  // Village arrow handled by turn-1 system
 }
 </script>
 
